@@ -1,0 +1,7 @@
+name = MD Panels Styles
+description = Provides styles of panels.
+package = Megadrupal Site
+core = 7.x
+version = 7.x-1.0
+
+dependencies[] = panels

@@ -1,0 +1,5 @@
+name = MD Form for Theme Site
+description = Provides custom and config form comment, webform, simplenews... for theme site.
+package = Megadrupal Site
+core = 7.x
+version = 7.x-1.0

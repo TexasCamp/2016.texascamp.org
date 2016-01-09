@@ -1,0 +1,149 @@
+<?php
+/**
+ * Implementation of hook_webform_component_info().
+ */
+function webform_mailchimp_webform_component_info() {
+  $components = array();
+
+  $components['mailchimp'] = array(
+    'label' => t('Mailchimp'),
+    'description' => t('Sign up to a newsletter.'),
+    'features' => array(
+      'csv' => TRUE,
+      'email' => TRUE,
+      'email_address' => FALSE,
+      'email_name' => FALSE,
+      'required' => TRUE,
+      'conditional' => FALSE,
+      'group' => FALSE,
+      'attachment' => FALSE,
+    ),
+    'file' => 'webform_mailchimp.inc',
+  );
+
+  return $components;
+}
+
+/**
+ * Implementation of hook_webform_submission_insert().
+ */
+function webform_mailchimp_webform_submission_insert($node, $submission) {
+  global $user;
+  $mailchimp_lists = array();
+  $email_address = '';
+
+  if (!empty($node->webform['components'])) {
+    foreach ($node->webform['components'] AS $key => $field) {
+      if ($field['type'] == 'mailchimp') {
+        $mailchimp_lists[] = $field['extra']['mailchimp_list'];
+        // Need to know if we should look for our own email field or another.
+        if ($field['extra']['use_existing_email_field'] != 'mailchimp_field') {
+          // If using existing field, check if the checkbox was checked
+          if ($submission->data[$key]['value'][0] == 1) {
+            // Loop through components again to find our email field
+            foreach($node->webform['components'] AS $key2 => $field2) {
+              if ($field2['form_key'] == $field['extra']['use_existing_email_field']) {
+                // Get the form value
+                $email_address = $submission->data[$key2]['value'][0];
+              }
+            }
+          }
+          // Visitor provided an email address but opted out of subscription
+	        else {
+	          $email_address = '';
+	        }
+        }
+        // We have our own email field
+        else {
+          $email_address = $submission->data[$key]['value'][0];
+        }
+
+        // Retrieve mergefields and create a merge array with key webform key and value Mailchimp merge tag
+        if (!empty($field['extra']['mergefields'])) {
+          $mergefields_key_array = array();
+          $keyvaluepairs = explode("\n", $field['extra']['mergefields']);
+
+          foreach ($keyvaluepairs AS $keyvalue) {
+            $keyvalue = trim($keyvalue);
+            $keyvalue = explode('|', $keyvalue);
+            if (is_array($keyvalue) && !empty($keyvalue[0]) && !empty($keyvalue[1])) {
+              $mergefields_key_array[$keyvalue[1]] = $keyvalue[0];
+            }
+          }
+        }
+
+        // Retrieve interestfields and create a merge array with key webform key and value Mailchimp group name
+        if (!empty($field['extra']['interestfields'])) {
+          $groupfields_key_array = array();
+          $keyvaluepairs = explode("\n", $field['extra']['interestfields']);
+
+          foreach ($keyvaluepairs AS $keyvalue) {
+            $keyvalue = trim($keyvalue);
+            $keyvalue = explode('|', $keyvalue);
+            if (is_array($keyvalue) && !empty($keyvalue[0]) && !empty($keyvalue[1])) {
+              $groupfields_key_array[$keyvalue[1]] = $keyvalue[0];
+            }
+          }
+        }
+
+      }
+    }
+
+    $mergefields_replacements = array();
+    // Create the mergefield array
+    if (!empty($mergefields_key_array) && is_array($mergefields_key_array)) {
+      foreach ($node->webform['components'] AS $key => $field) {
+        if (!empty($mergefields_key_array[$field['form_key']])) {
+          // This is probably a bit to easy... The delta value is not taken into account
+          $mergefields_replacements[$mergefields_key_array[$field['form_key']]] = $submission->data[$key]['value'][0];
+        }
+      }
+    }
+
+    $groupfields_replacements = array();
+    // Create the mergefield array
+    if (!empty($groupfields_key_array) && is_array($groupfields_key_array)) {
+      foreach ($node->webform['components'] AS $key => $field) {
+        if (!empty($groupfields_key_array[$field['form_key']])) {
+          // We are dealing with checkboxes, dropdowns and have received the id instead of the raw value
+          // So we need to extract the value and send that instead
+          $choices = explode("\n", $field['extra']['items']);
+          $sorted_choices = array();
+          foreach ($choices as $choice_key => $choice_val) {
+            $id_name = explode('|', trim($choice_val));
+            $sorted_choices[$id_name[0]] = $id_name[1];
+          }
+
+          foreach ($submission->data[$key]['value'] AS $filled_out_value) {
+            $groupfields_replacements[$groupfields_key_array[$field['form_key']]][] = str_replace(",", "\,", $sorted_choices[$filled_out_value]);
+          }
+        }
+      }
+      foreach ($groupfields_replacements AS $groupname => $values_array) {
+        $mergefields_replacements['GROUPINGS'][] = array(
+          'name' => $groupname,
+          'groups' => implode(',', $values_array),
+        );
+      }
+    }
+
+    // If we have an email address and a list is set, try to subscribe the user.
+    if ($email_address != '' && !empty($mailchimp_lists)) {
+      $q = mailchimp_get_api_object();
+      if ($q) {
+        foreach ($mailchimp_lists AS $mailchimp_list) {
+          $success = $q->listSubscribe($mailchimp_list, $email_address, $mergefields_replacements, 'html', FALSE, TRUE);
+          if ($success) {
+            watchdog('webform_mailchimp', 'E-mail subscribed: %email', array('%email' => $email_address), WATCHDOG_INFO);
+          }
+          else {
+            watchdog('webform_mailchimp', 'E-mail not subscribed: %email', array('%email' => $email_address), WATCHDOG_ERROR);
+          }
+        }
+      }
+      else {
+        watchdog('webform_mailchimp', 'Could not get the Mailchimp API object.', array(), WATCHDOG_ERROR);
+      }
+    }
+  }
+}

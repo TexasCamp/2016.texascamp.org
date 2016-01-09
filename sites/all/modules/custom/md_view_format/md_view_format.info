@@ -1,0 +1,8 @@
+name = MD View Format
+description = Provides custom and config views.
+package = Megadrupal Site
+core = 7.x
+version = 7.x-1.0
+
+; files
+files[] = plugins/views_plugin_style_md_list.inc

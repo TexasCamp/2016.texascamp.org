@@ -1,0 +1,123 @@
+<?php
+
+/**
+ * @file
+ * Code for the Md site.
+ */
+//function md_themesite_site_preprocess_image(&$variables) {
+//  //dsm($variables);
+//  $attributes = & $variables['attributes'];
+//  foreach (array('width', 'height') as $key) {
+//    unset($attributes[$key]);
+//    unset($variables[$key]);
+//  }
+//}
+
+/*----------------------------------Breadcrumb-------------------------------------*/
+function md_themesite_views_pre_render(&$view) {
+//    dsm($view);
+    
+    if (($view->name == 'leaders_about_team') || ($view->name == 'leaders_team') || ($view->name == 'leaders_contact_form') || ($view->name =='leaders_blog_page')) {
+        $breadcrumb = array();
+        $page_title = drupal_get_title();
+        $breadcrumb[0] = '<a class="pathway" href="'.url('<front>', array('absolute' => TRUE)).'"><i class="rt-icon-home"></i></a>';
+        $breadcrumb[] = $page_title;
+        drupal_set_breadcrumb($breadcrumb);
+    }
+     if ($view->name == 'leaders_member_page'){
+        $breadcrumb = array();
+        $breadcrumb[0] = '<a class="pathway" href="'.url('<front>', array('absolute' => TRUE)).'"><i class="rt-icon-home"></i></a>';
+        $breadcrumb[] = 'Team Member';
+        drupal_set_breadcrumb($breadcrumb);
+    }
+    if ($view->name == 'leaders_panel_archives'){
+        $breadcrumb = array();
+        $breadcrumb[0] = '<a class="pathway" href="'.url('<front>', array('absolute' => TRUE)).'"><i class="rt-icon-home"></i></a>';
+        $breadcrumb[] = 'Post Date';
+        drupal_set_breadcrumb($breadcrumb);
+    }
+    if ($view->name == 'leaders_blog_single'){
+        $breadcrumb = array();
+        $breadcrumb[0] = '<a class="pathway" href="'.url('<front>', array('absolute' => TRUE)).'"><i class="rt-icon-home"></i></a>';
+        $breadcrumb[] = 'Blog Single Item';
+        drupal_set_breadcrumb($breadcrumb);
+    }
+    
+    if ($view->name == 'leaders_blog_term') {
+        $breadcrumb = array();
+        $breadcrumb[0] = '<a class="pathway" href="'.url('<front>', array('absolute' => TRUE)).'"><i class="rt-icon-home"></i></a>';
+        $breadcrumb[] = 'Blog Item';
+        drupal_set_breadcrumb($breadcrumb);
+    }
+    
+    if (($view->name == 'portfolio')) {
+        $breadcrumb = array();
+        $page_title = drupal_get_title();
+        $breadcrumb[0] = '<a class="pathway" href="'.url('<front>', array('absolute' => TRUE)).'"><i class="rt-icon-home"></i></a>';
+        $breadcrumb[] = $page_title;
+        drupal_set_breadcrumb($breadcrumb);
+    }
+}
+
+
+/*------------------------------------------------ form ------------------------------------------------*/
+function md_themesite_form_alter(&$form, $form_state, $form_id) { 
+
+    // webform_client_form
+  if (stristr($form_id, "webform_client_form")) {
+    //$form['#attributes']['class'][] = 'contact-form';
+
+    $form['submitted']['email']['#attributes'] = array('placeholder' => t('Email'));
+    $form['submitted']['email']['#attributes']['class'][] = 'form-control';
+
+    unset($form['submitted']['message']['#theme_wrappers']);
+    $form['submitted']['message']['#attributes'] = array('placeholder' => t('Message'));
+    $form['submitted']['message']['#attributes']['class'][] = 'form-control';
+
+    $form['actions']['#attributes']['class'] = array('contact-form-submit', 'vertical-margin-40');
+    $form['actions']['submit']['#attributes']['class'] = array('theme_btn');
+  }
+
+  // simplenews_block_form
+  if (stristr($form_id, "simplenews_block_form")) {
+
+    $form['submit']['#value'] = t('Go!');
+    $form['submit']['#attributes']['class'] = array('theme_btn');
+
+  }
+    
+    
+  // comment_node_article_form
+  if ($form_id == 'comment_node_article_form') {
+    unset($form['author']['name']['#autocomplete_path']);
+  }
+
+  // user_login
+//  dsm($form); you must permissions devel
+  if ($form_id == 'user_login') {
+//    $form['#prefix'] = '<div class="col-sm-4">';
+//    $form['#suffix'] = '</div>';
+    $form['pass']['#attributes'] = array('class' => array('form-control'));
+    $form['actions']['submit']['#attributes'] = array('class' => array('theme_btn'));
+  }
+  if (($form_id == 'user_register_form')||($form_id == 'user_pass')) {
+    $form['pass']['#attributes'] = array('class' => array('form-control'));
+    $form['actions']['submit']['#attributes'] = array('class' => array('theme_btn'));
+  }
+}
+
+
+//Remove homepage fields in Form Comments 
+function md_themesite_form_comment_form_alter(&$form, &$form_state) {
+    $form['author']['homepage']['#access'] = FALSE;
+  }
+  
+//Form comments template    
+function md_themesite_theme() {
+  return array(
+    'comment_form__node_article' => array(
+      'template' => 'comment-form--node-article',
+      'render element' => 'form'
+    ),
+  );
+}

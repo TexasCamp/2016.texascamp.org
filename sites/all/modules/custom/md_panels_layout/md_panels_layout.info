@@ -1,0 +1,5 @@
+name = MD Panle Layout
+description = Provides layout for site.
+package = Megadrupal Site
+core = 7.x
+version = 7.x-1.0

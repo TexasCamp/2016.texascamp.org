@@ -1,0 +1,14 @@
+<?php
+
+/**
+ * Implement hook_ctools_plugin_directory().
+ */
+function md_panels_layout_ctools_plugin_directory($owner, $plugin_type) {
+  // Form 1 - for a module implementing only the 'content_types' plugin owned
+  // by CTools, this would cause the plugin system to search the
+  // <moduleroot>/plugins/content_types directory for .inc plugin files.
+  if ($owner == 'panels' && $plugin_type == 'layouts') {
+    return 'layouts';
+  }
+}
+

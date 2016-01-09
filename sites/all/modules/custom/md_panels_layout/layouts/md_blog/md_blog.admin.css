@@ -1,0 +1,25 @@
+
+.panel-blog .panel-top {
+    height: 10%;
+}
+
+.panel-blog .panel-main {
+    width: 75%;
+    float: left;
+}
+.panel-blog .panel-sidebar{
+    width: 25%;
+    float: right;
+}
+.panel-blog .panel-content{
+    overflow: hidden;
+    height: 70%;
+}
+
+.panel-blog .panel-bottom {
+    height: 20%;
+}
+
+.panel-blog .inside {
+    margin: 0 .5em 1em 0;
+}

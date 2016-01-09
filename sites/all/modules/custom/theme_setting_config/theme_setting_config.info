@@ -1,0 +1,4 @@
+name = Theme setting configuration
+description = Module for Theme Appearance setting
+core = 7.x
+package = Megadrupal Site

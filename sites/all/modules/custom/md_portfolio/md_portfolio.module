@@ -1,0 +1,133 @@
+<?php
+
+DEFINE('mdp_path', drupal_get_path('module', 'md_portfolio'));
+@require_once(mdp_path . '/md_portfolio.func.inc');
+
+function md_portfolio_views_api() {
+  return array("api" => "3.0");
+}
+
+function md_portfolio_menu() {
+  $md_render = array(
+    'md-portfolio/loadmore' => array(
+      'page callback' => 'md_portfolio_load_more',
+      'page arguments' => array(2,3,4),
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+    ),
+    'md-portfolio/loadcontent' => array(
+      'page callback' => 'md_portfolio_load_content',
+      'page arguments' => array(2,3),
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+    ),
+
+  );
+  return $md_render;
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ *
+ * Create new view mode for product display, commerce product.
+ */
+function md_portfolio_entity_info_alter(&$entity_info) {
+  $entity_info['node']['view modes']['mdp_full_popup'] = array(
+    'label' => t('Full popup'),
+    'custom settings' => TRUE,
+  );
+
+  $entity_info['node']['view modes']['mdp_inline_popup'] = array(
+    'label' => t('Inline popup'),
+    'custom settings' => TRUE,
+  );
+}
+
+/**
+* Implements hook_preprocess_node().
+*/
+function md_portfolio_preprocess_node(&$vars) {
+  if($vars['view_mode'] == 'mdp_full_popup') {
+    $vars['theme_hook_suggestions'][] = 'node__full_popup';
+    $vars['theme_hook_suggestions'][] = 'node__' . $vars['type'] . '__mdp_full_popup';
+  }
+
+  if($vars['view_mode'] == 'mdp_inline_popup') {
+    $vars['theme_hook_suggestions'][] = 'node__inline_popup';
+    $vars['theme_hook_suggestions'][] = 'node__' . $vars['type'] . '__mdp_inline_popup';
+  }
+  //dsm($vars);
+}
+
+/**
+ * Implements hook_theme().
+ */
+function md_portfolio_theme(&$existing) {
+  $themes = array(
+    'node__full_popup' => array(
+      'path' => drupal_get_path('module', 'md_portfolio') . '/templates',
+      'render element' => 'elements',
+      'template' => 'node--full-popup',
+    ),
+    'node__inline_popup' => array(
+      'path' => drupal_get_path('module', 'md_portfolio') . '/templates',
+      'render element' => 'elements',
+      'template' => 'node--inline-popup',
+    ),
+  );
+  return $themes;
+}
+
+function md_portfolio_load_more($vname = '', $display_id = '', $page = '') {
+  //$name = 'wle_view_portfolio';
+  $view_object = views_get_view($vname);
+  $view_object->set_current_page($page);
+  $wle_content = $view_object->preview($display_id);
+
+  $md_check_content = strpos($wle_content,'md_portfolio_display_content');
+  if($md_check_content !== false) {
+    $wle_content_start = strpos($wle_content, '--mdsstart--') + 13;
+    $wle_content_end = strpos($wle_content, '--mdsend--') - 2;
+    $wle = '<div class="cbp-loadMore-block">';
+    $wle .= substr($wle_content,$wle_content_start,$wle_content_end - $wle_content_start);
+    $wle .= '</div>';
+  } else {
+    $wle = '';
+  }
+
+  print $wle;
+}
+
+function md_portfolio_load_content($view_mode = '' , $nid = '') {
+  $node = node_load($nid);
+  if($node != null){
+    $md_type = $node->type;
+  }
+  $content = render(node_view($node, $view_mode));
+  $content_view = '<div class="cbp-l-project-container">'.$content.'</div>';
+  print $content_view;
+}
+
+function md_portfolio_library() {
+  $libraries['md_portfolio_lib'] = array(
+    'title' => 'Library for MD Portfolio',
+    'version' => '1.0',
+    'js' => array(
+      //mdp_path . '/js/jquery-migrate-1.2.1.min.js' => array(),
+      mdp_path . '/js/jquery.cubeportfolio.min.js' => array(),
+      mdp_path . '/js/md_portfolio.js' => array(),
+    ),
+    'css' => array(
+//      mdp_path . '/css/cubeportfolio.css' => array("group" => CSS_THEME, "weight" => '49'),
+      mdp_path . '/css/cubeportfolio.min.css' => array("group" => CSS_DEFAULT),
+      mdp_path . '/css/mdportfolio.css' => array("group" => CSS_DEFAULT),
+    ),
+  );
+
+  return $libraries;
+}
+
+function md_portfolio_page_alter(&$page){
+//  $md_default = md_portfolio_get_value_field('field_mdp_height');
+//  dsm(taxonomy_vocabulary_machine_name_load('md_taxonomy_portfolio'));
+}

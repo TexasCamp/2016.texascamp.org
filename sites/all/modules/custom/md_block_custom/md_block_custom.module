@@ -1,0 +1,308 @@
+<?php
+
+/**
+ * @file
+ * md_block_custom.block.inc
+ */
+/**
+ * hook_block_info().
+ */
+function md_block_custom_block_info() {
+  $blocks = array();
+  $blocks['mls_menu'] = array(
+    'info' => t('MD Leaders Site: Menu')
+  );
+  $blocks['mls_info'] = array(
+    'info' => t('MD Leaders Site: Action')
+  );
+  $blocks['mls_highlights'] = array(
+    'info' => t('MD Leaders Site: Highlights')
+  );
+  $blocks['mls_footer'] = array(
+    'info' => t('MD Leaders Site: footer')
+  );
+  $blocks['mls_flick'] = array(
+    'info' => t('MD Leaders Site: flick')
+  );
+  $blocks['mls_map'] = array(
+    'info' => t('MD Leaders Site: Map')
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function md_block_custom_block_configure($delta = '') {
+  $form = array();
+
+  switch ($delta) {
+    case 'mls_info':
+      $form['mls_action_info'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Text Info'),
+        '#default_value' => variable_get('mls_action_info', ''),
+      );
+      $form['mls_action_button'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Button'),
+        '#default_value' => variable_get('mls_action_button', ''),
+      );
+      $form['mls_action_button_link'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Link buton'),
+        '#default_value' => variable_get('mls_action_button_link', ''),
+      );
+      break;
+  case 'mls_footer':
+      $form['mls_footer_info'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Footer Info'),
+        '#default_value' => variable_get('mls_footer_info', ''),
+      );
+      break;
+//    case 'mls_map':
+//      $form['mls_map_address'] = array(
+//        '#type' => 'textfield',
+//        '#title' => t('Address'),
+//        '#default_value' => variable_get('mls_map_address', ''),
+//      );
+//      $form['mls_map_title'] = array(
+//        '#type' => 'textfield',
+//        '#title' => t('Title'),
+//        '#default_value' => variable_get('mls_map_title', ''),
+//      );
+//      $form['mls_map_description'] = array(
+//        '#type' => 'textfield',
+//        '#title' => t('Description'),
+//        '#default_value' => variable_get('mls_map_description', ''),
+//      );
+//      break;
+  }
+
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function md_block_custom_block_save($delta = '', $edit = array()) {
+  switch ($delta) {
+    case 'mls_info':
+      variable_set('mls_action_info', $edit['mls_action_info']);
+      variable_set('mls_action_button', $edit['mls_action_button']);
+      variable_set('mls_action_button_link', $edit['mls_action_button_link']);
+      break;
+    case 'mls_footer':
+      variable_set('mls_footer_info', $edit['mls_footer_info']);
+      break;
+//    case 'mls_map':
+//      variable_set('mls_map_address', $edit['mls_map_address']);
+//      variable_set('mls_map_title', $edit['mls_map_title']);
+//      variable_set('mls_map_description', $edit['mls_map_description']);
+//      break;
+  }
+}
+
+/**
+ * Implement hook_block_view()
+ */
+function md_block_custom_block_view($delta) {
+  $block = array();
+  switch ($delta) {
+    case 'mls_menu':
+      $block['content'] = mls_menu_block_content();
+      break;  
+    case 'mls_info':
+      $block['content'] = mls_info_block_content();
+      break;
+    case 'mls_highlights':
+      $block['content'] = mls_hightlights_block_content();
+      break;
+    case 'mls_footer':
+      $block['content'] = mls_footer_block_content();
+      break;
+   case 'mls_flick':
+            $block['subject'] = t('Flickr Widget');
+            $block['content'] = '<ul id="flickr"></ul>';
+            break;
+    case 'mls_map':
+//      $block['content'] = mls_map_block_content();
+        $block['content'] = '<div id="mapbox" class="sections">
+                    <div id="map_canvas"></div>
+            </div>';
+      break;
+  }
+  return $block;
+}
+
+//Block content
+//
+//mls_menu
+function mls_menu_block_content() {
+  global $base_url;
+    $content = '';
+    $menu = menu_navigation_links('main-menu');
+    $content .= '<div class="col-sm-12 mainmenu_wrap"><div class="main-menu-icon visible-xs"><span></span><span></span><span></span></div>';
+    
+     if(theme_get_setting('hdsocial_info','md_leaders')) {
+        $content .= '<p id="social" class="text-center">';
+        $social_acc = theme_get_setting('hdsocial_info','md_leaders');
+        foreach ($social_acc as $key => $value) {
+            $sc_icon_value = isset($social_acc[$key]['icon']) ? $social_acc[$key]['icon'] : array("icon" => "", "bundle" => "");
+            $content .= '<a class="'.$sc_icon_value['icon'].'" href="'.$social_acc[$key]['detail'].'">#</a>';
+        }
+        $content .= '</p>';
+    }
+    
+    $content .= '<nav>';
+    $content .= theme('links__system_main_menu', array(
+        'links' => menu_tree_output(menu_tree_all_data('main-menu')),
+        'attributes' => array(
+            'id' => 'mainmenu',
+            'class' => array(
+                    'main_menu','sf-menu',
+//                    'menu','responsive-menu','superfish','sf-js-enabled'
+                )),
+    ));
+    $content .= '</nav></div>';
+    return $content;
+}
+//mls_hightlights
+function mls_hightlights_block_content() {
+  $output = '<p>'.theme_get_setting('highlights_text','md_leaders').'</p>';
+  if(theme_get_setting('highlights_info','md_leaders')) {
+        $output .= '<ul class="list1">';
+        $highlight_list = theme_get_setting('highlights_info','md_leaders');
+        foreach ($highlight_list as $key => $value) {
+            $output .= '<li>'.$highlight_list[$key]['detail'].'</li>';
+        }
+        $output .= '</ul>';
+    }
+
+  return $output;
+}
+
+//mls_footer
+function mls_footer_block_content() {
+  global $base_url;  
+  $output = '';
+  $footer_info = variable_get('mls_footer_info','');
+  if(theme_get_setting('default_logo_footer','md_leaders') == 1) {
+      $logo_path = $base_url.'/'.drupal_get_path('theme','md_leaders').'/logo_footer.png';
+  }
+  else {
+        if(theme_get_setting('logo_footer_upload','md_leaders')) {
+          $file_upload = json_decode(theme_get_setting('logo_footer_upload','md_leaders'));
+          if($file_upload->fid != 0) {
+              $logo_path = $file_upload->url;
+          } else {
+              $logo_path = '';
+          }
+    }
+  }
+  $output .= '<p><img src="'.$logo_path.'" alt="logo"></p>';
+  $output .= '<p>' .$footer_info. '</p>';
+
+  return $output;
+
+}
+
+//mls_info
+function mls_info_block_content() {
+  $info = variable_get('mls_action_info', '');
+  $button = variable_get('mls_action_button', '');
+  $button_link = variable_get('mls_action_button_link', '');
+
+  $output = '<div class="col-sm-12 text-center">';
+  $output .= '<h2 class="block-header">' . $info . '</h2>';
+  $output .= '<p><a class="theme_btn inverse" href="'.$button_link .'">'.$button.'</a></p>';
+  $output .= '</div>';
+
+  return $output;
+
+}
+
+
+//mls_Map
+//function mls_map_block_content(){
+//  $address = variable_get('mls_map_address', '');
+//  $title = variable_get('mls_map_title', '');
+//  $description = variable_get('mls_map_description', '');
+//
+//  drupal_add_js(array(
+//    'md_block_custom' => array(
+//      'address' => $address,
+//      'title' => $title,
+//      'description' => $description,
+//    )
+//  ), 'setting');
+//
+//  return '<div id="map" class="map-contact"></div>';
+//}
+
+
+
+
+
+/*******************************************************************************
+ * Config Block View
+ ******************************************************************************/
+function md_block_custom_form_alter(&$form, &$form_state, $form_id){
+    
+    //dsm($form_id);
+    switch($form_id){
+        case 'block_admin_configure':
+            $delta = $form['delta']['#value'];
+            // Text before Title
+            if($delta=="leaders_service-block" || $delta=="portfolio-block_2"){
+
+                // Text after Title
+                $subtitle = variable_get($delta.'_block_sub_title');
+                $form['settings']['block_sub_title'] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Block Slogan'),
+                    '#default_value'    => $subtitle,
+                    '#description'   => t('Block Sub title in BS Theme'),
+                    '#maxlength' => 1024,
+                    '#weight'   => -18
+                );
+                
+                
+                $quote = variable_get($delta.'_quote');
+                $form['settings']['more_link']['quote'] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Block Quote'),
+                    '#default_value'    => $quote,
+                    '#description'   => t('Link title in BS Theme'),
+                    '#maxlength' => 1024,
+                    '#weight'   => -17
+                );
+                
+                $author = variable_get($delta.'_author');
+                $form['settings']['more_link']['author'] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Block Author'),
+                    '#default_value'    => $author,
+                    '#description'   => t('Link in BS Theme'),
+                    '#maxlength' => 1024,
+                    '#weight'   => -16
+                );
+                
+                
+            }
+            $form['#submit'][] = '_md_leaders_block_config_form_submit_alter';
+            break;
+
+    }
+    return $form;
+}
+/**
+ * Submit block configure form alter
+ */
+function _md_leaders_block_config_form_submit_alter($form,&$form_state){
+    $delta = $form_state['values']['delta'];
+    variable_set($delta.'_block_sub_title',$form_state['values']['block_sub_title']);
+    variable_set($delta.'_quote',$form_state['values']['quote']);
+    variable_set($delta.'_author',$form_state['values']['author']);
+}

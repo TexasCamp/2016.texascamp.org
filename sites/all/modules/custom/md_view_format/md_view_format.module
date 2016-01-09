@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * Code for the APage site.
+ */
+
+function md_view_format_views_plugins() {
+  return array(
+    'style' => array(
+      // BYT one container settings for all style plugins.
+      'md_list' => array(
+        'title' => t('MD Format List'),
+        'help' => t('Displays content on a formatted.'),
+        'handler' => 'views_plugin_style_md_list',
+        'theme' => 'views_view_md_list_content',
+        'theme path' => drupal_get_path('module', 'md_view_format') . '/theme',
+        'theme file' => 'view_format.theme.inc',
+        'uses row plugin' => TRUE,
+        'uses row class' => TRUE,
+        'uses grouping' => TRUE,
+        'uses options' => TRUE,
+        'type' => 'normal',
+      ),
+
+    )
+  );
+}
+
+
+

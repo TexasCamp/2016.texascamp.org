@@ -1,0 +1,23 @@
+.panel-top{
+    height: 20%;
+}
+
+.panel-main{
+    height:60%;
+}
+
+.panel-bottom{
+    height: 20%;
+}
+
+.panel-3row .panel-row {
+  width: 100%;
+}
+
+#panel-display .inside {
+    margin: 0 .5em 1em 0;
+}
+
+.panel-3row .panel-separator {
+  margin: 0 0 1em 0;
+}

@@ -1,0 +1,14 @@
+name = MD Portfolio
+description = Style for content type portfolio in Views
+
+dependencies[] = views
+dependencies[] = jquery_update
+
+core = 7.x
+version = 7.x-2.0
+package = MegaDrupal
+
+files[] = plugins/mdp/md_portfolio_mdp_plugin_rows.inc
+files[] = plugins/mdp/md_portfolio_mdp_plugin_style.inc
+files[] = md_portfolio.views.inc
+files[] = md_portfolio_load_more.inc

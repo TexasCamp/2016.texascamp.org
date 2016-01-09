@@ -1,0 +1,112 @@
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.cbp-l-project-details-list {
+    list-style: none;
+}
+
+html .mdp-filter-default .cbp-filter-item {
+    position: relative;
+}
+html .mdp-filter-default .cbp-filter-item  .cbp-count-tooltip {
+    background-color: #3288C4;
+    border-radius: 3px;
+    color: #FFF;
+    font-size: 11px;
+    margin: 0 auto;
+    text-align: center;
+    width: 34px;
+    position: absolute;
+    top: 30px;
+    bottom: auto !important;
+    left: 0;
+    right: 0;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    opacity: 0;
+    -webkit-transition: all .25s ease;
+    -moz-transition: all .25s ease;
+    -ms-transition: all .25s ease;
+    -o-transition: all .25s ease;
+    transition: all .25s ease;
+    -webkit-transform: translateY(-100%);
+    -moz-transform: translateY(-100%);
+    -ms-transform: translateY(-100%);
+    -o-transform: translateY(-100%);
+    transform: translateY(-100%);
+}
+html .mdp-filter-default .cbp-filter-item  .cbp-count-tooltip:before {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #3288C4;
+    visibility: hidden;
+}
+html .mdp-filter-default .cbp-filter-item:hover  .cbp-count-tooltip:before {
+    visibility: visible;
+}
+html .mdp-filter-default .cbp-filter-item:hover  .cbp-count-tooltip {
+    top: -10px;
+    bottom: auto !important;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+    opacity: 1;
+}
+html .mdp-filter-default .cbp-filter-item  .cbp-count-default {
+    position: static !important;
+    background: none !important;
+    opacity: 1 !important;
+    font-size: 12px !important;
+    display: inline !important;
+}
+html .mdp-filter-default .cbp-filter-item  .cbp-count-default:before {
+    display: none !important;
+}
+html .mdp-filter-default .cbp-filter-item  .cbp-count-default {
+    color: #5A5A5A !important;
+}
+html .mdp-filter-default .cbp-filter-item:hover  .cbp-count-default,
+html .mdp-filter-default .cbp-filter-item-active.cbp-filter-item  .cbp-count-default {
+    color: #3288C4 !important;
+}
+
+.mpd-cursor{
+    cursor: pointer;
+}
+.cbp-l-caption-alignCenter .cbp-l-caption-body{
+    color: #CCC;
+}
+.cbp-l-project-details-list .field-name-field-mdp-client{
+    display: inline-block;
+}
+.form-item-style-options-md-style-item-height.dependent-options,
+.md-style-container-type-level-height-fieldset.form-wrapper.dependent-options{
+    margin-left: 0;
+}
+.cbp-slider-wrap {
+    list-style: none;
+    overflow: hidden;
+}
+.cbp-slider .cbp-slider-item {
+    visibility: hidden;
+}
+.cbp-slider .cbp-slider-item.cbp-slider-item-current {
+    visibility: visible;
+}
+.field-name-field-mdp-categories.field-type-taxonomy-term-reference {
+    margin-left: 100px;
+}
+
+.cbp-popup-singlePage .cbp-l-project-details-list {
+    padding: 0;
+}
+.form-item-style-options-md-style-item-height {
+    margin: 0 !important;
+}
