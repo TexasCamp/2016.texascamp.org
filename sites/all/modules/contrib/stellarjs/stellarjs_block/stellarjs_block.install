@@ -1,0 +1,84 @@
+<?php
+
+/**
+ * @file stellarjs_block.install
+ * Contains install and update functions for Image Block module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function stellarjs_block_schema() {
+  $schema = array();
+  $schema['stellarjs_block'] = array(
+    'description' => 'Stores contents of Stellar blocks.',
+    'fields' => array(
+      'bid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "The block's {block}.bid.",
+      ),
+      'body' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+        'size' => 'big',
+        'description' => 'Block content.',
+        'translatable' => TRUE,
+      ),
+      'info' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Block description.',
+      ),
+      'format' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'description' => 'The {filter_format}.format of the block body.',
+      ),
+      'fid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => "The File's {files}.fid.",
+      ),
+      'data' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+        'size' => 'big',
+        'description' => 'A serialized array of name value pairs that are related to the block file.',
+      ),
+    ),
+    'unique keys' => array(
+      'info' => array('info'),
+    ),
+    'indexes' => array(
+      'fid' => array('fid'),
+    ),
+    'primary key' => array('bid'),
+  );
+  
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function stellarjs_block_install() {
+  variable_set('stellarjs_block_max_file_size', 0);
+  variable_set('stellarjs_block_max_dimensions', 0);
+  variable_set('stellarjs_block_image_path', 'public://stellarjs_block/');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function stellarjs_block_uninstall() {
+  variable_del('stellarjs_block_max_file_size');
+  variable_del('stellarjs_block_max_dimensions');
+  variable_del('stellarjs_block_image_path');
+}

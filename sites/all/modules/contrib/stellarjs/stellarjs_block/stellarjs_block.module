@@ -1,0 +1,374 @@
+<?php
+
+/**
+ * @file stellarjs_block.module
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function stellarjs_block_menu() {
+  // Create an array of block settings.
+  $settings = array(
+    'title' => 'Add StellarJS block',
+    'description' => 'Add a new StellarJS block.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('stellarjs_block_add_block_form'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'stellarjs_block.admin.inc',
+  );
+
+  // Add a local action to the block configuration page.
+  $items['admin/structure/block/add-stellarjs-block'] = array(
+    'access arguments' => array('administer blocks'),
+  ) + $settings;
+
+  // Get the default site theme.
+  $default_theme = variable_get('theme_default', 'bartik');
+
+  // Add a local action to the per-theme block configuration pages.
+  foreach (list_themes() as $key => $theme) {
+    if ($key != $default_theme) {
+      $items['admin/structure/block/list/' . $key . '/add-stellarjs-block'] = array(
+        'access callback' => '_stellarjs_block_themes_access',
+        'access arguments' => array($theme),
+      ) + $settings;
+    }
+  }
+
+  $items['admin/structure/block/manage/stellarjs_block/%/delete'] = array(
+    'title' => 'Delete block',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('stellarjs_block_delete', 5),
+    'access arguments' => array('administer blocks'),
+    'type' => MENU_CALLBACK,
+    'file' => 'stellarjs_block.admin.inc',
+  );
+
+  $items['admin/config/system/stellarjs_block'] = array(
+    'title' => 'Stellar block settings',
+    'description' => 'Configure Stellar block settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('stellarjs_block_admin_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'stellarjs_block.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Menu item access callback - only admin or enabled themes can be accessed.
+ */
+function _stellarjs_block_themes_access($theme) {
+  return user_access('administer blocks') && drupal_theme_access($theme);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter();
+ */
+function stellarjs_block_form_block_admin_display_form_alter(&$form, &$form_state, $form_id) {
+  $result = db_query('SELECT bid FROM {stellarjs_block}');
+
+  // Add delete links to StellarJS blocks.
+  foreach ($result as $block) {
+    $form['blocks']['stellarjs_block_' . $block->bid]['delete'] = array(
+      '#type' => 'link',
+      '#title' => t('delete'),
+      '#href' => 'admin/structure/block/manage/stellarjs_block/' . $block->bid . '/delete',
+    );
+  }
+}
+
+/**
+ * Returns information from database about a user-created (StellarJS) block.
+ *
+ * @param $bid
+ *   ID of the block to get information for.
+ *
+ * @return
+ *   Associative array of information stored in the database for this block.
+ *   Array keys:
+ *   - bid: Block ID.
+ *   - info: Block description.
+ *   - body: Block body.
+ *   - image: Background image.
+ *   - stellar_background_ratio: Background scrolling speed.
+ *   - stellar_ratio: Object scrolling speed.
+ *   - stellar_horizontal_offset: Horizontal offset for background image.
+ *   - stellar_vertical_offset: Vertical offset for background image.
+ *   - stellar_parent_offset: Set parent as offset.
+ */
+function stellarjs_block_block_get($bid) {
+  return db_query("SELECT * FROM {stellarjs_block} WHERE bid = :bid", array(':bid' => $bid))->fetchAssoc();
+}
+
+/**
+ * Returns the file information for a give block ID.
+ */
+function stellarjs_block_get_file($bid) {
+  $fid = db_query("SELECT fid FROM {stellarjs_block} WHERE bid = :bid", array(':bid' => $bid))->fetchField();
+  return file_load($fid);
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function stellarjs_block_block_info() {
+  $blocks = array();
+
+  $result = db_query('SELECT bid, info FROM {stellarjs_block} ORDER BY info');
+  foreach ($result as $block) {
+    $blocks[$block->bid]['info'] = $block->info;
+  }
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function stellarjs_block_block_configure($delta = '') {
+  if ($delta) {
+    $config = stellarjs_block_block_get($delta);
+  } else {
+    $config = array();
+  }
+  module_load_include('module', 'block');  
+  $form = block_custom_block_form($config);
+
+  return stellarjs_block_configure_form($form, $config);
+}
+
+/**
+ * Form constructor for the Stellar block form.
+ *
+ * @param $form
+ *   Form data after being altered by block_custom_block_form().
+  * @param $block
+ *   If editing existing block, this is the retrieved object.
+ *
+ * @ingroup forms
+ */
+function stellarjs_block_configure_form(&$form, $block = NULL) {
+  $data = !empty($block['data']) ? unserialize($block['data']) : array();
+
+  $form['stellarjs'] = array(
+    '#title' => t('StellaJS Config'),
+    '#description' => t('Stellar parallax block settings.'),
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+    '#weight' => isset($form['body_field']['#weight']) ? $form['body_field']['#weight'] + 0.2 : 0,
+  );
+  $form['stellarjs']['image'] = array(
+    '#type' => 'managed_file',
+    '#name' => 'stellarjs_block_image',
+    '#title' => t('Background Image'),
+    '#default_value' => (!empty($block['fid'])) ? $block['fid'] : 0,
+    '#description' => t("Upload an image to be processed."),
+    '#required' => FALSE,
+    '#upload_location' => variable_get('stellarjs_block_image_path', 'public://stellarjs_block/'),
+    '#upload_validators' => array(
+      'file_validate_extensions' => array('gif png jpg jpeg'),
+      'file_validate_size' => array(variable_get('stellarjs_block_max_file_size', 0)),
+      'file_validate_image_resolution' => array(variable_get('stellarjs_block_max_dimensions', 0)),
+    ),
+  );
+  $form['stellarjs']['stellar_background_ratio'] = array(
+    '#type' => 'textfield',
+    '#element_validate' => array('element_validate_number'),
+    '#title' => t('Background scroll ratio'),
+    '#description' => t('Controls how fast the background image scrolls. Natural scroll speed is 1.0. For example, 0.5 is half speed, 2 is double speed. Default: 0.5'),
+    '#default_value' => (!empty($data['stellar_background_ratio'])) ? $data['stellar_background_ratio'] : 0.5,
+  );
+  $form['stellarjs']['advanced_options'] = array(
+    '#title' => t('Advanced Options'),
+    '#type' => 'fieldset',
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $image_options = array('default' => "Default") + image_style_options(false);
+  $form['stellarjs']['advanced_options']['image_style'] = array(
+    '#type' => 'select',
+    '#title' => t('Image Style'),
+    '#description' => t('Use an image style to change the dimensions of the image.'),
+    '#default_value' => isset($data['image_style']) ? $data['image_style'] : 'default',
+    '#options' => $image_options,
+  );
+  $form['stellarjs']['advanced_options']['stellar_ratio'] = array(
+    '#type' => 'textfield',
+    '#element_validate' => array('element_validate_number'),
+    '#title' => t('Scroll ratio'),
+    '#description' => t('Controls how fast the entire block scrolls down the screen. Natural scroll speed is 1.0. For example, 0.5 is half speed, 2 is double speed.'),
+    '#default_value' => (!empty($data['stellar_ratio'])) ? $data['stellar_ratio'] : NULL,
+  );
+  $form['stellarjs']['advanced_options']['stellar_horizontal_offset'] = array(
+    '#type' => 'textfield',
+    '#element_validate' => array('element_validate_number'),
+    '#title' => t('Horizontal Offset'),
+    '#description' => t('Fix initial horizontal image position.'),
+    '#default_value' => (!empty($data['stellar_horizontal_offset'])) ? $data['stellar_horizontal_offset'] : NULL,
+  );
+  $form['stellarjs']['advanced_options']['stellar_vertical_offset'] = array(
+    '#type' => 'textfield',
+    '#element_validate' => array('element_validate_number'),
+    '#title' => t('Vertical Offset'),
+    '#description' => t('Fix initial vertical image position.'),
+    '#default_value' => (!empty($data['stellar_vertical_offset'])) ? $data['stellar_vertical_offset'] : NULL,
+  );
+  $form['stellarjs']['advanced_options']['stellar_offset_parent'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Offset Parent'),
+    '#description' => t('By default, offsets are relative to the element\'s offset parent.'),
+    '#default_value' => (!empty($data['stellar_offset_parent'])) ? $data['stellar_offset_parent'] : 0,
+  );
+
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function stellarjs_block_block_save($delta = 0, $edit = array()) {
+  stellarjs_block_custom_block_save($delta, $edit);
+}
+
+/**
+ * Saves a user-created StellarJS block in the database.
+ *
+ * @param $edit
+ *   Associative array of fields to save. Array keys:
+ *   - bid: Block ID.
+ *   - info: Block description.
+ *   - body: Block body.
+ *   - image: Background image.
+ *   - stellar_background_ratio: Background scrolling speed.
+ *   - stellar_ratio: Object scrolling speed.
+ *   - stellar_horizontal_offset: Horizontal offset for background image.
+ *   - stellar_vertical_offset: Vertical offset for background image.
+ *   - stellar_parent_offset: Set parent as offset.
+ * @param $delta
+ *   Block ID of the block to save.
+ *
+ * @return
+ *   Always returns TRUE.
+ */
+function stellarjs_block_custom_block_save($delta = '', $edit = array()) {
+  // Set up data storage for serialization.
+  $data = array();
+  if (!empty($edit['stellarjs'])) {
+    foreach ($edit['stellarjs'] as $key => $value) {
+      if (!is_array($edit['stellarjs'][$key])) {
+        $data[$key] = $value;
+      }
+    }
+    if (!empty($edit['stellarjs']['advanced_options'])) {
+      foreach ($edit['stellarjs']['advanced_options'] as $key => $value){ 
+        $data[$key] = $value;
+      }
+    }
+  }
+
+  // Save managed file.
+  if (!empty($data['image'])) {
+    $file = file_load($data['image']);
+    // Set file to permanent, save file.
+    $file->status = FILE_STATUS_PERMANENT;
+    file_save($file);
+    // Add file usage for later referencing.
+    file_usage_add($file, 'stellarjs_block', 'stellarjs_block', $delta);
+  }
+  
+  // Save block.
+  db_update('stellarjs_block')
+    ->fields(array(
+      'info' => $edit['info'],
+      'body' => $edit['body']['value'],
+      'format' => $edit['body']['format'],
+      'fid' => !empty($file) ? $file->fid : 0,
+      'data' => serialize($data),
+    ))
+    ->condition('bid', $delta)
+    ->execute();
+
+    return TRUE;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function stellarjs_block_block_view($delta = '') {
+  $block = db_query('SELECT body, format, fid, data FROM {stellarjs_block} WHERE bid = :bid', array(':bid' => $delta))->fetchObject();
+  $data['subject'] = NULL;
+  $data['content'] = theme('stellarjs_block', array('block' => $block));
+  return $data;
+}
+
+/**
+ * Process variables for stellarjs_block-content.tpl.php.
+ *
+ * The $variables array contains the following arguments:
+ * - $block
+ *
+ * @see stellarjs_block-content.tpl.php
+ */
+function template_preprocess_stellarjs_block(&$variables) {
+  $block = $variables['block'];
+  $variables['content'] = check_markup($block->body, $block->format, '', TRUE);
+}
+
+/**
+ * Implements hook_menu().
+ */
+function stellarjs_block_preprocess_block(&$variables) {
+  // Add attributes to block wrapper.
+  $block = $variables['block'];
+  if ($block->module == 'stellarjs_block') {
+    // Get Stellar block info.
+    $stellar = db_query("SELECT * FROM {stellarjs_block} WHERE bid = :delta", array(':delta' => $block->delta))->fetchObject();
+    // Check if block data exists.
+    if (!empty($stellar)) {
+      // Extract data.
+      $data = !empty($stellar->data) ? unserialize($stellar->data) : array();
+      // Set up empty attributes array.
+      $attributes = array();
+      if (!empty($data)) {
+        foreach ($data as $key => $value) {
+          if (!empty($value) && strpos($key, 'stellar') !== FALSE) {
+            $attributes['data-'.drupal_clean_css_identifier($key)] = $value;
+          }
+        }
+      }
+      // Check if file exists.
+      if (!empty($stellar->fid)) {
+        $file = file_load($stellar->fid);
+        if (!empty($file->fid)) {
+          // Generate image path.
+          $image_path = (!empty($data['image_style']) && $data['image_style'] !== 'default') ? image_style_url($data['image_style'], $file->uri) : file_create_url($file->uri);
+          if (isset($variables['attributes_array']['style'])) {
+            $variables['attributes_array']['style'] = $variables['attributes_array']['style'].'background-image:url('.$image_path.');';
+          } else {
+            $variables['attributes_array']['style'] = 'background-image:url('.$image_path.');';
+          }
+        }
+      }
+      // Merge all attributes.
+      if (!empty($variables['attributes_array'])) {
+        $variables['attributes_array'] = array_merge($variables['attributes_array'], $attributes);
+      } else {
+        $variables['attributes_array'] = $attributes;
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_theme()
+ */
+function stellarjs_block_theme() {
+  return array(
+    'stellarjs_block' => array(
+      'render element' => 'elements',
+      'template' => 'stellarjs_block',
+    ),
+  );
+}

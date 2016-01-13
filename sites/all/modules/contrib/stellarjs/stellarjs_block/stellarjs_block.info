@@ -1,0 +1,13 @@
+name = "StellarJS Block"
+description = Provides a file field in block configuration form for displaying a parallax image in a block.
+core = 7.x
+
+dependencies[] = block
+dependencies[] = image
+dependencies[] = stellarjs
+; Information added by Drupal.org packaging script on 2015-10-06
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "stellarjs"
+datestamp = "1444172646"
+

@@ -1,0 +1,196 @@
+<?php
+/**
+ * @file
+ * Code for the stellar feature.
+ */
+
+define("STELLARJS_VERSION", variable_get('stellarjs_version', '0.6.2'));
+define("STELLARJS_DEBUG", variable_get('stellarjs_debug', FALSE));
+
+/*
+ * Implements hook_preprocess_page().
+ */
+function stellarjs_preprocess_page($variables) {
+	$module_path = drupal_get_path('module', 'stellarjs');
+	libraries_load('stellarjs');
+
+	// Add settings to Drupal.settings
+  $settings = array();
+  $settings['disable_on_mobile'] = variable_get('stellarjs_disable_mobile', 0);
+  $settings['mobile_screen_width'] = variable_get('stellarjs_mobile_screen_width', 768);
+  
+  drupal_add_js(array('stellarjs' => $settings),array('type' => 'setting'));
+  drupal_add_js($module_path . '/js/drupal.stellar.js', array('scope' => 'footer'));
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function stellarjs_libraries_info() {
+	$libraries['stellarjs'] = array(
+		'name' => 'Stellar.js',
+		'vendor url' => 'http://markdalgleish.com/projects/stellar.js',
+		'download url' => 'https://github.com/markdalgleish/stellar.js',
+		'version arguments' => array(
+			'file' => 'jquery.stellar.min.js',
+      // jQuery Stellar v0.6.2
+			'pattern' => '/Stellar\.js v(\d+\.+\d+\.+\d+)/',
+			'lines' => 2,
+			),
+		'files' => array(
+			'js' => array(
+				'jquery.stellar.min.js',
+				),
+			),
+		'integration files' => array(
+			'stellar' => array(
+				'js' => array('js/drupal.stellar.js'),
+				),
+			),
+		);
+
+	return $libraries;
+}
+
+/**
+ * Implements hook_libraries_info_alter().
+ */
+function stellarjs_libraries_info_alter(&$libraries) {
+	$debug = variable_get('stellarjs_debug', FALSE);
+	if ($debug) {
+    // Switch to the unminified version of the library
+		if (isset($libraries['stellarjs'])) {
+			$libraries['stellarjs']['files']['js'] = array(
+				'jquery.stellar.js',
+			);
+		}
+	}
+}
+
+/**
+ * Implements hook_library().
+ *
+ * We also define Stellar through the core library callbacks.
+ */
+function stellarjs_library() {
+	$library_path = libraries_get_path('stellarjs');
+
+	$libraries['stellarjs'] = array(
+		'title' => 'Stellar.js',
+		'website' => 'http://markdalgleish.com/projects/stellar.js',
+		'version' => STELLARJS_VERSION,
+		'js' => array(
+			$library_path . '/jquery.stellar.min.js' => array(
+				'scope' => 'footer',
+			),
+		),
+	);
+	return $libraries;
+}
+
+/**
+ * Implements hook_library_alter().
+ */
+function stellarjs_library_alter(&$libraries, $module) {
+	$module_path = drupal_get_path('module', 'stellarjs');
+
+  // Enable debug mode
+	if (STELLARJS_DEBUG) {
+		if ($module == 'stellarjs' and isset($libraries['stellarjs'])) {
+			$libraries['stellarjs']['js'] = array(
+				libraries_get_path() . '/jquery.stellar.js' => array(
+					'scope' => 'footer',
+				),
+			);
+		}
+	}
+}
+
+/**
+ * Implements hook_permission().
+ */
+function stellarjs_permission() {
+	return array(
+		'administer stellarjs' =>  array(
+			'title' => t('Administer the StellarJS module'),
+		),
+	);
+}
+
+/**
+ * Implements hook_menu().
+ */
+function stellarjs_menu() {
+	$items = array();
+
+	$items['admin/config/development/stellarjs'] = array(
+		'title' => t('Stellar.js'),
+		'description' => 'Configure the advanced Stellar.js module settings.',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('stellarjs_form_settings'),
+		'access arguments' => array('administer stellarjs'),
+		'weight' => 2,
+	);
+
+	return $items;
+}
+
+/**
+ * Implements hook_help().
+ */
+function stellarjs_help($path, $arg) {
+	switch ($path) {
+		case 'admin/config/media/stellarjs':
+			return
+			'<p>'
+			. t('For a full documentation of all options, refer to the official @docs.', array('@docs' => l(t('Stellar.js documentation'), 'http://markdalgleish.com/projects/stellar.js/docs/')))
+			. '</p>';
+	}
+}
+
+/**
+ * Form builder; Form for advanced module settings.
+ */
+function stellarjs_form_settings() {
+	$form = array();
+
+	$form['library'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Library',
+	);
+
+  // Debug mode toggle
+	$form['library']['stellarjs_debug'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Enable debug mode'),
+		'#description' => t('Load the human-readable version of the stellar library.'),
+		'#default_value' => variable_get('stellarjs_debug', 0),
+	);
+	// Disable on mobile
+	$form['library']['stellarjs_disable_mobile'] = array(
+		'#type' => 'select',
+		'#title' => t('Disable on mobile'),
+		'#description' => t('On mobile, disable Stellar activation by either device detection (Android, iOS, etc) or screen width.'),
+		'#default_value' => variable_get('stellarjs_disable_mobile', 0),
+		'#options' => array(
+			0 => t('No'),
+			1 => t('By mobile device detection'),
+			2 => t('By screen width'),
+		),
+	);
+	// Define mobile width
+	$form['library']['stellarjs_mobile_screen_width'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Mobile activation width'),
+		'#description' => t('Set the width in pixels (without PX). Default is 768.'),
+		'#default_value' => variable_get('stellarjs_mobile_screen_width', 768),
+		'#element_validate' => array('element_validate_number'),
+		'#states' => array(
+			'visible' => array(
+				':input[name=stellarjs_disable_mobile]' => array('value' => 2),
+			),
+		),
+	);
+
+	return system_settings_form($form);
+}

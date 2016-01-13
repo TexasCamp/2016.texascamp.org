@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * Implements hook_requirements().
+ */
+function stellarjs_requirements($phase) {
+  $requirements = array();
+  // Ensure translations don't break at install time
+  $t = get_t();
+
+  // Check to see if the Stellar.js library is available
+  if ($phase == 'runtime') {
+    $requirements['stellarjs'] = array(
+      'title' => $t('Stellar.js'),
+      'description' => $t('Version 0.6.2 installed'),
+      'severity' => REQUIREMENT_OK,
+    );
+    _stellarjs_requirements_library_installed($requirements);
+  }
+  return $requirements;
+}
+
+/**
+ * Check if the library is available
+ *
+ * @param array $requirements
+ *  Requirements definition
+ */
+function _stellarjs_requirements_library_installed(&$requirements) {
+  $t = get_t();
+
+  $path = libraries_get_path('stellarjs');
+  $installed = file_exists($path . '/jquery.stellar.min.js') && file_exists($path . '/jquery.stellar.js');
+
+  // Check the results of the test
+  if (!$installed) {
+    $requirements['stellarjs']['description'] = $t('Stellar.js library not found. Please consult the README.txt for installation instructions.');
+    $requirements['stellarjs']['severity'] = REQUIREMENT_ERROR;
+    $requirements['stellarjs']['value'] = $t('Stellar.js library not found.');
+    return;
+  }
+
+  $js = file_exists($path . '/jquery.stellar.min.js') ? fopen($path . '/jquery.stellar.min.js', 'r') : fopen($path . '/jquery.stellar.js', 'r');
+  $header = fread($js, 64);
+  $matches = array();
+  if (preg_match("/ v([0-9]+)\.([0-9]+)\.([0-9]+)/", $header, $matches)) {
+    if (!($matches[1] == 0 and $matches[2] >= 0)) {
+      $requirements['stellarjs']['description'] = $t('Stellar.js must be version 0.6 or higher. Please consult the README.txt for installation instructions.');
+      $requirements['stellarjs']['severity'] = REQUIREMENT_WARNING;
+      $requirements['stellarjs']['value'] = $t('Incorrect version detected.');
+      return;
+    }
+    else {
+      $version = $matches[1] . "." . $matches[2] . "." . $matches[3];
+      variable_set('stellarjs_version', $version);
+      $requirements['stellarjs']['description'] = $t('Version %version installed', array( '%version' => $version));
+      $requirements['stellarjs']['value'] = $t('!version', array( '!version' => $version));
+      return;
+    }
+  }
+  else {
+    $requirements['stellarjs']['description'] = $t('Stellar.js version could not be determined. Please consult the README.txt for installation instructions.');
+    $requirements['stellarjs']['severity'] = REQUIREMENT_WARNING;
+    $requirements['stellarjs']['value'] = $t('Unable to detect version.');
+  }
+}
