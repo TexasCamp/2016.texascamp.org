@@ -1,0 +1,165 @@
+<?php
+
+/**
+ * @file
+ * Enhanced control over the data attributes of any Block.
+ *
+ * Block Data allows users to add data attributes to any block through the
+ * block's configuration interface. This implementation is based on an
+ * alteration of the Core block database table to leverage the Core Block API
+ * functions, objects, and structure.
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function block_data_permission() {
+  return array(
+    'administer block data' => array(
+      'title' => t('Administer block data'),
+      'description' => t('Add data attributes for blocks.'),
+    ),
+  );
+}
+
+/**
+ * Implements theme_preprocess_block().
+ *
+ * Extend block's classes with any user defined attributes.
+ */
+function block_data_preprocess_block(&$vars) {
+  $block = $vars['block'];
+  $modules = unserialize($block->data_attr);
+  // Add attributes to block;
+  if (!empty($modules)) {
+    $data_attr = array();
+    foreach ($modules as $module) {
+      foreach ($module as $key => $value) {
+        // Account for style attribute, merge with existing value.
+        if ($key === 'style') {
+          $value = (!empty($vars['attributes_array']['style'])) ? $vars['attributes_array']['style'] . $value : $value;
+        }
+        $data_attr[$key] = $value;
+      }
+    }
+    $vars['attributes_array'] = array_merge($vars['attributes_array'], $data_attr);
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ *
+ * Extend panel block's attributes with any user defined attributes.
+ */
+function block_data_preprocess_panels_pane(&$vars) {
+  if ($vars['pane']->type != 'block') {
+    return;
+  }
+  // Infer the block's $module and $delta from the pane subtype.
+  $block_parts = explode('-', $vars['pane']->subtype);
+  // Load the block based on the block parts.
+  $block = block_load($block_parts[0], $block_parts[1]);
+  // Extract data attributes.
+  $modules = unserialize($block->data_attr);
+  // Add attributes to block;
+  if (!empty($modules)) {
+    $data_attr = array();
+    foreach ($modules as $module) {
+      foreach ($module as $key => $value) {
+        $data_attr[$key] = $value;
+      }
+    }
+    $vars['attributes_array'] = array_merge($vars['attributes_array'], $data_attr);
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Alter block edit form to add configuration field.
+ */
+function block_data_form_alter(&$form, &$form_state, $form_id) {
+  if (user_access('administer block classes') && ($form_id == 'block_admin_configure' || $form_id == 'block_add_block_form')) {
+    // Load statically cached block object used to display the form.
+    $block = block_load($form['module']['#value'], $form['delta']['#value']);
+
+    // Add block data fields.
+    // Retrieve block attributes data.
+    $data = (!empty($block->data_attr)) ? unserialize($block->data_attr) : NULL;
+
+    // Account for CSS Class weight, put after them.
+    $block_data_weight = NULL;
+    if (isset($form['settings']['css_class'])) {
+      if (empty($form['settings']['css_class']['#weight'])) {
+        $form['settings']['css_class']['#weight'] = (isset($form['settings']['body_field']['#weight'])) ? $form['settings']['body_field']['#weight']+1 : 0;
+        $block_data_weight = $form['settings']['css_class']['#weight']+1;
+      }
+    }
+
+    $form['settings']['block_data'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Block Data Attributes'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#weight' => $block_data_weight,
+    );
+
+    $form['settings']['block_data']['data_attr'] = array(
+      '#type' => 'options',
+      '#key_type_toggle' => NULL,
+      '#key_type_toggled' => TRUE,
+      '#default_value_allowed' => FALSE,
+      '#options' => (!empty($data['block_data'])) ? $data['block_data'] : array(),
+    );
+
+    $form['#submit'][] = 'block_data_form_submit';
+  }
+}
+
+/**
+ * Helper function: submit callback for block configuration pages.
+ *
+ * Save added data attributes.
+ */
+function block_data_form_submit($form, &$form_state) {
+  if ($form_state['values']['form_id'] == 'block_admin_configure' || $form_state['values']['form_id'] == 'block_add_block_form') {
+    if (isset($form_state['values']['data_attr']['options_field']) && user_access('administer blocks')) {
+      
+      // Explode values, create new array using prop:value
+      $input = explode("\n", trim($form_state['input']['data_attr']['options_field']));
+
+      $block_data = array();
+      // Loop through pairs.
+      if (!empty($input)) {
+        foreach ($input as $key => $value) {
+          // Split by pipe.
+          $data = explode('|', $value);
+          // Check if data attributes exist (will always have empty values) by default.
+          if (!empty($data[0]) && !empty($data[1])) {
+            // Remove spaces, clean up for data attributes.
+            $data_prop = drupal_clean_css_identifier($data[0]);
+            $data_value = trim($data[1]);
+            // Assign to array.
+            $block_data[$data_prop] = $data_value;
+          }
+        }
+      }
+      // Key by module name.
+      $data_attr = array(
+        'block_data' => $block_data,
+      );
+
+      $data_serialized = serialize($data_attr);
+
+      db_update('block')
+        ->fields(array('data_attr' => $data_serialized))
+        ->condition('module', $form_state['values']['module'])
+        ->condition('delta', $form_state['values']['delta'])
+        ->execute();
+      // Flush all context module cache to use the updated data_attr.
+      if (module_exists('context')) {
+        cache_clear_all('context', 'cache', TRUE);
+      }
+    }
+  }
+}

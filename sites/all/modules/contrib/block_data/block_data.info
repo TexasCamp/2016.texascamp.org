@@ -1,0 +1,13 @@
+name = Block Data
+description = Allows adding data attributes to blocks.
+core = 7.x
+
+dependencies[] = block
+dependencies[] = options_element
+
+; Information added by Drupal.org packaging script on 2015-10-06
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "block_data"
+datestamp = "1444093440"
+
