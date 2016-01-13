@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the block_row module.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function block_row_schema() {
+  $schema['block_row'] = array(
+    'fields' => array(
+      'module' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The module to which the block belongs.',
+      ),
+      'delta' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => "The ID of the module's block.",
+      ),
+      'row' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'String containing the row name.',
+      ),
+      'row_class' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'String containing the classes for the row.',
+      ),
+    ),
+    'primary key' => array('module', 'delta'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Enable hook for block_row()
+ */
+function block_row_enable() {
+  // Set module weight low so we handle blocks after context, blocker and any others.
+  db_update('system')
+    ->fields(array(
+      'weight' => 100,
+    ))
+    ->condition('type', 'module')
+    ->condition('name', 'block_row')
+    ->execute();  
+}

@@ -1,0 +1,133 @@
+<?php
+
+/**
+ * Alter block edit form
+ */
+function block_row_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'block_admin_configure' || $form_id == 'block_add_block_form') {
+    $block = new stdClass;
+    $block->module = $form['module']['#value'];
+    $block->delta = $form['delta']['#value'];
+    $block_row = block_row($block);
+
+    $form['settings']['row'] = array(
+      '#type' => 'select',
+      '#title' => t('Row'),
+      '#options' => array(
+        '' => '',
+        'row1' => 'Row 1',
+        'row2' => 'Row 2',
+        'row3' => 'Row 3',
+        'row4' => 'Row 4',
+        'row5' => 'Row 5',
+      ),
+      '#default_value' => (isset($block_row->row)?$block_row->row:''),
+      '#description' => t('Select the row for this block.'),
+    );
+
+    $form['settings']['row_class'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Row Class(es)'),
+      '#default_value' => (isset($block_row->row_class)?$block_row->row_class:""),
+      '#description' => t('Enter CSS classes to add to the row classes.'),
+      '#maxlength' => 255,
+    );
+
+    $form['#submit'][] = 'block_row_form_submit';
+  }
+}
+
+/**
+ * Save supplied row.
+ */
+function block_row_form_submit($form, &$form_state) {
+  if ($form_state['values']['form_id'] == 'block_admin_configure' || $form_state['values']['form_id'] == 'block_add_block_form') {
+    if (isset($form_state['values']['row']) && user_access('administer blocks')) {
+      $module = $form_state['values']['module'];
+      $delta = $form_state['values']['delta'];
+      $row = $form_state['values']['row'];
+      $row_class = $form_state['values']['row_class'];
+      db_delete('block_row')->condition('module', $module)->condition('delta', $delta)->execute();
+      if (!empty($row)) {
+        $id = db_insert('block_row')->fields(array('module' => $module, 'delta' => $delta, 'row' => $row, 'row_class' => $row_class))->execute();
+      }
+    }
+  }
+}
+
+/**
+ * Return row info
+ */
+function block_row($block) {
+  return db_select('block_row', 'b')
+          ->fields('b')
+          ->condition('module', $block->module)
+          ->condition('delta', $block->delta)
+          ->execute()
+          ->fetchObject();
+}
+
+/**
+ * Implements hook_theme()
+ */
+function block_row_theme($existing, $type, $theme, $path) {
+  return array(
+    'block_row_wrapper' => array(
+      'template' => 'block-row-wrapper',
+      'variables' => array('content' => array(), 'css_classes' => array()),
+      'pattern' => 'block_row_wrapper__',
+    ),
+  );
+}
+
+function block_row_preprocess_block_row_wrapper(&$variables) {
+  foreach($variables['css_classes'] as $css_class) {
+    $variables['classes_array'] = array_merge($variables['classes_array'], explode(' ', $css_class));
+  }
+}
+
+/**
+ * Implements hook__page_build()
+ */
+function block_row_page_build(&$page) {
+  global $theme;
+  $regions = system_region_list($theme);
+  foreach($regions as $region => $region_name) {
+    if (isset($page[$region])) {
+      foreach(element_children($page[$region]) as $block_id) {
+        if (!isset($page[$region][$block_id]['#block'])) {
+          continue; // Sanity check.
+        }
+        // Load in the row and row_class if it is not already loaded. 
+        // Ideally there would be a hook_block_load where we could add this.
+        if (!isset($page[$region][$block_id]['#block']->row)) {
+          $block_row = block_row($page[$region][$block_id]['#block']);
+          if ($block_row) {
+            $page[$region][$block_id]['#block']->row = $block_row->row;
+            $page[$region][$block_id]['#block']->row_class = $block_row->row_class;
+          }
+        }
+        // Now put all blocks in rows that have rows.
+        if (isset($page[$region][$block_id]['#block']->row) && $page[$region][$block_id]['#block']->row) {
+          $row = $page[$region][$block_id]['#block']->row;
+          // Make sure the row is initialized.
+          if (!isset($page[$region][$row])) {
+            $page[$region][$row] = array(
+              '#css_classes' => array($row),
+              '#theme' => 'block_row_wrapper',
+              '#weight' => $page[$region][$block_id]['#weight'], // Need a better way to do this.
+            );
+            $page[$region]['#sorted'] = FALSE;
+          }
+          if (isset($page[$region][$block_id]['#block']->row_class) && $page[$region][$block_id]['#block']->row_class) {
+            $page[$region][$row]['#css_classes'][] = $page[$region][$block_id]['#block']->row_class;
+          }
+          // Move the block to the row.
+          $page[$region][$row]['#content'][$block_id] = $page[$region][$block_id];
+          unset($page[$region][$block_id]);
+        }        
+      }
+    }
+  }
+  
+}
