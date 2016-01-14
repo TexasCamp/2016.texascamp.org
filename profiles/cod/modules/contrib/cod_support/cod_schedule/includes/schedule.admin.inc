@@ -220,7 +220,11 @@ function cod_event_time_form_submit(&$form, &$form_state) {
   if ($form_state['op'] == 'add') {
     // The form_state value is set to the site timezone, so we need to get back
     // to the conference tz by calculating setting the timezone to eventtz.
-    $eventtz = new DateTimeZone($form['#conference']->field_dates[LANGUAGE_NONE][0]['timezone']);
+    if (!empty($form['#conference'])) {
+      $eventtz = new DateTimeZone($form['#conference']->field_dates[LANGUAGE_NONE][0]['timezone']);
+    } else {
+      $eventtz = new DateTimeZone(variable_get('date_default_timezone', @date_default_timezone_get()));
+    }
 
     // Convert the timezone fields.
     $value1 = new DateTime($form_state['values']['field_evttime_date'][LANGUAGE_NONE][0]['value']);
