@@ -1,0 +1,5 @@
+This theme is licensed under a dual license. 
+
+The PHP code and components that directly interact with Drupal are licensed under LGPL.
+
+JavaScript, CSS, LESS, images and other components that do not directly interact with Drupal are Premium Components licensed under the Open Enterprise Licensing Agreement.

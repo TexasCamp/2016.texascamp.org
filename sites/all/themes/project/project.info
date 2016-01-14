@@ -1,0 +1,50 @@
+name = Project
+description = A Bootstrap Sub-theme
+core = 7.x
+base theme = bootstrap
+
+;;;;;;;;;;;;;;;;;;;;;
+;; Regions
+;;;;;;;;;;;;;;;;;;;;;
+
+regions[header_top]     = 'Header Top'
+regions[header_bottom]  = 'Header Bottom'
+regions[header]         = 'Top Bar'
+regions[highlighted]    = 'Highlighted'
+regions[help]           = 'Help'
+regions[content]        = 'Content'
+regions[sidebar_first]  = 'Primary'
+regions[sidebar_second] = 'Secondary'
+regions[footer]         = 'Footer'
+regions[footer_bottom]  = 'Footer bottom'
+
+
+;;;;;;;;;;;;;;;;;;;;;
+;; Stylesheets
+;;;;;;;;;;;;;;;;;;;;;
+
+stylesheets[all][] = less/project.less
+
+;;;;;;;;;;;;;;;;;;;;;
+;; LESS
+;;;;;;;;;;;;;;;;;;;;;
+
+less[vars][@brand-primary]   = #2A90CC
+less[vars][@brand-secondary] = #FFC629
+less[vars][@brand-accent]    = #FF5C29
+less[vars][@brand-accent-2]  = #FF9F29
+less[vars][@brand-accent-3]  = #078ED0
+
+;;;;;;;;;;;;;;;;;;;;;
+;; Scripts
+;;;;;;;;;;;;;;;;;;;;;
+
+scripts[] = 'js/modernizr.js'
+scripts[] = 'js/project.js'
+
+; Disable BootstrapCDN if using Bootstrap source files in your sub-theme.
+settings[bootstrap_cdn] = ''
+settings[bootstrap_navbar_position] = 'static-top'
+settings[toggle_name] = 0
+
+settings[project_plugins][bootstrap_notify] = 0
