@@ -16,7 +16,9 @@
 }
 
 .header-top {
-  padding: 0;
+  &:not(.banner) {
+    padding: 0;
+  }
   .conference-title {
     background-color: @brand-primary;
     color: white;
