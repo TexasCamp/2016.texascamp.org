@@ -3,7 +3,7 @@
     <div class="container">
       <div class="row">
 
-          <div class="col-md-3">
+          <div class="col-md-1">
             <!-- header-left start -->
             <div class="header-left clearfix">
               <!-- logo -->
@@ -28,7 +28,7 @@
             </div> <!-- header-left start -->
           </div>
 
-          <div class="col-md-9">
+          <div class="col-md-11">
             <!-- header-right start -->
             <div class="header-right clearfix">
               <!-- main-navigation start -->
