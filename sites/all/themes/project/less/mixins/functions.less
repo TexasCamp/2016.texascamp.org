@@ -3,3 +3,9 @@
 .torgba(@hex, @trans) {
 	@rgba: rgba(red(@hex), green(@hex), blue(@hex), @trans);
 }
+
+.font-size(@font-size) {
+	@rem: @font-size;
+	font-size: @font-size * 10px;
+	font-size: ~"@{rem}rem"; 
+}

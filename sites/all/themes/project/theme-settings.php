@@ -152,6 +152,12 @@ function project_form_system_theme_settings_alter(&$form, &$form_state) {
 			'animated' => t('Animated'),
 		),
 	);
+	$form['project_regions']['header']['navbar_transparent'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Transparent Navbar'),
+		'#description' => t('Make the navbar transparent.'),
+		'#default_value' => (theme_get_setting('navbar_transparent')) ? theme_get_setting('navbar_transparent') : 0,
+	);
 
 	$form['project_regions']['main_content'] = array(
 		'#type' => 'fieldset', 
@@ -244,6 +250,18 @@ function project_form_system_theme_settings_alter(&$form, &$form_state) {
 			0 => t('Disabled'),
 			1 => t('Production (Chart.min.js)'),
 			2 => t('Development (Chart.js)'),
+			3 => t('CDN'),
+		),
+	);
+	$form['project_plugins']['fontawesome'] = array(
+		'#type' => 'select',
+		'#title' => t('Font Awesome'),
+		'#description' => t('Font Awesome gives you scalable vector icons that can instantly be customized — size, color, drop shadow, and anything that can be done with the power of CSS. Read the docs on !github', array('!github' => l('Github.', 'https://fortawesome.github.io/Font-Awesome'))),
+		'#default_value' => (theme_get_setting('fontawesome')) ? theme_get_setting('fontawesome') : 0,
+		'#options' => array(
+			0 => t('Disabled'),
+			1 => t('Production (font-awesome.min.css)'),
+			2 => t('Development (font-awesome.css)'),
 			3 => t('CDN'),
 		),
 	);

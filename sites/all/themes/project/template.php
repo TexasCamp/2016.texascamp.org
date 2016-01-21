@@ -29,8 +29,7 @@ function project_preprocess_html(&$vars) {
   $plugin_path = $theme_path . '/plugins/';
   $plugins = array();
 
-
-  // Hover.css
+  // Animate.css
   $animate = theme_get_setting('animate');
     if ($animate > 0) {
     $plugins['animate']['external'] = NULL;
@@ -97,6 +96,25 @@ function project_preprocess_html(&$vars) {
       case 3:
         $plugins['chartjs']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js';
         $plugins['chartjs']['external'] = 'external';
+        break;
+    }
+  }
+
+  // Font Awesome
+  $fontawesome = theme_get_setting('fontawesome');
+  if ($fontawesome > 0) {
+    $plugins['fontawesome']['external'] = NULL;
+    $plugins['fontawesome']['type'] = 'css';
+    switch ($fontawesome) {
+      case 1:
+        $plugins['fontawesome']['path'] = $plugin_path.'font-awesome/css/font-awesome.min.css';
+        break;
+      case 2:
+        $plugins['fontawesome']['path'] = $plugin_path.'font-awesome/css/font-awesome.css';
+        break;
+      case 3:
+        $plugins['fontawesome']['path'] = 'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css';
+        $plugins['fontawesome']['external'] = 'external';
         break;
     }
   }
@@ -219,6 +237,13 @@ function project_preprocess_html(&$vars) {
       }
     }
   }
+
+  // Adding additional classes when necessary.
+  // Transparent Navbar.
+  if (theme_get_setting('navbar_transparent')) {
+    $vars['classes_array'][] = 'transparent-header';
+  }
+
 }
 
 /*

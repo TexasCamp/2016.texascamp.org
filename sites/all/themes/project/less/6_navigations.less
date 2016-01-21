@@ -16,7 +16,7 @@
 /* first level menu item */
 .navbar-default .navbar-nav > li > a {
 	color: @gray-dark;
-	font-size: 16px;
+	.font-size(1.6);
 	padding: 10px 15px 10px 15px;
 	z-index: 102;
 	border: none;
@@ -96,7 +96,7 @@
 /* second level menu item */
 .dropdown-menu > li > a {
 	padding: 10px 20px;
-	font-size: 14px;
+	.font-size(1.4);
 	color: @gray-dark;
 	border-bottom: 1px solid #f7f7f7;
 	.transition(none);
@@ -165,12 +165,12 @@ header.full-width .dropdown-menu .dropdown-menu.to-left {
 }
 .mega-menu h4.title {
 	margin: 5px 0;
-	font-size: 15px;
+	.font-size(1.5);
 	text-transform: uppercase;
 }
 .mega-menu .menu > li > a {
 	padding: 5px 0;
-	font-size: 14px;
+	.font-size(1.4);
 	color: @gray-dark;
 	border-bottom: 1px solid #f7f7f7;
 	display: block;
@@ -179,7 +179,7 @@ header.full-width .dropdown-menu .dropdown-menu.to-left {
 .mega-menu .menu > li > a i,
 .dropdown-menu > li > a i {
 	padding-left: 5px;
-	font-size: 12px;
+	.font-size(1.2);
 	width: 20px;
 	position: relative;
 	top: -1px;
@@ -193,7 +193,7 @@ header.full-width .dropdown-menu .dropdown-menu.to-left {
 }
 .mega-menu .menu > li > a i.fa-circle-o,
 .dropdown-menu > li > a i.fa-circle-o {
-	font-size: 7px;
+	.font-size(0.7);
 	top: -3px;
 }
 .mega-menu .menu > li > a i.fa-spin {
@@ -237,7 +237,7 @@ header .dropdown-menu > li.active > a i.fa-circle-o:before {
 	right: 6px;
 	line-height: 1;
 	color: #d1d1d1;
-	font-size: 14px;
+	.font-size(1.4);
 }
 .header.centered .dropdown>a:before {
 	top: 18px;
@@ -368,7 +368,7 @@ header.full-width .animated.main-navigation .dropdown-menu .open .dropdown-menu.
 /* Medium desktop devices and tablets */
 @media (min-width:768px) and (max-width:1199px) {
 	.navbar-default .navbar-nav > li > a { 
-		font-size: 15px;
+		.font-size(1.5);
 		padding: 28px 10px 27px 10px;
 	}
 }
@@ -676,7 +676,7 @@ header.full-width .animated.main-navigation .dropdown-menu .open .dropdown-menu.
 	padding: 10px 10px;
 	text-transform: none;
 	line-height: 1;
-	font-size: 14px;
+	.font-size(1.4);
 	font-weight: 400;
 	color: @gray-light;
 }
@@ -770,7 +770,7 @@ header.full-width .animated.main-navigation .dropdown-menu .open .dropdown-menu.
 .offcanvas-toggle-left:after {
 	font-family: "FontAwesome";
 	content: "\f0c9";
-	font-size: 22px;
+	.font-size(2.2);
 	line-height: 35px;
 	text-align: center;
 	color: #000000;
@@ -795,7 +795,7 @@ header.full-width .animated.main-navigation .dropdown-menu .open .dropdown-menu.
 .offcanvas-toggle-right:after {
 	font-family: "FontAwesome";
 	content: "\f0c9";
-	font-size: 22px;
+	.font-size(2.2);
 	line-height: 35px;
 	text-align: center;
 	color: #000000;
