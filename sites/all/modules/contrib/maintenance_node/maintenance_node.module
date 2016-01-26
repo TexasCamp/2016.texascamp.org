@@ -1,0 +1,172 @@
+<?php
+/**
+ * @file
+ * Use a node instead of plain text for maintenance mode.
+ *
+ */
+
+function maintenance_node_form_system_site_maintenance_mode_alter(&$form, &$form_state) {
+
+  // Only show settings if Maintenance Mode is actually turned on. Determine if fieldset is collapsed.
+  $maintenance_mode_status = variable_get('maintenance_mode', FALSE);
+  $maintenance_mode_node = variable_get('maintenance_node_search_node', '');
+  if (empty($maintenance_mode_node)) {
+    $maintenance_mode_node = TRUE;
+  } else {
+    $maintenance_mode_node = FALSE;
+  }
+
+  if ($maintenance_mode_status == TRUE) {
+    $form['maintenance_node_settings'] = array(
+      '#type' => 'fieldset', 
+      '#title' => t('Maintenance Node settings'), 
+      '#collapsible' => TRUE, 
+      '#collapsed' => $maintenance_mode_node,
+      );
+
+    $form['maintenance_node_settings']['maintenance_node_search_node'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Maintenance Node'),
+      '#default_value' => variable_get('maintenance_node_search_node', FALSE),
+      '#description' => t('Search for the node you would like to use instead of the default maintenance text. If Autocomplete doesn\'t work, just enter the node ID.'),
+      '#required' => FALSE,
+      '#autocomplete_path' => 'maintenance_node/autocomplete',
+      );
+
+    $maintenance_node_search_node = variable_get('maintenance_node_search_node');
+    if (!empty($maintenance_node_search_node)) {
+      // Get node ID from setting
+      $nid = _maintenance_node_get_node_id($maintenance_node_search_node);
+      // Get node type
+      $node_type = db_query('SELECT type FROM node where nid = :nid', array(':nid' => $nid))->fetchAll();
+      // Get view modes from node type
+      $view_mode_settings = field_view_mode_settings('node', $node_type[0]->type);
+      // Only return enabled view modes for the node type
+      foreach ($view_mode_settings as $key => $value) {
+        if ($value['custom_settings'] == FALSE) {
+          unset($view_mode_settings[$key]);
+        } else {
+          $view_mode_settings[$key] = ucfirst($key);
+        }
+      }
+      // Always have Full as an option.
+      if (!isset($view_mode_settings['full'])) {
+        $view_mode_settings['full'] = t('Full');
+      }
+      // Add the node types to the form.
+      $form['maintenance_node_settings']['maintenance_node_view_mode'] = array(
+        '#type' => 'select',
+        '#title' => t('Node View Mode'),
+        '#description' => t('Choose a specific view mode for this node. Full Content is set by default'),
+        '#options' => $view_mode_settings,
+        '#default_value' => variable_get('maintenance_node_view_mode', 'full'),
+        '#required' => FALSE,
+        );
+      $form['maintenance_node_settings']['maintenance_node_title'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Node Title'),
+        '#default_value' => variable_get('maintenance_node_title', FALSE),
+        '#description' => t("If you don't want to use the title of the node, you can change that here only if the theme uses the standard \$title variable in the template."),
+        '#required' => FALSE,
+        );
+    } else {
+      variable_del('maintenance_node_view_mode', NULL);
+      variable_del('maintenance_node_title', NULL);
+    }
+  }
+}
+
+function maintenance_node_menu() {
+  $items['maintenance_node/autocomplete'] = array(
+    'page callback' => '_maintenance_node_autocomplete',
+    'access arguments' => array('access maintenance_node autocomplete'),
+    'type' => MENU_CALLBACK,
+    );
+
+  return $items;
+}
+
+function system_site_maintenance_mode_validate($form, &$form_state) {
+  $maintenance_mode_status = variable_get('maintenance_mode', FALSE);
+  if ($form_state['values']['maintenance_mode'] == 1 && $maintenance_mode_status == TRUE) {
+    $node_text = $form_state['values']['maintenance_node_search_node'];
+    if (is_numeric($node_text)) {
+      // Check if NID exists
+      $node_check = node_load($form_state['values']['maintenance_node_search_node']);
+      if (!$node_check) {
+        form_set_error('maintenance_node_search_node', t('This is not a valid node ID.'));
+      }
+    } else {
+      $nid = _maintenance_node_get_node_id($form_state['values']['maintenance_node_search_node']);
+      if (isset($nid) && is_numeric($nid)) {
+        $node_check = node_load($nid);
+        if (!$node_check) {
+          form_set_error('maintenance_node_search_node', t('This is not a valid input format. ex: Node Title [nid:1] or just 1.'));
+        }
+      } else {
+        form_set_error('maintenance_node_search_node', t('This is not a valid input format. ex: Node Title [nid:1] or just 1.'));
+      }
+    }
+  }
+}
+
+function _maintenance_node_autocomplete($string) {
+  $matches = array();
+  
+  // Run query and select rows that match.
+  $query = db_select('node', 'n');
+  $return = $query
+  ->fields('n', array('title', 'nid'))
+  ->condition('n.title', '%' . db_like($string) . '%', 'LIKE')
+  ->range(0, 10)
+  ->execute();
+
+  // Add matches to $matches  
+  foreach ($return as $row) {
+    $node_title = check_plain($row->title) . ' [nid:' . $row->nid . ']';
+    $matches[$node_title] = $node_title;
+  }
+
+  // return for JS
+  drupal_json_output($matches);
+}
+
+function maintenance_node_preprocess_maintenance_page(&$vars) {
+  if ($vars['is_admin'] == FALSE) {
+    // Get selected node, extract nid, load node.
+    $node_title = variable_get('maintenance_node_title', FALSE);
+    $node_text = variable_get('maintenance_node_search_node', FALSE);
+    $node_view_mode = variable_get('maintenance_node_view_mode', 'full');
+
+    if (!empty($node_text)) {
+      // Get NID
+      $nid = _maintenance_node_get_node_id($node_text);
+      if ($nid) {
+        // Load node
+        $node = node_load($nid);
+        // Get node data and remove the title.
+        $node_full = node_view($node, $node_view_mode);
+        unset($node_full['title']);
+
+        // Set custom node as content, render title.
+        $vars['title'] = $node->title;
+        $vars['content'] = render($node_full);
+      }
+      // Change out the title if a custom title is set.
+      $vars['title'] = (!empty($node_title)) ? check_plain($node_title) : $vars['title'];
+    }
+  }
+}
+
+/*
+ * Function that returns the node ID.
+ */
+function _maintenance_node_get_node_id($text) {
+  if (is_numeric($text)) {
+    // Return if it's a whole number.
+    return $text;
+  } else {
+    $node_text = explode(':', $text);
+    return rtrim($node_text[1], ']');
+  }
+}

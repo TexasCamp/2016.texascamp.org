@@ -1,0 +1,5 @@
+name = Maintenance Node
+description = Use node content instead of the default maintenance text.
+version = 7.x-1.0
+core = 7.x
+configure = admin/config/development/maintenance

@@ -1,0 +1,14 @@
+<?php
+/**
+ * @file
+ * Uninstall processes for maintenance_node.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function maintenance_node_uninstall() {
+	variable_del('maintenance_node_search_node', NULL);
+	variable_del('maintenance_node_view_mode', NULL);
+	variable_del('maintenance_node_title', NULL);
+}
