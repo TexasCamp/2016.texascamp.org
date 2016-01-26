@@ -327,6 +327,10 @@ function project_preprocess_page(&$vars) {
 
 }
 
+function project_preprocess_maintenance_page(&$variables) {
+  project_preprocess_page($variables);
+}
+
 /*
  * Implements theme_status_messages().
  */

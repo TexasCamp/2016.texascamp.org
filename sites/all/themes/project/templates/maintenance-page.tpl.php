@@ -74,37 +74,75 @@
  */
 ?>
 
-<div class="page-wrapper">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+<!--[if IE 9]> <html lang="<?php print $language->language; ?>" dir="<?php print $language->dir; ?>" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="<?php print $language->language; ?>" dir="<?php print $language->dir; ?>"<?php print $rdf_namespaces;?>>
+<!--
+_______                          __________      _____                           _____             
+__  __ \___________________      ___  ____/________  /______________________________(_)___________ 
+_  / / /__  __ \  _ \_  __ \     __  __/  __  __ \  __/  _ \_  ___/__  __ \_  ___/_  /__  ___/  _ \
+/ /_/ /__  /_/ /  __/  / / /     _  /___  _  / / / /_ /  __/  /   __  /_/ /  /   _  / _(__  )/  __/
+\____/ _  .___/\___//_/ /_/      /_____/  /_/ /_/\__/ \___//_/    _  .___//_/    /_/  /____/ \___/ 
+       /_/                                                        /_/                              
 
-  <div class="header-container">
-    <?php 
-      // Header Top.
-      include 'includes/header_top.inc';
-      // Navigation
-      include 'includes/header.inc';
-      // Header Bottom
-      include 'includes/header_bottom.inc';
-    ?>
+Open Enterprise CMS brought to you by Levelten Interactive.
+http://getcm2.com
+
+-->
+<head profile="<?php print $grddl_profile; ?>">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <?php print $head; ?>
+  <title><?php print $head_title; ?></title>
+  <?php print $styles; ?>
+  <!-- HTML5 element support for IE6-8 -->
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <?php print $scripts; ?>
+</head>
+<body class="<?php print $classes; ?>" <?php print $attributes;?>>
+  <div id="skip-link">
+    <a href="#main-content" class="element-invisible element-focusable"><?php print t('Skip to main content'); ?></a>
   </div>
+  <?php print $page_top; ?>
 
-  <!-- breadcrumbs -->
-  <?php if (!empty($breadcrumb)):?> 
-    <div class="breadcrumb-container">
-      <div class="container">
-        <?php print $breadcrumb; ?>
+    <div class="page-wrapper">
+
+      <div class="header-container">
+        <?php 
+          // Header Top.
+          include 'includes/header_top.inc';
+          // Navigation
+          include 'includes/header.inc';
+          // Header Bottom
+          include 'includes/header_bottom.inc';
+        ?>
       </div>
+
+      <!-- breadcrumbs -->
+      <?php if (!empty($breadcrumb)):?> 
+        <div class="breadcrumb-container">
+          <div class="container">
+            <?php print $breadcrumb; ?>
+          </div>
+        </div>
+      <?php endif;?>
+
+      <!-- banner -->
+      <?php include 'includes/banner.inc'; ?>
+
+      <!-- top-bar -->
+      <?php include 'includes/top_bar.inc'; ?>
+
+      <!-- main-content -->
+      <?php include 'includes/content.inc'; ?>
+
+      <!-- footer -->
+      <?php include 'includes/footer.inc'; ?>
     </div>
-  <?php endif;?>
 
-  <!-- banner -->
-  <?php include 'includes/banner.inc'; ?>
-
-  <!-- top-bar -->
-  <?php include 'includes/top_bar.inc'; ?>
-
-  <!-- main-content -->
-  <?php include 'includes/content.inc'; ?>
-
-  <!-- footer -->
-  <?php include 'includes/footer.inc'; ?>
-</div>
+    <?php print $page_bottom; ?>
+  </body>
+</html>
