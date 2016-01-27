@@ -327,8 +327,18 @@ function project_preprocess_page(&$vars) {
 
 }
 
-function project_preprocess_maintenance_page(&$variables) {
-  project_preprocess_page($variables);
+function project_preprocess_maintenance_page(&$vars) {
+  project_preprocess_page($vars);
+
+  // Add main menu.
+  $main_menu = menu_tree('main-menu');
+  $main_menu['#theme_wrappers'][] = 'project_menu_tree__main_menu';
+  $vars['main_menu'] = $main_menu;
+
+  // Add back Bootstrap.js
+  $bootstrap_path = drupal_get_path('theme', 'bootstrap');
+  drupal_add_js($bootstrap_path . '/js/bootstrap.js');
+
 }
 
 /*
@@ -509,4 +519,11 @@ function project_less_paths_alter(array &$less_paths, $system_name) {
   if ($colorize) {
     $less_paths[] = drupal_get_path('theme', 'project') . '/less/color.less';
   }
+}
+
+/**
+ * Implements hook_menu_tree_MENU_ID
+ */
+function project_menu_tree__main_menu($variables) {
+  return '<ul class="menu nav navbar-nav">' . $variables['tree'] . '</ul>';
 }

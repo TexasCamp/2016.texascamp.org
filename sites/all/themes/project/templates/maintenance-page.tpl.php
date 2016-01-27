@@ -77,7 +77,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
 <!--[if IE 9]> <html lang="<?php print $language->language; ?>" dir="<?php print $language->dir; ?>" class="ie9"> <![endif]-->
 <!--[if !IE]><!-->
-<html lang="<?php print $language->language; ?>" dir="<?php print $language->dir; ?>"<?php print $rdf_namespaces;?>>
+<html lang="<?php print $language->language; ?>" dir="<?php print $language->dir; ?>">
 <!--
 _______                          __________      _____                           _____             
 __  __ \___________________      ___  ____/________  /______________________________(_)___________ 
@@ -90,7 +90,7 @@ Open Enterprise CMS brought to you by Levelten Interactive.
 http://getcm2.com
 
 -->
-<head profile="<?php print $grddl_profile; ?>">
+<head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <?php print $head; ?>
@@ -106,19 +106,89 @@ http://getcm2.com
   <div id="skip-link">
     <a href="#main-content" class="element-invisible element-focusable"><?php print t('Skip to main content'); ?></a>
   </div>
-  <?php print $page_top; ?>
-
     <div class="page-wrapper">
 
       <div class="header-container">
-        <?php 
-          // Header Top.
-          include 'includes/header_top.inc';
-          // Navigation
-          include 'includes/header.inc';
-          // Header Bottom
-          include 'includes/header_bottom.inc';
-        ?>
+        <?php include 'includes/header_top.inc'; ?>
+
+
+        <!-- Header -->
+<header <?php if(!empty($header_attr)) {print drupal_attributes($header_attr);} ?> >
+  <div class="container">
+    <div class="row">
+
+        <div class="col-md-1">
+          <!-- header-left start -->
+          <div class="header-left clearfix">
+            <!-- logo -->
+            <?php if ($logo): ?>
+              <div id="logo" class="logo">
+                <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>">
+                  <img class="img-responsive" src="<?php print $logo; ?>" alt="<?php print t('Home'); ?>" />
+                </a>
+              </div>
+            <?php endif; ?>
+            <!-- name-and-slogan -->
+            <?php if (!empty($site_name)): ?>
+              <div class="site-name">
+                <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>"><?php print $site_name; ?></a>
+              </div>
+            <?php endif; ?>
+            <?php if (!empty($site_slogan)): ?>
+              <div class="site-slogan">
+                <?php print $site_slogan; ?>
+              </div>
+            <?php endif; ?>
+          </div> <!-- header-left start -->
+        </div>
+
+        <div class="col-md-11">
+          <!-- header-right start -->
+          <div class="header-right clearfix">
+            <!-- main-navigation start -->
+            <div <?php if ($navbar_attr){ print drupal_attributes($navbar_attr); } ?>>
+              <nav class="navbar navbar-default" role="navigation">
+                <div class="container-fluid">
+                  <!-- Toggle get grouped for better mobile display -->
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                  </div>
+                  <!-- Collect the nav links, forms, and other content for toggling -->
+                  <div class="collapse navbar-collapse" id="navbar-collapse-1">
+                    <?php if (!empty($main_menu)): ?>
+                      <?php print drupal_render($main_menu); ?>
+                    <?php endif; ?>
+                    <!-- header buttons -->
+                    <div class="header-dropdown-buttons hidden-xs">
+                      <?php if($toggle_search): ?>
+                        <div class="btn-group dropdown">
+                          <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <?php print $search_icon; ?>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-right dropdown-animation">
+                            <li><?php print $search_box; ?></li>
+                          </ul>
+                        </div>
+                      <?php endif; ?>
+                    </div> <!-- header buttons end-->
+                  </div> <!-- end-navbar -->
+                </div>
+              </nav>
+            </div>
+          </div>
+        </div>
+    </div> <!-- /.row -->
+  </div> <!-- /.container -->
+</header>
+
+          
+
+        <?php include 'includes/header_bottom.inc'; ?>
       </div>
 
       <!-- breadcrumbs -->
@@ -137,12 +207,53 @@ http://getcm2.com
       <?php include 'includes/top_bar.inc'; ?>
 
       <!-- main-content -->
-      <?php include 'includes/content.inc'; ?>
+      <section class="main-container">
+        <div class="container">
+          <?php include 'includes/information.inc'; ?>
+          <div class="row">
+
+            <!-- main start -->
+            <div class="main <?php print $main_class; ?>" >
+              <!-- title -->
+              <?php include 'includes/title.inc'; ?>
+              <a id="main-content"></a>
+              
+              <?php print render($content); ?>
+            </div>
+            <!-- main end -->
+
+            <?php include 'includes/sidebar_first.inc'; ?>
+            <?php include 'includes/sidebar_second.inc'; ?>
+        
+          </div>
+        </div>
+      </section>
 
       <!-- footer -->
-      <?php include 'includes/footer.inc'; ?>
+      <footer id="footer" <?php print drupal_attributes($footer_attr); ?>>
+        <div class="footer">
+          <div class="container">
+            <div class="footer-inner">
+              <div class="row">
+                <?php if (!empty($page['footer'])): ?>
+                  <?php print render($page['footer']); ?>
+                <?php endif; ?>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="subfooter">
+          <div class="container">
+            <div class="subfooter-inner">
+              <div class="row">
+                <?php if (!empty($page['footer_bottom'])): ?>
+                  <?php print render($page['footer_bottom']); ?>
+                <?php endif; ?>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
-
-    <?php print $page_bottom; ?>
   </body>
 </html>
