@@ -14,7 +14,7 @@ function eventbrite_api_views_data() {
   /**
    * Integrate the events table.
    */
-  $data['eventbrite_api_events']['table']['group'] = t('Eventbrite events');
+  $data['eventbrite_api_events']['table']['group']  = t('Eventbrite events');
   $data['eventbrite_api_events']['table']['entity type'] = 'event';
 
   $data['eventbrite_api_events']['table']['base'] = array(
@@ -47,8 +47,8 @@ function eventbrite_api_views_data() {
     'help' => t('The unique internal identifier of event tickets.'),
     'relationship' => array(
       'base' => 'eventbrite_api_tickets',
-      'base field' => 'eid',
-      'field' => 'eid',
+      'base field' => 'tid',
+      'field' => 'tid',
       'handler' => 'views_handler_relationship',
       'label' => t('Event tickets'),
       'title' => t('Tickets'),
@@ -90,18 +90,18 @@ function eventbrite_api_views_data() {
       'title' => t('Language'),
       'help' => t('The language the event is in.'),
       'field' => array(
-        'handler' => 'views_handler_field_locale_language',
-        'click sortable' => TRUE,
+       'handler' => 'views_handler_field_locale_language',
+       'click sortable' => TRUE,
       ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_locale_language',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_locale_language',
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
+     'filter' => array(
+       'handler' => 'views_handler_filter_locale_language',
+     ),
+     'argument' => array(
+       'handler' => 'views_handler_argument_locale_language',
+     ),
+     'sort' => array(
+     'handler' => 'views_handler_sort',
+     ),
     );
   }
 
@@ -165,7 +165,7 @@ function eventbrite_api_views_data() {
   // Expose the number of registered event attendees.
   $data['eventbrite_api_events']['num_attendee_rows'] = array(
     'title' => t('Registered attendees'),
-    'help' => t('The umber of registered event attendees.'),
+    'help' => t('The number of registered event attendees.'),
     'field' => array(
       'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
@@ -209,26 +209,7 @@ function eventbrite_api_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'eventbrite_api_handler_filter_datetime',
-    ),
-    'sort' => array(
-      'handler' => 'views_handler_sort_date',
-    ),
-    'argument' => array(
-      'handler' => 'views_handler_argument_date',
-    ),
-  );
-
-  // Expose the event end date.
-  $data['eventbrite_api_events']['end_date'] = array(
-    'title' => t('End date'),
-    'help' => t('The date the event ends.'),
-    'field' => array(
-      'handler' => 'eventbrite_api_handler_field_datetime',
-      'click sortable' => TRUE,
-    ),
-    'filter' => array(
-      'handler' => 'eventbrite_api_handler_filter_datetime',
+      'handler' => 'views_handler_filter_date',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort_date',
@@ -251,25 +232,6 @@ function eventbrite_api_views_data() {
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
-    ),
-  );
-
-  // Expose the event status.
-  $data['eventbrite_api_events']['status'] = array(
-    'title' => t('Status'),
-    'help' => t('The event status.'),
-    'field' => array(
-      'handler' => 'views_handler_field',
-      'click sortable' => TRUE,
-    ),
-    'filter' => array(
-      'handler' => 'views_handler_filter_string',
-    ),
-    'sort' => array(
-      'handler' => 'views_handler_sort',
-    ),
-    'argument' => array(
-      'handler' => 'views_handler_argument_string',
     ),
   );
 
@@ -339,7 +301,7 @@ function eventbrite_api_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'eventbrite_api_handler_filter_datetime',
+      'handler' => 'views_handler_filter_date',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort_date',
@@ -387,6 +349,25 @@ function eventbrite_api_views_data() {
     ),
   );
 
+  // Expose the event status setting.
+  $data['eventbrite_api_events']['status'] = array(
+    'title' => t('Status'),
+    'help' => t('Whether the event is draft or live.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'eventbrite_api_handler_filter_event_status',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
   // Expose the date the event was modified.
   $data['eventbrite_api_events']['modified'] = array(
     'title' => t('Modified'),
@@ -396,7 +377,7 @@ function eventbrite_api_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'eventbrite_api_handler_filter_datetime',
+      'handler' => 'views_handler_filter_date',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort_date',
@@ -425,6 +406,39 @@ function eventbrite_api_views_data() {
     ),
   );
 
+  // Expose the account id.
+  $data['eventbrite_api_events']['acid'] = array(
+    'title' => t('Account ID'),
+    'help' => t('The unique internal identifier of the eventbrite account.'),
+    'relationship' => array(
+      'handler' => 'views_handler_relationship',
+      'base' => 'eventbrite_api_accounts',
+      'base field' => 'acid',
+      'label' => t('Eventbrite account'),
+      'title' => t('Account'),
+      'help' => t('The account this event belongs to.'),
+    ),
+  );
+
+  // Expose the eventbrite account.
+  $data['eventbrite_api_events']['acid'] = array(
+    'title' => t('Account'),
+    'help' => t('The eventbrite account of the event.'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),
+  );
+
   // Expose links to operate on the event.
   $data['eventbrite_api_events']['edit_event'] = array(
     'field' => array(
@@ -445,7 +459,7 @@ function eventbrite_api_views_data() {
   /**
    * Integrate the organizers table.
    */
-  $data['eventbrite_api_organizers']['table']['group'] = t('Eventbrite organizer');
+  $data['eventbrite_api_organizers']['table']['group']  = t('Eventbrite organizer');
   $data['eventbrite_api_organizers']['table']['entity type'] = 'organizer';
 
   $data['eventbrite_api_organizers']['table']['base'] = array(
@@ -556,6 +570,39 @@ function eventbrite_api_views_data() {
     ),
   );
 
+  // Expose the account id.
+  $data['eventbrite_api_organizers']['acid'] = array(
+    'title' => t('Account ID'),
+    'help' => t('The unique internal identifier of the eventbrite account.'),
+    'relationship' => array(
+      'handler' => 'views_handler_relationship',
+      'base' => 'eventbrite_api_accounts',
+      'base field' => 'acid',
+      'label' => t('Eventbrite account'),
+      'title' => t('Account'),
+      'help' => t('The account this organizer belongs to.'),
+    ),
+  );
+
+  // Expose the eventbrite account.
+  $data['eventbrite_api_organizers']['acid'] = array(
+    'title' => t('Account'),
+    'help' => t('The eventbrite account of the organiser.'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),
+  );
+
   // Expose links to operate on the organizer.
   $data['eventbrite_api_organizers']['edit_organizer'] = array(
     'field' => array(
@@ -568,7 +615,7 @@ function eventbrite_api_views_data() {
   /**
    * Integrate the tickets table.
    */
-  $data['eventbrite_api_tickets']['table']['group'] = t('Eventbrite ticket');
+  $data['eventbrite_api_tickets']['table']['group']  = t('Eventbrite ticket');
   $data['eventbrite_api_tickets']['table']['entity type'] = 'ticket';
 
   $data['eventbrite_api_tickets']['table']['base'] = array(
@@ -665,7 +712,7 @@ function eventbrite_api_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'eventbrite_api_handler_filter_datetime',
+      'handler' => 'views_handler_filter_date',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort_date',
@@ -684,7 +731,7 @@ function eventbrite_api_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'eventbrite_api_handler_filter_datetime',
+      'handler' => 'views_handler_filter_date',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort_date',
@@ -847,6 +894,20 @@ function eventbrite_api_views_data() {
     ),
   );
 
+  // Expose the account id.
+  $data['eventbrite_api_tickets']['acid'] = array(
+    'title' => t('Account ID'),
+    'help' => t('The unique internal identifier of the eventbrite account.'),
+    'relationship' => array(
+      'handler' => 'views_handler_relationship',
+      'base' => 'eventbrite_api_accounts',
+      'base field' => 'acid',
+      'label' => t('Eventbrite account'),
+      'title' => t('Account'),
+      'help' => t('The account this ticket belongs to.'),
+    ),
+  );
+
   // Expose links to operate on the ticket.
   $data['eventbrite_api_tickets']['edit_ticket'] = array(
     'field' => array(
@@ -877,7 +938,7 @@ function eventbrite_api_views_data() {
   /**
    * Integrate the venues table.
    */
-  $data['eventbrite_api_venues']['table']['group'] = t('Eventbrite venue');
+  $data['eventbrite_api_venues']['table']['group']  = t('Eventbrite venue');
   $data['eventbrite_api_venues']['table']['entity type'] = 'venue';
 
   $data['eventbrite_api_venues']['table']['base'] = array(
@@ -1119,6 +1180,20 @@ function eventbrite_api_views_data() {
     ),
   );
 
+  // Expose the account id.
+  $data['eventbrite_api_venues']['acid'] = array(
+    'title' => t('Account ID'),
+    'help' => t('The unique internal identifier of the eventbrite account.'),
+    'relationship' => array(
+      'handler' => 'views_handler_relationship',
+      'base' => 'eventbrite_api_accounts',
+      'base field' => 'acid',
+      'label' => t('Eventbrite account'),
+      'title' => t('Account'),
+      'help' => t('The account this venues belongs to.'),
+    ),
+  );
+
   // Expose links to operate on the venue.
   $data['eventbrite_api_venues']['edit_venue'] = array(
     'field' => array(
@@ -1128,10 +1203,10 @@ function eventbrite_api_views_data() {
     ),
   );
 
-  /**
-   * Integrate the attendees table.
-   */
-  $data['eventbrite_api_attendees']['table']['group'] = t('Eventbrite attendee');
+ /**
+  * Integrate the attendees table.
+  */
+  $data['eventbrite_api_attendees']['table']['group']  = t('Eventbrite attendee');
   $data['eventbrite_api_attendees']['table']['entity type'] = 'attendee';
 
   $data['eventbrite_api_attendees']['table']['base'] = array(
@@ -1521,7 +1596,7 @@ function eventbrite_api_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'eventbrite_api_handler_filter_datetime',
+      'handler' => 'views_handler_filter_date',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort_date',
@@ -1828,7 +1903,7 @@ function eventbrite_api_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'eventbrite_api_handler_filter_datetime',
+      'handler' => 'views_handler_filter_date',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort_date',
@@ -1885,7 +1960,7 @@ function eventbrite_api_views_data() {
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'eventbrite_api_handler_filter_datetime',
+      'handler' => 'views_handler_filter_date',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort_date',
@@ -2044,6 +2119,20 @@ function eventbrite_api_views_data() {
     ),
   );
 
+  // Expose the account id.
+  $data['eventbrite_api_attendees']['acid'] = array(
+    'title' => t('Account ID'),
+    'help' => t('The unique internal identifier of the eventbrite account.'),
+    'relationship' => array(
+      'handler' => 'views_handler_relationship',
+      'base' => 'eventbrite_api_accounts',
+      'base field' => 'acid',
+      'label' => t('Eventbrite account'),
+      'title' => t('Account'),
+      'help' => t('The account this attendee belongs to.'),
+    ),
+  );
+
   // Expose link to view the full attendee record.
   $data['eventbrite_api_attendees']['view_attendee'] = array(
     'field' => array(
@@ -2056,7 +2145,7 @@ function eventbrite_api_views_data() {
   /**
    * Integrate the attendees answers table.
    */
-  $data['eventbrite_api_attendees_answers']['table']['group'] = t('Eventbrite attendee answers');
+  $data['eventbrite_api_attendees_answers']['table']['group']  = t('Eventbrite attendee answers');
   $data['eventbrite_api_attendees_answers']['table']['entity type'] = 'attendee';
 
   $data['eventbrite_api_attendees_answers']['table']['base'] = array(
@@ -2156,6 +2245,113 @@ function eventbrite_api_views_data() {
   $data['eventbrite_api_attendees_answers']['question_type'] = array(
     'title' => t('Question type'),
     'help' => t('The attendee question type.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
+  /**
+   * Integrate the organizers table.
+   */
+  $data['eventbrite_api_accounts']['table']['group']  = t('Eventbrite account');
+  $data['eventbrite_api_accounts']['table']['entity type'] = 'account';
+
+  $data['eventbrite_api_accounts']['table']['base'] = array(
+    'field' => 'acid',
+    'title' => t('Eventbrite accounts'),
+    'help' => t('Event brite Accounts.'),
+  );
+
+  // Expose the account ID.
+  $data['eventbrite_api_accounts']['acid'] = array(
+    'title' => t('Account ID'),
+    'help' => t('The unique internal identifier of the eventbrite account.'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),
+  );
+
+  // Expose the account name.
+  $data['eventbrite_api_accounts']['name'] = array(
+    'title' => t('Name'),
+    'help' => t('The name of the eventbrite account.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
+  // Expose the account user key.
+  $data['eventbrite_api_accounts']['api_userkey'] = array(
+    'title' => t('API User Key'),
+    'help' => t('The API User Key of the eventbrite account.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
+  // Expose the account app key.
+  $data['eventbrite_api_accounts']['api_appkey'] = array(
+    'title' => t('API App Key'),
+    'help' => t('The API App Key of the eventbrite account.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
+  // Expose the account oath key.
+  $data['eventbrite_api_accounts']['api_oauth'] = array(
+    'title' => t('API OAuth Key'),
+    'help' => t('The API OAuth Key of the eventbrite account.'),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,

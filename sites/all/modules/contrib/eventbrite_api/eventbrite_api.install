@@ -6,45 +6,6 @@
  */
 
 /**
- * Implements hook_requirements().
- */
-function eventbrite_api_requirements($phase) {
-  // The array that we will return.
-  $requirements = array();
-  // We only need the "runtime" phase.
-  if ($phase == 'runtime') {
-    // Installation version of t().
-    $t = get_t();
-    // Load the library.
-    $library = libraries_detect('eventbrite');
-    // If the library is not installed.
-    if (empty($library['installed'])) {
-      // Build the requirements array.
-      $requirements['eventbrite'] = array(
-        'title' => $t('Eventbrite'),
-        'value' => $t('Not found'),
-        'severity' => REQUIREMENT_ERROR,
-        'description' => $t('You need to download !eventbrite_php and place it into a directory named eventbrite in the %path directory on your server.', array(
-          '!eventbrite_php' => l($t('eventbrite.php'), $library['download url']),
-          '%path' => 'sites/all/libraries'
-        )),
-      );
-    }
-    // Let the user know that it's working.
-    else {
-      // Build the requirements array.
-      $requirements['eventbrite'] = array(
-        'title' => $t('Eventbrite'),
-        'value' => $t('Found'),
-        'severity' => REQUIREMENT_OK,
-        'description' => $t('The eventbrite.php library is installed.'),
-      );
-    }
-  }
-  return $requirements;
-}
-
-/**
  * Implements hook_schema().
  */
 function eventbrite_api_schema() {
@@ -60,6 +21,13 @@ function eventbrite_api_schema() {
       ),
       'oid' => array(
         'description' => 'The id of the event organiser.',
+        'type' => 'int',
+        'size' => 'big',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ),
+      'acid' => array(
+        'description' => 'The id of the drupal eventbrite account.',
         'type' => 'int',
         'size' => 'big',
         'unsigned' => FALSE,
@@ -200,6 +168,10 @@ function eventbrite_api_schema() {
         'table' => 'eventbrite_api_organizers',
         'columns' => array('oid' => 'oid'),
       ),
+      'acid' => array(
+        'table' => 'eventbrite_api_accounts',
+        'columns' => array('acid' => 'acid'),
+      ),
     ),
     'primary key' => array('eid'),
   );
@@ -208,6 +180,13 @@ function eventbrite_api_schema() {
     'fields' => array(
       'oid' => array(
         'description' => 'The primary identifier for an event organizer.',
+        'type' => 'int',
+        'size' => 'big',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ),
+      'acid' => array(
+        'description' => 'The id of the drupal eventbrite account.',
         'type' => 'int',
         'size' => 'big',
         'unsigned' => FALSE,
@@ -233,13 +212,19 @@ function eventbrite_api_schema() {
       'url' => array(
         'description' => 'The Eventbrite URL for the event.',
         'type' => 'varchar',
-        'length' => 2048,
+        'length' => 100,
         'not null' => TRUE,
         'default' => '',
       ),
     ),
     'indexes' => array(
       'organizer_name' => array('name'),
+    ),
+    'foreign keys' => array(
+      'acid' => array(
+        'table' => 'eventbrite_api_accounts',
+        'columns' => array('acid' => 'acid'),
+      ),
     ),
     'primary key' => array('oid'),
   );
@@ -255,6 +240,13 @@ function eventbrite_api_schema() {
       ),
       'eid' => array(
         'description' => 'The id of the associated event.',
+        'type' => 'int',
+        'size' => 'big',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ),
+      'acid' => array(
+        'description' => 'The id of the drupal eventbrite account.',
         'type' => 'int',
         'size' => 'big',
         'unsigned' => FALSE,
@@ -355,6 +347,10 @@ function eventbrite_api_schema() {
         'table' => 'eventbrite_api_events',
         'columns' => array('eid' => 'eid'),
       ),
+      'acid' => array(
+        'table' => 'eventbrite_api_accounts',
+        'columns' => array('acid' => 'acid'),
+      ),
     ),
     'primary key' => array('tid'),
   );
@@ -363,6 +359,13 @@ function eventbrite_api_schema() {
     'fields' => array(
       'vid' => array(
         'description' => 'The primary identifier for an event venue.',
+        'type' => 'int',
+        'size' => 'big',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ),
+      'acid' => array(
+        'description' => 'The id of the drupal eventbrite account.',
         'type' => 'int',
         'size' => 'big',
         'unsigned' => FALSE,
@@ -454,6 +457,10 @@ function eventbrite_api_schema() {
         'table' => 'eventbrite_api_events',
         'columns' => array('eid' => 'eid'),
       ),
+      'acid' => array(
+        'table' => 'eventbrite_api_accounts',
+        'columns' => array('acid' => 'acid'),
+      ),
     ),
     'primary key' => array('vid'),
   );
@@ -462,6 +469,13 @@ function eventbrite_api_schema() {
     'fields' => array(
       'aid' => array(
         'description' => 'The primary identifier for an event attendee.',
+        'type' => 'int',
+        'size' => 'big',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ),
+      'acid' => array(
+        'description' => 'The id of the drupal eventbrite account.',
         'type' => 'int',
         'size' => 'big',
         'unsigned' => FALSE,
@@ -626,7 +640,7 @@ function eventbrite_api_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
-      'website' => array(
+      'job_title' => array(
         'description' => 'The website of the workplace of the attendee.',
         'type' => 'varchar',
         'length' => 255,
@@ -669,8 +683,7 @@ function eventbrite_api_schema() {
         'default' => '',
       ),
       'barcode' => array(
-        'description' => 'The barcode number of the order.',
-        // Stored as varchar because bigint is too small.
+        'description' => 'The barcode number of the order.', // Stored as varchar because bigint is too small.
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
@@ -692,10 +705,12 @@ function eventbrite_api_schema() {
       ),
       'discount' => array(
         'description' => 'The attendee discount on this order.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
+        'type' => 'numeric',
+        'size' => 'normal',
+        'default' => 0,
+        'precision' => 10,
+        'scale' => 2,
+        'not null' => FALSE,
       ),
       'work_city' => array(
         'description' => 'The city of the workplace of the attendee.',
@@ -796,6 +811,10 @@ function eventbrite_api_schema() {
         'table' => 'eventbrite_api_tickets',
         'columns' => array('tid' => 'tid'),
       ),
+      'acid' => array(
+        'table' => 'eventbrite_api_accounts',
+        'columns' => array('acid' => 'acid'),
+      ),
     ),
     'primary key' => array('aid'),
   );
@@ -804,6 +823,13 @@ function eventbrite_api_schema() {
     'fields' => array(
       'aid' => array(
         'description' => 'The primary identifier for an event attendee.',
+        'type' => 'int',
+        'size' => 'big',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ),
+      'acid' => array(
+        'description' => 'The id of the drupal eventbrite account.',
         'type' => 'int',
         'size' => 'big',
         'unsigned' => FALSE,
@@ -968,7 +994,7 @@ function eventbrite_api_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
-      'website' => array(
+      'job_title' => array(
         'description' => 'The website of the workplace of the attendee.',
         'type' => 'varchar',
         'length' => 255,
@@ -1011,8 +1037,7 @@ function eventbrite_api_schema() {
         'default' => '',
       ),
       'barcode' => array(
-        'description' => 'The barcode number of the order.',
-        // Stored as varchar because bigint is too small.
+        'description' => 'The barcode number of the order.', // Stored as varchar because bigint is too small.
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
@@ -1034,10 +1059,12 @@ function eventbrite_api_schema() {
       ),
       'discount' => array(
         'description' => 'The attendee discount on this order.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
+        'type' => 'numeric',
+        'size' => 'normal',
+        'default' => 0,
+        'precision' => 10,
+        'scale' => 2,
+        'not null' => FALSE,
       ),
       'work_city' => array(
         'description' => 'The city of the workplace of the attendee.',
@@ -1138,6 +1165,10 @@ function eventbrite_api_schema() {
         'table' => 'eventbrite_api_tickets',
         'columns' => array('tid' => 'tid'),
       ),
+      'acid' => array(
+        'table' => 'eventbrite_api_accounts',
+        'columns' => array('acid' => 'acid'),
+      ),
     ),
     'primary key' => array('aid'),
   );
@@ -1181,6 +1212,54 @@ function eventbrite_api_schema() {
       ),
     ),
     'primary key' => array('aid'),
+  );
+  $schema['eventbrite_api_accounts'] = array(
+    'description' => 'The table for event accounts.',
+    'fields' => array(
+      'acid' => array(
+        'description' => 'The primary identifier for an eventbrite account.',
+        'type' => 'serial',
+        'size' => 'small',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => 'The name of the eventbrite account.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'api_userkey' => array(
+        'description' => 'The api_userkey',
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'api_appkey' => array(
+        'description' => 'The api_appkey.',
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'api_oauth' => array(
+        'description' => 'The api_oauth.',
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'is_default' => array(
+        'description' => 'Is this the default account.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('acid'),
   );
   return $schema;
 }
@@ -1368,7 +1447,7 @@ function eventbrite_api_update_7100() {
         'not null' => TRUE,
         'default' => '',
       ),
-      'website' => array(
+      'job_title' => array(
         'description' => 'The website of the workplace of the attendee.',
         'type' => 'varchar',
         'length' => 255,
@@ -1411,8 +1490,7 @@ function eventbrite_api_update_7100() {
         'default' => '',
       ),
       'barcode' => array(
-        'description' => 'The barcode number of the order.',
-        // Stored as varchar because bigint is too small.
+        'description' => 'The barcode number of the order.', // Stored as varchar because bigint is too small.
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
@@ -1782,40 +1860,87 @@ function eventbrite_api_update_7103() {
 /**
  * Implements hook_update_N().
  *
- * Changes the discount code to varchar (this was missed in 7103).
+ * Adds tables for the support of multiple Eventbrite accounts.
  *
  */
-function eventbrite_api_update_7104() {
-  // Attendees discount.
-  $table = 'eventbrite_api_attendees';
-  $field = $field_new = 'discount';
-  $spec = array(
-    'description' => 'The attendee discount on this order.',
-    'type' => 'varchar',
-    'length' => 255,
-    'not null' => TRUE,
-    'default' => '',
+function eventbrite_api_update_7200() {
+  $schema['eventbrite_api_accounts'] = array(
+    'description' => 'The table for event accounts.',
+    'fields' => array(
+      'acid' => array(
+        'description' => 'The primary identifier for an eventbrite account.',
+        'type' => 'serial',
+        'size' => 'big',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => 'The name of the eventbrite account.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'api_userkey' => array(
+        'description' => 'The api_userkey',
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'api_appkey' => array(
+        'description' => 'The api_appkey.',
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'api_oauth' => array(
+        'description' => 'The api_oauth.',
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'is_default' => array(
+        'description' => 'Is this the default account.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('acid'),
   );
-  db_change_field($table, $field, $field_new, $spec);
-  // Add the website column.
-  $spec = array(
-    'description' => 'The website of the workplace of the attendee.',
-    'type' => 'varchar',
-    'length' => 2048,
-    'not null' => FALSE,
-    'default' => '',
-  );
-  db_add_field('eventbrite_api_attendees', 'website', $spec);
-  // Organizer URL field.
-  $table = 'eventbrite_api_organizers';
-  $field = $field_new = 'url';
-  $spec = array(
-    'description' => 'The Eventbrite URL for the event.',
-    'type' => 'varchar',
-    'length' => 2048,
-    'not null' => TRUE,
-    'default' => '',
-  );
-  db_change_field($table, $field, $field_new, $spec);
+  db_create_table('eventbrite_api_accounts', $schema['eventbrite_api_accounts']);
+  return $schema;
+}
 
+/**
+ * Implements hook_update_N().
+ *
+ * Adds tables for the support of multiple Eventbrite accounts.
+ *
+ */
+function eventbrite_api_update_7201() {
+  // Account id.
+  $field = $field_new = 'acid';
+  $spec = array(
+    'description' => 'The id of the drupal eventbrite account.',
+    'type' => 'int',
+    'size' => 'big',
+    'unsigned' => FALSE,
+    'not null' => TRUE,
+  );
+  $table = 'eventbrite_api_attendees';
+  db_add_field($table, $field, $spec);
+
+  $table = 'eventbrite_api_organizers';
+  db_add_field($table, $field, $spec);
+
+  $table = 'eventbrite_api_tickets';
+  db_add_field($table, $field, $spec);
+
+  $table = 'eventbrite_api_venues';
+  db_add_field($table, $field, $spec);
 }

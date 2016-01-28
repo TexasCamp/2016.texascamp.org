@@ -37,6 +37,6 @@ class eventbrite_api_handler_field_venue_link_edit extends views_handler_field {
     $text = !empty($this->options['text']) ? $this->options['text'] : t('edit');
     $vid = $this->get_value($values, 'vid');
 
-    return l($text, 'admin/eventbrite/venue/' . $vid . '/edit');
+    return l($text, 'admin/config/services/eventbrite/venue/' . $vid . '/edit');
   }
 }

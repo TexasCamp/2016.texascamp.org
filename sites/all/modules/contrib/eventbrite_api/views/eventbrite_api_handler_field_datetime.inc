@@ -14,18 +14,7 @@ class eventbrite_api_handler_field_datetime extends views_handler_field_date {
     $value = strtotime($this->get_value($values));
     // The rest is simply a copy of the render function from views_handler_field_date.
     $format = $this->options['date_format'];
-    if (in_array($format, array(
-      'custom',
-      'raw time ago',
-      'time ago',
-      'raw time hence',
-      'time hence',
-      'raw time span',
-      'time span',
-      'raw time span',
-      'inverse time span',
-      'time span'
-    ))) {
+    if (in_array($format, array('custom', 'raw time ago', 'time ago', 'raw time hence', 'time hence', 'raw time span', 'time span', 'raw time span', 'inverse time span', 'time span'))) {
       $custom_format = $this->options['custom_date_format'];
     }
 

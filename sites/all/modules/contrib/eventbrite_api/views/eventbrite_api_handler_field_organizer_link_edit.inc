@@ -37,6 +37,6 @@ class eventbrite_api_handler_field_organizer_link_edit extends views_handler_fie
     $text = !empty($this->options['text']) ? $this->options['text'] : t('edit');
     $oid = $this->get_value($values, 'oid');
 
-    return l($text, 'admin/eventbrite/organizer/' . $oid . '/edit');
+    return l($text, 'admin/config/services/eventbrite/organizer/' . $oid . '/edit');
   }
 }

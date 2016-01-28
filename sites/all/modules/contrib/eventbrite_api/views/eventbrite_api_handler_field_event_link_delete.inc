@@ -28,6 +28,6 @@ class eventbrite_api_handler_field_event_link_delete extends eventbrite_api_hand
     $text = !empty($this->options['text']) ? $this->options['text'] : t('delete');
     $eid = $this->get_value($values, 'eid');
 
-    return l($text, 'admin/eventbrite/event/' . $eid . '/delete');
+    return l($text, 'admin/config/services/eventbrite/event/' . $eid . '/delete');
   }
 }

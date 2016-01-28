@@ -37,6 +37,6 @@ class eventbrite_api_handler_field_attendee_link extends views_handler_field {
     $text = !empty($this->options['text']) ? $this->options['text'] : t('view');
     $aid = $this->get_value($values, 'aid');
 
-    return l($text, 'admin/eventbrite/attendee/' . $aid);
+    return l($text, 'admin/config/services/eventbrite/attendee/' . $aid);
   }
 }

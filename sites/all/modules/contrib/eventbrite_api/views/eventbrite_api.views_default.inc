@@ -11,140 +11,170 @@ function eventbrite_api_views_default_views() {
 
   // Events.
 
-  $view = new view();
-  $view->name = 'events_list';
-  $view->description = '';
-  $view->tag = 'default';
-  $view->base_table = 'eventbrite_api_events';
-  $view->human_name = 'Events';
-  $view->core = 7;
-  $view->api_version = '3.0';
-  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+$view = new view();
+$view->name = 'events_list';
+$view->description = '';
+$view->tag = 'default';
+$view->base_table = 'eventbrite_api_events';
+$view->human_name = 'Events List';
+$view->core = 7;
+$view->api_version = '3.0';
+$view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
-  /* Display: Master */
-  $handler = $view->new_display('default', 'Master', 'default');
-  $handler->display->display_options['title'] = 'Events';
-  $handler->display->display_options['use_more_always'] = FALSE;
-  $handler->display->display_options['access']['type'] = 'perm';
-  $handler->display->display_options['access']['perm'] = 'administer eventbrite';
-  $handler->display->display_options['cache']['type'] = 'none';
-  $handler->display->display_options['query']['type'] = 'views_query';
-  $handler->display->display_options['exposed_form']['type'] = 'basic';
-  $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '50';
-  $handler->display->display_options['style_plugin'] = 'table';
-  $handler->display->display_options['style_options']['columns'] = array(
-    'created' => 'created',
-    'description' => 'description',
-    'eid' => 'eid',
-    'modified' => 'modified',
-    'title' => 'title',
-    'url' => 'url',
-  );
-  $handler->display->display_options['style_options']['default'] = '-1';
-  $handler->display->display_options['style_options']['info'] = array(
-    'created' => array(
-      'sortable' => 0,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 0,
-    ),
-    'description' => array(
-      'sortable' => 0,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 0,
-    ),
-    'eid' => array(
-      'sortable' => 0,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 0,
-    ),
-    'modified' => array(
-      'sortable' => 0,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 0,
-    ),
-    'title' => array(
-      'sortable' => 0,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 0,
-    ),
-    'url' => array(
-      'sortable' => 0,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 0,
-    ),
-  );
-  /* No results behavior: Global: Text area */
-  $handler->display->display_options['empty']['area']['id'] = 'area';
-  $handler->display->display_options['empty']['area']['table'] = 'views';
-  $handler->display->display_options['empty']['area']['field'] = 'area';
-  $handler->display->display_options['empty']['area']['label'] = 'No events';
-  $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'There are no events yet. Please <a href="/admin/eventbrite/event/add">add an event</a>.';
-  $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
-  /* Field: Eventbrite events: Event ID */
-  $handler->display->display_options['fields']['eid']['id'] = 'eid';
-  $handler->display->display_options['fields']['eid']['table'] = 'eventbrite_api_events';
-  $handler->display->display_options['fields']['eid']['field'] = 'eid';
-  $handler->display->display_options['fields']['eid']['separator'] = '';
-  /* Field: Eventbrite events: Title */
-  $handler->display->display_options['fields']['title']['id'] = 'title';
-  $handler->display->display_options['fields']['title']['table'] = 'eventbrite_api_events';
-  $handler->display->display_options['fields']['title']['field'] = 'title';
-  /* Field: Eventbrite events: URL */
-  $handler->display->display_options['fields']['url']['id'] = 'url';
-  $handler->display->display_options['fields']['url']['table'] = 'eventbrite_api_events';
-  $handler->display->display_options['fields']['url']['field'] = 'url';
-  $handler->display->display_options['fields']['url']['alter']['make_link'] = TRUE;
-  $handler->display->display_options['fields']['url']['alter']['path'] = '[url]';
-  $handler->display->display_options['fields']['url']['alter']['external'] = TRUE;
-  /* Field: Eventbrite events: Modified */
-  $handler->display->display_options['fields']['modified']['id'] = 'modified';
-  $handler->display->display_options['fields']['modified']['table'] = 'eventbrite_api_events';
-  $handler->display->display_options['fields']['modified']['field'] = 'modified';
-  $handler->display->display_options['fields']['modified']['date_format'] = 'short';
-  /* Field: Eventbrite events: Created */
-  $handler->display->display_options['fields']['created']['id'] = 'created';
-  $handler->display->display_options['fields']['created']['table'] = 'eventbrite_api_events';
-  $handler->display->display_options['fields']['created']['field'] = 'created';
-  $handler->display->display_options['fields']['created']['date_format'] = 'short';
-  /* Field: Eventbrite events: Edit link */
-  $handler->display->display_options['fields']['edit_event']['id'] = 'edit_event';
-  $handler->display->display_options['fields']['edit_event']['table'] = 'eventbrite_api_events';
-  $handler->display->display_options['fields']['edit_event']['field'] = 'edit_event';
-  /* Field: Eventbrite events: Delete link */
-  $handler->display->display_options['fields']['delete_event']['id'] = 'delete_event';
-  $handler->display->display_options['fields']['delete_event']['table'] = 'eventbrite_api_events';
-  $handler->display->display_options['fields']['delete_event']['field'] = 'delete_event';
+/* Display: Master */
+$handler = $view->new_display('default', 'Master', 'default');
+$handler->display->display_options['title'] = 'Events';
+$handler->display->display_options['use_more_always'] = FALSE;
+$handler->display->display_options['access']['type'] = 'perm';
+$handler->display->display_options['access']['perm'] = 'administer eventbrite';
+$handler->display->display_options['cache']['type'] = 'none';
+$handler->display->display_options['query']['type'] = 'views_query';
+$handler->display->display_options['exposed_form']['type'] = 'basic';
+$handler->display->display_options['pager']['type'] = 'full';
+$handler->display->display_options['pager']['options']['items_per_page'] = '50';
+$handler->display->display_options['style_plugin'] = 'table';
+$handler->display->display_options['style_options']['columns'] = array(
+  'created' => 'created',
+  'description' => 'description',
+  'eid' => 'eid',
+  'modified' => 'modified',
+  'title' => 'title',
+  'url' => 'url',
+);
+$handler->display->display_options['style_options']['default'] = '-1';
+$handler->display->display_options['style_options']['info'] = array(
+  'created' => array(
+    'sortable' => 0,
+    'default_sort_order' => 'asc',
+    'align' => '',
+    'separator' => '',
+    'empty_column' => 0,
+  ),
+  'description' => array(
+    'sortable' => 0,
+    'default_sort_order' => 'asc',
+    'align' => '',
+    'separator' => '',
+    'empty_column' => 0,
+  ),
+  'eid' => array(
+    'sortable' => 0,
+    'default_sort_order' => 'asc',
+    'align' => '',
+    'separator' => '',
+    'empty_column' => 0,
+  ),
+  'modified' => array(
+    'sortable' => 0,
+    'default_sort_order' => 'asc',
+    'align' => '',
+    'separator' => '',
+    'empty_column' => 0,
+  ),
+  'title' => array(
+    'sortable' => 0,
+    'default_sort_order' => 'asc',
+    'align' => '',
+    'separator' => '',
+    'empty_column' => 0,
+  ),
+  'url' => array(
+    'sortable' => 0,
+    'default_sort_order' => 'asc',
+    'align' => '',
+    'separator' => '',
+    'empty_column' => 0,
+  ),
+);
+/* No results behavior: Global: Text area */
+$handler->display->display_options['empty']['area']['id'] = 'area';
+$handler->display->display_options['empty']['area']['table'] = 'views';
+$handler->display->display_options['empty']['area']['field'] = 'area';
+$handler->display->display_options['empty']['area']['label'] = 'No events';
+$handler->display->display_options['empty']['area']['empty'] = TRUE;
+$handler->display->display_options['empty']['area']['content'] = 'There are no events yet. Please <a href="/admin/config/services/eventbrite/event/add">add an event</a>.';
+$handler->display->display_options['empty']['area']['format'] = 'filtered_html';
+/* Field: Eventbrite events: Event ID */
+$handler->display->display_options['fields']['eid']['id'] = 'eid';
+$handler->display->display_options['fields']['eid']['table'] = 'eventbrite_api_events';
+$handler->display->display_options['fields']['eid']['field'] = 'eid';
+$handler->display->display_options['fields']['eid']['separator'] = '';
+/* Field: Eventbrite events: Title */
+$handler->display->display_options['fields']['title']['id'] = 'title';
+$handler->display->display_options['fields']['title']['table'] = 'eventbrite_api_events';
+$handler->display->display_options['fields']['title']['field'] = 'title';
+/* Field: Eventbrite events: Status */
+$handler->display->display_options['fields']['status']['id'] = 'status';
+$handler->display->display_options['fields']['status']['table'] = 'eventbrite_api_events';
+$handler->display->display_options['fields']['status']['field'] = 'status';
+/* Field: Eventbrite events: URL */
+$handler->display->display_options['fields']['url']['id'] = 'url';
+$handler->display->display_options['fields']['url']['table'] = 'eventbrite_api_events';
+$handler->display->display_options['fields']['url']['field'] = 'url';
+$handler->display->display_options['fields']['url']['alter']['make_link'] = TRUE;
+$handler->display->display_options['fields']['url']['alter']['path'] = '[url]';
+$handler->display->display_options['fields']['url']['alter']['external'] = TRUE;
+$handler->display->display_options['fields']['url']['alter']['max_length'] = '50';
+$handler->display->display_options['fields']['url']['alter']['trim'] = TRUE;
+/* Field: Eventbrite events: Start date */
+$handler->display->display_options['fields']['start_date']['id'] = 'start_date';
+$handler->display->display_options['fields']['start_date']['table'] = 'eventbrite_api_events';
+$handler->display->display_options['fields']['start_date']['field'] = 'start_date';
+$handler->display->display_options['fields']['start_date']['date_format'] = 'short';
+/* Field: Eventbrite events: Created */
+$handler->display->display_options['fields']['created']['id'] = 'created';
+$handler->display->display_options['fields']['created']['table'] = 'eventbrite_api_events';
+$handler->display->display_options['fields']['created']['field'] = 'created';
+$handler->display->display_options['fields']['created']['date_format'] = 'short';
+/* Field: Eventbrite events: Edit link */
+$handler->display->display_options['fields']['edit_event']['id'] = 'edit_event';
+$handler->display->display_options['fields']['edit_event']['table'] = 'eventbrite_api_events';
+$handler->display->display_options['fields']['edit_event']['field'] = 'edit_event';
+/* Field: Eventbrite events: Delete link */
+$handler->display->display_options['fields']['delete_event']['id'] = 'delete_event';
+$handler->display->display_options['fields']['delete_event']['table'] = 'eventbrite_api_events';
+$handler->display->display_options['fields']['delete_event']['field'] = 'delete_event';
+/* Sort criterion: Eventbrite events: Status */
+$handler->display->display_options['sorts']['status']['id'] = 'status';
+$handler->display->display_options['sorts']['status']['table'] = 'eventbrite_api_events';
+$handler->display->display_options['sorts']['status']['field'] = 'status';
+$handler->display->display_options['sorts']['status']['order'] = 'DESC';
+/* Sort criterion: Eventbrite events: Start date */
+$handler->display->display_options['sorts']['start_date']['id'] = 'start_date';
+$handler->display->display_options['sorts']['start_date']['table'] = 'eventbrite_api_events';
+$handler->display->display_options['sorts']['start_date']['field'] = 'start_date';
+$handler->display->display_options['sorts']['start_date']['order'] = 'DESC';
+/* Filter criterion: Eventbrite events: Status */
+$handler->display->display_options['filters']['status']['id'] = 'status';
+$handler->display->display_options['filters']['status']['table'] = 'eventbrite_api_events';
+$handler->display->display_options['filters']['status']['field'] = 'status';
+$handler->display->display_options['filters']['status']['exposed'] = TRUE;
+$handler->display->display_options['filters']['status']['expose']['operator_id'] = 'status_op';
+$handler->display->display_options['filters']['status']['expose']['label'] = 'Status';
+$handler->display->display_options['filters']['status']['expose']['operator'] = 'status_op';
+$handler->display->display_options['filters']['status']['expose']['identifier'] = 'status';
+$handler->display->display_options['filters']['status']['expose']['remember_roles'] = array(
+  2 => '2',
+  1 => 0,
+  3 => 0,
+  5 => 0,
+);
 
-  /* Display: Page */
-  $handler = $view->new_display('page', 'Page', 'page');
-  $handler->display->display_options['path'] = 'admin/eventbrite/event/list';
-  $handler->display->display_options['menu']['type'] = 'default tab';
-  $handler->display->display_options['menu']['title'] = 'Events';
-  $handler->display->display_options['menu']['description'] = 'Manage Eventbrite event data.';
-  $handler->display->display_options['menu']['weight'] = '0';
-  $handler->display->display_options['menu']['name'] = 'management';
-  $handler->display->display_options['menu']['context'] = 0;
-  $handler->display->display_options['menu']['context_only_inline'] = 0;
-  $handler->display->display_options['tab_options']['type'] = 'normal';
-  $handler->display->display_options['tab_options']['title'] = 'Events';
-  $handler->display->display_options['tab_options']['description'] = 'Manage Eventbrite event data.';
-  $handler->display->display_options['tab_options']['weight'] = '0';
-  $handler->display->display_options['tab_options']['name'] = 'management';
-
+/* Display: Page */
+$handler = $view->new_display('page', 'Page', 'page');
+$handler->display->display_options['path'] = 'admin/config/services/eventbrite/event/list';
+$handler->display->display_options['menu']['type'] = 'default tab';
+$handler->display->display_options['menu']['title'] = 'Events';
+$handler->display->display_options['menu']['description'] = 'Manage Eventbrite event data.';
+$handler->display->display_options['menu']['weight'] = '0';
+$handler->display->display_options['menu']['name'] = 'management';
+$handler->display->display_options['menu']['context'] = 0;
+$handler->display->display_options['menu']['context_only_inline'] = 0;
+$handler->display->display_options['tab_options']['type'] = 'normal';
+$handler->display->display_options['tab_options']['title'] = 'Events';
+$handler->display->display_options['tab_options']['description'] = 'Manage Eventbrite event data.';
+$handler->display->display_options['tab_options']['weight'] = '0';
+$handler->display->display_options['tab_options']['name'] = 'management';
   $views[$view->name] = $view;
 
   // Organizers.
@@ -154,7 +184,7 @@ function eventbrite_api_views_default_views() {
   $view->description = '';
   $view->tag = 'default';
   $view->base_table = 'eventbrite_api_organizers';
-  $view->human_name = 'Organizers';
+  $view->human_name = 'Organizers List';
   $view->core = 7;
   $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
@@ -177,7 +207,7 @@ function eventbrite_api_views_default_views() {
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['label'] = 'No organizers';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'There are no organizers yet. <a href="/admin/eventbrite/organizer/add">Add an organizer</a>.';
+  $handler->display->display_options['empty']['area']['content'] = 'There are no organizers yet. <a href="/admin/config/services/eventbrite/organizer/add">Add an organizer</a>.';
   $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
   /* Field: Eventbrite organizer: Organizer ID */
   $handler->display->display_options['fields']['oid']['id'] = 'oid';
@@ -199,7 +229,7 @@ function eventbrite_api_views_default_views() {
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
-  $handler->display->display_options['path'] = 'admin/eventbrite/organizer/list';
+  $handler->display->display_options['path'] = 'admin/config/services/eventbrite/organizer/list';
   $handler->display->display_options['menu']['type'] = 'default tab';
   $handler->display->display_options['menu']['title'] = 'Organizers';
   $handler->display->display_options['menu']['description'] = 'Manage Eventbrite organizers.';
@@ -222,7 +252,7 @@ function eventbrite_api_views_default_views() {
   $view->description = '';
   $view->tag = 'default';
   $view->base_table = 'eventbrite_api_tickets';
-  $view->human_name = 'Tickets';
+  $view->human_name = 'Tickets List';
   $view->core = 7;
   $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
@@ -257,7 +287,7 @@ function eventbrite_api_views_default_views() {
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['label'] = 'No tickets';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'There are no tickets. <a href="/admin/eventbrite/ticket/add">Add a ticket</a>.';
+  $handler->display->display_options['empty']['area']['content'] = 'There are no tickets. <a href="/admin/config/services/eventbrite/ticket/add">Add a ticket</a>.';
   $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
   /* Relationship: Eventbrite ticket: Event ID */
   $handler->display->display_options['relationships']['eid']['id'] = 'eid';
@@ -318,7 +348,7 @@ function eventbrite_api_views_default_views() {
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
-  $handler->display->display_options['path'] = 'admin/eventbrite/ticket/list';
+  $handler->display->display_options['path'] = 'admin/config/services/eventbrite/ticket/list';
   $handler->display->display_options['menu']['type'] = 'default tab';
   $handler->display->display_options['menu']['title'] = 'Tickets';
   $handler->display->display_options['menu']['description'] = 'Manage Eventbrite tickets.';
@@ -341,7 +371,7 @@ function eventbrite_api_views_default_views() {
   $view->description = '';
   $view->tag = 'default';
   $view->base_table = 'eventbrite_api_venues';
-  $view->human_name = 'Venues';
+  $view->human_name = 'Venues List';
   $view->core = 7;
   $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
@@ -364,7 +394,7 @@ function eventbrite_api_views_default_views() {
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['label'] = 'No venues';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'There are no venues yet. <a href="/admin/eventbrite/venue/add">Add a venue</a>.';
+  $handler->display->display_options['empty']['area']['content'] = 'There are no venues yet. <a href="/admin/config/services/eventbrite/venue/add">Add a venue</a>.';
   $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
   /* Field: Eventbrite venue: Venue ID */
   $handler->display->display_options['fields']['vid']['id'] = 'vid';
@@ -390,7 +420,7 @@ function eventbrite_api_views_default_views() {
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
-  $handler->display->display_options['path'] = 'admin/eventbrite/venue/list';
+  $handler->display->display_options['path'] = 'admin/config/services/eventbrite/venue/list';
   $handler->display->display_options['menu']['type'] = 'default tab';
   $handler->display->display_options['menu']['title'] = 'Venues';
   $handler->display->display_options['menu']['description'] = 'Manage Eventbrite venues.';
@@ -413,7 +443,7 @@ function eventbrite_api_views_default_views() {
   $view->description = '';
   $view->tag = 'default';
   $view->base_table = 'eventbrite_api_attendees';
-  $view->human_name = 'Attendees';
+  $view->human_name = 'Attendees List';
   $view->core = 7;
   $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
@@ -557,7 +587,7 @@ function eventbrite_api_views_default_views() {
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
-  $handler->display->display_options['path'] = 'admin/eventbrite/attendee/list';
+  $handler->display->display_options['path'] = 'admin/config/services/eventbrite/attendee/list';
   $handler->display->display_options['menu']['type'] = 'default tab';
   $handler->display->display_options['menu']['title'] = 'Attendees';
   $handler->display->display_options['menu']['description'] = 'View Eventbrite attendee data.';

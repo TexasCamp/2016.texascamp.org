@@ -37,6 +37,6 @@ class eventbrite_api_handler_field_ticket_link_edit extends views_handler_field 
     $text = !empty($this->options['text']) ? $this->options['text'] : t('edit');
     $tid = $this->get_value($values, 'tid');
 
-    return l($text, 'admin/eventbrite/ticket/' . $tid . '/edit');
+    return l($text, 'admin/config/services/eventbrite/ticket/' . $tid . '/edit');
   }
 }

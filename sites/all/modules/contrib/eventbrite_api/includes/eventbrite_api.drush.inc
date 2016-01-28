@@ -8,9 +8,9 @@
 /**
  * The Eventbrite PHP download URL.
  */
-define('EVENTBRITE_PHP_URI', 'https://raw.github.com/ryanjarvinen/eventbrite.php/master/Eventbrite.php');
+define('EVENTBRITE_PHP_URI',  'https://raw.github.com/ryanjarvinen/eventbrite.php/master/Eventbrite.php');
 define('EVENTBRITE_PHP_PATH', 'sites/all/libraries');
-define('EVENTBRITE_PHP_DIR', 'eventbrite');
+define('EVENTBRITE_PHP_DIR',  'eventbrite');
 
 /**
  * Implementation of hook_drush_command().
@@ -51,7 +51,7 @@ function drush_eventbrite_api_eventbrite_php($path = NULL) {
   // Make the actual Eventbrite library directory.
   $dir = EVENTBRITE_PHP_DIR;
   drush_op('mkdir', $dir);
-  // Make sure it can be opened.
+	// Make sure it can be opened.
   chmod($dir, 0644);
   // Download the file as eventbrite.php.
   drush_download_file(EVENTBRITE_PHP_URI, $dir . '/eventbrite.php');

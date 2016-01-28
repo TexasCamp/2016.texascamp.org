@@ -1,7 +1,7 @@
 <?php
 
 class EventbriteApiAttendeesController extends EntityAPIController {
-
+  
   protected function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
     $query = parent::buildQuery($ids, $conditions, $revision_id);
     $query->innerJoin('eventbrite_api_attendees_answers', 'a', 'base.aid = a.aid');
@@ -11,13 +11,13 @@ class EventbriteApiAttendeesController extends EntityAPIController {
     $query->addField('a', 'question_type', 'question_type');
     return $query;
   }
-
-  /**
-   * Overridden.
-   * @see EntityAPIController#load($ids, $conditions)
-   *
-   * In contrast to the parent implementation, multiple rows are
-   * grouped by field api_key to handle multiple methods for each key.
+ 
+  /**                                                                   
+   * Overridden.   
+   * @see EntityAPIController#load($ids, $conditions)   
+   *   
+   * In contrast to the parent implementation, multiple rows are   
+   * grouped by field api_key to handle multiple methods for each key.   
    */
   public function load($ids = array(), $conditions = array()) {
     $entities = array();
@@ -92,7 +92,7 @@ class EventbriteApiAttendeesController extends EntityAPIController {
         }
 
         $queried_entities[$record->{$this->idKey}] = $record; // d p m  this
-
+        
         /*if (isset($queried_entities[$record->{$this->idKey}])) {
           $queried_entities[$record->{$this->idKey}]->methods[] = $record->method;
         }
@@ -102,7 +102,7 @@ class EventbriteApiAttendeesController extends EntityAPIController {
           unset($record->method);
           $queried_entities[$record->{$this->idKey}] = $record;
         }*/
-
+        
       }
     }
 
@@ -140,7 +140,7 @@ class EventbriteApiAttendeesController extends EntityAPIController {
       $entities = $passed_ids;
     }
     return $entities;
-
+    
   }
-
+ 
 }

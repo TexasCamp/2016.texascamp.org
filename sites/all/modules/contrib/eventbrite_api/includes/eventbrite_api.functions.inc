@@ -1,6 +1,6 @@
 <?php
 
-function eventbrite_api_currencies() {
+function _eventbrite_api_currencies() {
   $currencies = array(
     'AFN' => t('Afghanistani Afghani'),
     'ALL' => t('Albanian Lek'),
@@ -167,7 +167,7 @@ function eventbrite_api_currencies() {
   return $currencies;
 }
 
-function eventbrite_api_countries() {
+function _eventbrite_api_countries() {
   $countries = array(
     'AD' => 'Andorra',
     'AE' => 'United Arab Emirates',
@@ -424,7 +424,7 @@ function eventbrite_api_countries() {
   return $countries;
 }
 
-function eventbrite_api_ctime($timestamp = NULL) {
+function _eventbrite_api_ctime($timestamp = NULL) {
   if (empty($timestamp)) {
     $timestamp = time();
   }
@@ -432,8 +432,15 @@ function eventbrite_api_ctime($timestamp = NULL) {
   return $time;
 }
 
-function eventbrite_api_datef($date) {
+function _eventbrite_api_datef($date) {
   return $date . ':00';
+}
+
+function _eventbrite_api_list_accounts() {
+  $result = db_select('eventbrite_api_accounts', 'eba')
+    ->fields('eba', array('acid', 'name', 'api_userkey', 'api_appkey', 'api_oauth', 'is_default'))
+    ->execute()->fetchAllAssoc('acid');
+  return $result;
 }
 
 function event_create() {
@@ -469,18 +476,12 @@ function event_save(&$event) {
 }
 
 function event_delete($entity) {
-  // Delete the entity locally.
-  entity_delete('event', $entity->eid);
-  // Update the event on Eventbrite.
-  $auth = array(
-    'app_key' => variable_get('eventbrite_api_appkey', ''),
-    'user_key' => variable_get('eventbrite_api_userkey', '')
-  );
-  $eb_client = new Eventbrite($auth);
-  $response = $eb_client->event_update(array(
-    'id' => $entity->eid,
-    'status' => 'deleted'
-  ));
+  // // Delete the entity locally.
+  // //entity_delete('event', $entity->eid);
+  // // Update the event on Eventbrite.
+  // $eventbrite = new eventBriteEvents($entity->id);
+  // $entity->status = 'deleted';
+  // $response = $eventbrite->eventUpdate($entity);
 }
 
 function organizer_create() {
@@ -560,90 +561,417 @@ function venue_delete($entity) {
   // MAKE THIS CANCEL EVENT WITH EVENTBRITE.
 }
 
-function eventbrite_api_import_all() {
-  if (($library = libraries_load('eventbrite')) && !empty($library['loaded'])) {
-    // Authorisation details.
-    $auth = array(
-      'app_key' => variable_get('eventbrite_api_appkey', ''),
-      'user_key' => variable_get('eventbrite_api_userkey', '')
-    );
-    // Connect to Eventbrite.
-    $eb_client = new Eventbrite($auth);
-    // Get all data by using the user_list_events method.
-    $import = $eb_client->user_list_events();
-    // Now get all attendee data.
-    $results = array();
-    // Go through the events.
-    foreach ($import->events as $entity) {
-      // Try to load attendees from this event by the event ID.
-      try {
-        $id = $entity->event->id;
-        $results[$id] = $eb_client->event_list_attendees(array('id' => $id));
-      } // If we can't, set an error.
-      catch (Exception $e) {
-        $error = $e->getMessage();
-        // But make sure the error isn't just no attendees to load.
-        if ($error == 'No records were found with the given parameters..' || strpos($error, 'Event deleted or cancelled.') !== FALSE) {
-          drupal_set_message('Event "' . $entity->event->title . '" (ID ' . $entity->event->id . ') has no attendees to load.', 'warning§');
-        }
-        else {
-          drupal_set_message($error, 'error');
-        }
-      }
+function _eventbrite_api_import_all($account = NULL) {
+  if (!is_null($account)) {
+    watchdog('eventbrite_api', 'Import all started for account !account!', array('!account' => $account->name));
+  }
+
+  $import = array();
+  $events = array();
+  $attendees = array();
+  $organizers = array();
+  $tickets = array();
+  $venues = array();
+  // Get all the event data
+  _eventbrite_api_import_events($events, $account);
+  $import['events'] = $events;
+
+  // If there is a v3 user id, get a list of all organisation/venue, if not fall
+  // back to getting 1 per event
+  if (!is_null(variable_get('eventbrite_user_id_v3',NULL))) {
+    _eventbrite_api_import_organizersall(variable_get('eventbrite_user_id_v3',NULL), $organizers, $account);
+  }
+  if (!is_null(variable_get('eventbrite_user_id_v3',NULL))) {
+    _eventbrite_api_import_venuesall(variable_get('eventbrite_user_id_v3',NULL), $venues, $account);
+  }
+  foreach ($events as $event) {
+    $id = $event['id'];
+    // TO FIX: for some reason the attendee event date keeps coming back blank?
+    _eventbrite_api_import_attendees($id, $attendees, $event['start_date'], $account);
+    if (count($organizers) === 0 && isset($event['organizer'])) {
+      $organizerid = $event['organizer']['id'];
+      _eventbrite_api_import_organizers($organizerid, $organizers, $account);
     }
-    // If we have attendees.
-    if ($results) {
-      // Add the attendees to our import data.
-      $import->attendees = $results;
-    }
-    // Format it nicely.
-    $events = eventbrite_api_format_all($import);
-    // Should we delete everything before importing?
-    if (variable_get('eventbrite_api_import_delete', 1) == 1) {
-      // Yes.
-      $result = db_truncate('eventbrite_api_events')->execute();
-      $result = db_truncate('eventbrite_api_organizers')->execute();
-      $result = db_truncate('eventbrite_api_tickets')->execute();
-      $result = db_truncate('eventbrite_api_venues')->execute();
-      $result = db_truncate('eventbrite_api_attendees')->execute();
-      $result = db_truncate('eventbrite_api_attendees_answers')->execute();
-      // Set a count array for our entities.
-      $count = array(
-        'events' => 0,
-        'organizers' => 0,
-        'tickets' => 0,
-        'venues' => 0,
-        'attendees' => 0,
-      );
-      // Run through the array.
-      foreach ($events as $type => $data) {
-        // Count how many entities we have.
-        $count[$type] = count($data);
-        // Run through the sub arrays.
-        foreach ($data as $record) {
-          // Make sure all records have the correct keys.
-          $record = (object) array_merge((array) eventbrite_api_entity_prepare($type), (array) $record);
-          // Write the record.
-          $write = drupal_write_record('eventbrite_api_' . $type, $record);
-        }
-      }
-      // Set a message and let the user know what's been imported.
-      $placeholders = array(
-        '@events' => $count['events'],
-        '@organizers' => $count['organizers'],
-        '@tickets' => $count['tickets'],
-        '@venues' => $count['venues'],
-        '@attendees' => $count['attendees'],
-      );
-      drupal_set_message(t('Import successful. @events events, @organizers organizers,
-      @tickets tickets, @venues venues and @attendees attendees imported.', $placeholders));
-    }
-    else {
-      // Update.
+    _eventbrite_api_import_tickets_from_event($event, $tickets, $account);
+    if (count($venues) === 0 && isset($event['venue'])) {
+      $venueid = $event['venue']['id'];
+      _eventbrite_api_import_venues($venueid, $venues, $account);
     }
   }
+    // Add the attendees to our import data.
+  $import['attendees'] = $attendees;
+  $import['organizers'] = $organizers;
+  $import['tickets'] = $tickets;
+  $import['venues'] = $venues;
+
+  // Should we delete everything before importing?
+  if (variable_get('eventbrite_api_import_delete', 1) == 1) {
+    // Set a count array for our entities.
+    $count = array(
+     'events' => count($import['events']),
+     'organizers' => count($import['organizers']),
+     'tickets' => count($import['tickets']),
+     'venues' => count($import['venues']),
+     'attendees' => count($import['attendees']),
+    );
+
+    // Run through the array.
+    foreach ($import as $type => $data) {
+      // Count how many entities we have.
+      $count[$type] = count($data);
+      // Run through the sub arrays.
+      foreach ($data as $record) {
+        // Make sure all records have the correct keys.
+        $record = (object) array_merge((array) eventbrite_api_entity_prepare($type), (array) $record);
+        // Write the record.
+        $write = drupal_write_record('eventbrite_api_' . $type, $record);
+      }
+    }
+    // Set a message and let the user know what's been imported.
+    $placeholders =  array(
+      '@events' => $count['events'],
+      '@organizers' => $count['organizers'],
+      '@tickets' => $count['tickets'],
+      '@venues' => $count['venues'],
+      '@attendees' => $count['attendees'],
+    );
+    drupal_set_message(t('Import successful. @events events, @organizers organizers,
+    @tickets tickets, @venues venues and @attendees attendees imported.', $placeholders));
+  }
   else {
-    drupal_set_message(t('Please install the Eventbrite API library. Check the !readme for further information.', array('!readme' => l(t('README'), 'admin/help/eventbrite_api'))), 'error');
+    // Update.
+  }
+  if (!is_null($account)) {
+    watchdog('eventbrite_api', 'Import all complete for account !account!', array('!account' => $account->name));
+  }
+}
+
+/**
+ * Function _eventbrite_api_import_events
+ *   Get a list of events for import into the drupal db
+ *
+ * @param array $events
+ *   This is passed by reference so that we can fill it up during the import all
+ */
+function _eventbrite_api_import_events(&$events, $account = NULL) {
+  // Try to load events from this event by the event ID.
+  if (is_null($account)) {
+    $eventbrite = new eventBriteUser();
+  }
+  else {
+    $eventbrite = new eventBriteUser(NULL, NULL, $account->api_userkey, $account->api_appkey, $account->api_oauth);
+  }
+  $list = $eventbrite->userListEvents();
+  // If we can't, set an error.
+  if (isset($list['error'])) {
+    $msg = t('Event ID: !event. !message', array('!event' => $eventid, '!message' => $list['error']['error_type'] . ': ' . $list['error']['error_message']));
+    watchdog('eventbrite_api', 'Import Events: ' . $msg);
+    drupal_set_message($msg, 'warning');
+  }
+  else {
+    // Grab each event from the returned json and add it directly to the
+    // return array
+    foreach ($list['events'] as $event) {
+      $events[$event['event']['id']] =  $event['event'];
+      $events[$event['event']['id']]['eid'] =  $event['event']['id'];
+      $events[$event['event']['id']]['acid'] =  $account->acid;
+      if (isset($event['event']['organizer'])) {
+        $events[$event['event']['id']]['oid'] =  $event['event']['organizer']['id'];
+      }
+      if (isset($event['event']['venue'])) {
+        $events[$event['event']['id']]['vid'] =  $event['event']['venue']['id'];
+      }
+      if (variable_get('eventbrite_api_import_strip', 1)) {
+        $events[$event['event']['id']]['description'] =  strip_tags($events[$event['event']['id']]['description']);
+      }
+    }
+  }
+}
+
+/**
+ * Function _eventbrite_api_import_event
+ *   Get a list of events for import into the drupal db
+ *
+ * @param array $events
+ *   This is passed by reference so that we can fill it up during the import all
+ */
+function _eventbrite_api_import_event($eventid, &$events, $account = NULL) {
+  // Try to load events from this event by the event ID.
+  if (is_null($account)) {
+    $eventbrite = new eventBriteEvents();
+  }
+  else {
+    $eventbrite = new eventBriteEvents($eventid, $account->api_userkey, $account->api_appkey, $account->api_oauth);
+  }
+  $list = $eventbrite->eventGet();
+  // If we can't, set an error.
+  if (isset($list['error'])) {
+    $msg = t('Event ID: !event. !message', array('!event' => $eventid, '!message' => $list['error']['error_type'] . ': ' . $list['error']['error_message']));
+    watchdog('eventbrite_api', 'Import Events: ' . $msg);
+    drupal_set_message($msg, 'warning');
+  }
+  else {
+    // Grab each event from the returned json and add it directly to the
+    // return array
+    $event = $list['event'];
+    $events[$event['id']] =  $event;
+    $events[$event['id']]['eid'] =  $event['id'];
+    $events[$event['id']]['acid'] =  $account->acid;
+  }
+}
+
+/**
+ * Function _eventbrite_api_import_attendees
+ *   Get a list of attendees for a specified event and prepare them for import
+ *   into the drupal db
+ *
+ * @param int $eventid
+ *   THe event id
+ * @param array $attendees
+ *   This is passed by reference so that we can fill it up during the import all
+ */
+function _eventbrite_api_import_attendees($eventid, &$attendees, $event_date, $account = NULL) {
+  // Try to load attendees from this event by the event ID.
+  if (is_null($account)) {
+    $attendobj = new eventBriteAttendee();
+  }
+  else {
+    $attendobj = new eventBriteAttendee($eventid, $account->api_userkey, $account->api_appkey, $account->api_oauth);
+  }
+  $list = $attendobj->attendeeList();
+  // If we can't, set an error.
+  if (isset($list['error'])) {
+    $msg = t('Attendees for Event ID: !event. !message', array('!event' => $eventid, '!message' => $list['error']['error_type'] . ': ' . $list['error']['error_message']));
+    watchdog('eventbrite_api', 'Import All: ' . $msg);
+    drupal_set_message($msg, 'warning');
+  }
+  else {
+    // Grab each attendee from the returned json and add it directly to the
+    // return array
+    foreach ($list['attendees'] as $attendee) {
+      $attendees[$attendee['attendee']['id']] =  $attendee['attendee'];
+      $attendees[$attendee['attendee']['id']]['aid'] =  $attendee['attendee']['id'];
+      // TO FIX: for some reason the event date keeps coming back blank?
+      $attendees[$attendee['attendee']['id']]['event_date'] =  $event_date;
+      $attendees[$attendee['attendee']['id']]['discount'] =  $attendee['attendee']['discount'] == '' ? 0 : $attendee['attendee']['discount'];
+      $attendees[$attendee['attendee']['id']]['acid'] =  $account->acid;
+    }
+  }
+}
+
+/**
+ * Function _eventbrite_api_import_organizers
+ *   Get a list of organizers for a specified event and prepare them for import
+ *   into the drupal db
+ *
+ * @param int $organizerid
+ *   THe event id
+ * @param array $organizers
+ *   This is passed by reference so that we can fill it up during the import all
+ */
+function _eventbrite_api_import_organizers($organizerid, &$organizers, $account = NULL) {
+  if (!array_key_exists($organizerid, $organizers)) {
+    // Try to load organizers from this event by the event ID.
+    if (is_null($account)) {
+      $orgobj = new eventBriteOrganizer();
+    }
+    else {
+      $orgobj = new eventBriteOrganizer($organizerid, $account->api_userkey, $account->api_appkey, $account->api_oauth);
+    }
+    $list = $orgobj->organiserGet();
+
+    // If we can't, set an error.
+    if (isset($list['error'])) {
+      $msg = t('Organizers for Event ID: !event. !message', array('!event' => $eventid, '!message' => $list['error']['error_type'] . ': ' . $list['error']['error_message']));
+      watchdog('eventbrite_api', 'Import Organizers: ' . $msg);
+      drupal_set_message($msg, 'warning');
+    }
+    else {
+      // Grab each organizer from the returned json and add it directly to the
+      // return array
+      $organizer = $list['organizer'][0];
+      $organizers[$organizer['id']] =  $organizer;
+      $organizers[$organizer['id']]['oid'] =  $organizer['id'];
+      $organizers[$organizer['id']]['acid'] =  $account->acid;
+    }
+  }
+}
+
+/**
+ * Function _eventbrite_api_import_organizersall
+ *   Get a list of organizers for a specified user and prepare them for import
+ *   into the drupal db
+ *
+ * @param int $user_id
+ *   The user to list organisers for
+ * @param array $organizers
+ *   This is passed by reference so that we can fill it up during the import all
+ */
+function _eventbrite_api_import_organizersall($user_id, &$organizers, $account = NULL) {
+  // Try to load organizers from this user
+  if (is_null($account)) {
+    $orgobj = new eventBriteOrganizer();
+  }
+  else {
+    $orgobj = new eventBriteOrganizer(NULL, $account->api_userkey, $account->api_appkey, $account->api_oauth);
+  }
+  $list = $orgobj->organisersList($user_id);
+
+  // If we can't, set an error.
+  if (isset($list['error'])) {
+    $msg = t('Organizers for User ID: !user. !message', array('!user' => $user_id, '!message' => $list['error']['error_type'] . ': ' . $list['error']['error_message']));
+    watchdog('eventbrite_api', 'Import Organizers: ' . $msg);
+    drupal_set_message($msg, 'warning');
+  }
+  else {
+    // Grab each organizer from the returned json and add it directly to the
+    // return array
+    foreach ($list['organizers'] as $organiser) {
+      $organiser['long_description'] = $organiser['description']['text'];
+      $organiser['description'] = $organiser['description']['text'];
+      $organiser['oid'] = $organiser['id'];
+      $organiser['acid'] = $account->acid;
+      $organizers[$organiser['id']] = $organiser;
+    }
+  }
+}
+
+/**
+ * Function _eventbrite_api_import_tickets
+ *   Get a list of tickets for a specified event and prepare them for import
+ *   into the drupal db
+ *
+ * @param int $eventid
+ *   THe event id
+ * @param array $tickets
+ *   This is passed by reference so that we can fill it up during the import all
+ */
+function _eventbrite_api_import_tickets($eventid, &$tickets, $account = NULL) {
+  // Try to load tickets from this event by the event ID.
+  if (is_null($account)) {
+    $eventobj = new eventBriteEvents();
+  }
+  else {
+    $eventobj = new eventBriteEvents($eventid, $account->api_userkey, $account->api_appkey, $account->api_oauth);
+  }
+  $list = $eventobj->eventGet();
+  // If we can't, set an error.
+  if (isset($list['error'])) {
+    $msg = t('tickets for Event ID: !event. !message', array('!event' => $eventid, '!message' => $list['error']['error_type'] . ': ' . $list['error']['error_message']));
+    watchdog('eventbrite_api', 'Import ticket: ' . $msg);
+    drupal_set_message($msg, 'warning');
+  }
+  else {
+    // Grab each ticket from the returned json and add it directly to the
+    // return array
+    $event = $list['event'];
+    _eventbrite_api_import_tickets_from_event($event, $tickets);
+  }
+}
+
+/**
+ * Function _eventbrite_api_import_tickets_from_event
+ *   Get a list of tickets for a specified event and prepare them for import
+ *   into the drupal db. Take the tickets from an existing event array
+ *
+ * @param int $event
+ *   THe event array
+ * @param array $tickets
+ *   This is passed by reference so that we can fill it up during the import all
+ */
+function _eventbrite_api_import_tickets_from_event($event, &$tickets, $account = NULL) {
+  if (isset($event['tickets'])) {
+    foreach ($event['tickets'] as $ticket) {
+      $tickets[$ticket['ticket']['id']] =  $ticket['ticket'];
+      $tickets[$ticket['ticket']['id']]['tid'] =  $ticket['ticket']['id'];
+      $tickets[$ticket['ticket']['id']]['eid'] =  $event['id'];
+      $tickets[$ticket['ticket']['id']]['acid'] =  $account->acid;
+      $tickets[$ticket['ticket']['id']]['price'] =  str_replace(',', '', $ticket['ticket']['price']);
+    }
+  }
+}
+
+/**
+ * Function _eventbrite_api_import_venues
+ *   Get a list of venues for a specified event and prepare them for import
+ *   into the drupal db
+ *
+ * @param int $venueid
+ *   The venue id
+ * @param array $venues
+ *   This is passed by reference so that we can fill it up during the import all
+ */
+function _eventbrite_api_import_venues($venueid, &$venues, $account = NULL) {
+  if (!array_key_exists($venueid, $venues)) {
+    // Try to load the venue
+    if (is_null($account)) {
+      $venueobj = new eventBriteVenues();
+    }
+    else {
+      $venueobj = new eventBriteVenues($venueid, $account->api_userkey, $account->api_appkey, $account->api_oauth);
+    }
+    $list = $venueobj->venueGet();
+
+    // If we can't, set an error.
+    if (isset($list['error'])) {
+      $msg = t('Venue ID: !venue. !message', array('!venue' => $eventid, '!message' => $list['error']['error_type'] . ': ' . $list['error']['error_message']));
+      watchdog('eventbrite_api', 'Import Venue: ' . $msg);
+      drupal_set_message($msg, 'warning');
+    }
+    else {
+      // Grab each venue from the returned json and add it directly to the
+      // return array
+      $venue = $list['venue'][0];
+      $venues[$venue['id']] =  $venue;
+      $venues[$venue['id']]['vid'] =  $venue['id'];
+      $venues[$venue['id']]['lat_long'] =  $venue['latitude'] . ' / ' . $venue['longitude'];
+      $venues[$venue['id']]['acid'] =  $account->acid;
+    }
+  }
+}
+
+/**
+ * Function _eventbrite_api_import_venuesall
+ *   Get a list of venues for a specified user and prepare them for import
+ *   into the drupal db
+ *
+ * @param int $user_id
+ *   The user to list venues for
+ * @param array $venues
+ *   This is passed by reference so that we can fill it up during the import all
+ */
+function _eventbrite_api_import_venuesall($user_id, &$venues, $account = NULL) {
+  // Try to load venues from this user
+  if (is_null($account)) {
+    $venueobj = new eventBriteVenues();
+  }
+  else {
+    $venueobj = new eventBriteVenues(NULL, $account->api_userkey, $account->api_appkey, $account->api_oauth);
+  }
+  $list = $venueobj->venuesList($user_id);
+
+  // If we can't, set an error.
+  if (isset($list['error'])) {
+    $msg = t('Venues for User ID: !user. !message', array('!user' => $user_id, '!message' => $list['error']['error_type'] . ': ' . $list['error']['error_message']));
+    watchdog('eventbrite_api', 'Import Venues: ' . $msg);
+    drupal_set_message($msg, 'warning');
+  }
+  else {
+    // Grab each venue from the returned json and add it directly to the
+    // return array
+    foreach ($list['venues'] as $venue) {
+      $venue['city'] = isset($venue['address']['city'])? $venue['address']['city'] : '';
+      $venue['country'] = isset($venue['address']['country'])? $venue['address']['country'] : '';
+      $venue['region'] = isset($venue['address']['region'])? $venue['address']['region'] : '';
+      $venue['postal_code'] = isset($venue['address']['postal_code'])? $venue['address']['postal_code'] : '';
+      $venue['address_2'] = isset($venue['address']['address_2'])? $venue['address']['address_2'] : '';
+      $venue['address'] = isset($venue['address']['address'])? $venue['address']['address'] : '';
+      $venue['country_code'] = isset($venue['address']['country_code'])? $venue['address']['country_code'] : '';
+      $venue['lat_long'] =  $venue['latitude'] . ' / ' . $venue['longitude'];
+      $venue['vid'] = $venue['id'];
+      $venue['acid'] = $account->acid;
+      $venues[$venue['id']] = $venue;
+    }
   }
 }
 
@@ -695,10 +1023,6 @@ function eventbrite_api_format_all($data) {
         if (!empty($ticket->ticket->price)) {
           $ticket->ticket->price = str_replace(',', '', $ticket->ticket->price);
         }
-        // Remove commas from display prices.
-        if (!empty($ticket->ticket->display_price)) {
-          $ticket->ticket->display_price = str_replace(',', '', $ticket->ticket->display_price);
-        }
         // Assign the venue object as an array to $events.
         $events['tickets'][$tid] = (array) $ticket->ticket;
       }
@@ -716,10 +1040,6 @@ function eventbrite_api_format_all($data) {
     }
     if (!empty($vid)) {
       $events['events'][$eid]['vid'] = $vid;
-    }
-    // Remove the HTML from the description if the user wishes.
-    if (variable_get('eventbrite_api_import_strip', 1) == 1) {
-      $events['events'][$eid]['description'] = strip_tags($events['events'][$eid]['description']);
     }
   }
   // Run through the attendee data.
@@ -761,7 +1081,7 @@ function eventbrite_api_format_all($data) {
   $events['attendees'] = $attendees;
   // Format the questions/answers.
   $questions = array();
-  foreach ($answers as $key => $answer) {
+  foreach($answers as $key => $answer) {
     foreach ($answer as $a) {
       $a->answer->aid = $key;
       $questions[$key] = (array) $a->answer;
@@ -792,18 +1112,19 @@ function eventbrite_api_entity_prepare($type) {
     'capacity' => '',
     'num_attendee_rows' => '',
     'title' => '',
-    'start_date' => eventbrite_api_ctime(),
+    'start_date' => _eventbrite_api_ctime(),
     'status' => '',
     'description' => '',
-    'end_date' => eventbrite_api_ctime(),
+    'end_date' => _eventbrite_api_ctime(),
     'tags' => '',
     'timezone_offset' => '',
     'password' => '',
-    'created' => eventbrite_api_ctime(),
+    'created' => _eventbrite_api_ctime(),
     'url' => '',
     'privacy' => '',
-    'modified' => eventbrite_api_ctime(),
+    'modified' => _eventbrite_api_ctime(),
     'repeats' => '',
+    'acid' => '',
     'is_new' => TRUE,
   );
   $organizer = array(
@@ -812,6 +1133,7 @@ function eventbrite_api_entity_prepare($type) {
     'description' => '',
     'long_description' => '',
     'url' => '',
+    'acid' => '',
     'is_new' => TRUE,
   );
   $ticket = array(
@@ -820,8 +1142,8 @@ function eventbrite_api_entity_prepare($type) {
     'name' => '',
     'type' => '',
     'description' => '',
-    'start_date' => eventbrite_api_ctime(),
-    'end_date' => eventbrite_api_ctime(),
+    'start_date' => _eventbrite_api_ctime(),
+    'end_date' => _eventbrite_api_ctime(),
     'min' => '',
     'max' => '',
     'price' => '0.00',
@@ -830,6 +1152,7 @@ function eventbrite_api_entity_prepare($type) {
     'currency' => '',
     'quantity_available' => '',
     'display_price' => '0.00',
+    'acid' => '',
     'is_new' => TRUE,
   );
   $venue = array(
@@ -845,6 +1168,7 @@ function eventbrite_api_entity_prepare($type) {
     'longitude' => '',
     'latitude' => '',
     'lat_long' => '',
+    'acid' => '',
     'is_new' => TRUE,
   );
   $attendee = array(
@@ -869,7 +1193,7 @@ function eventbrite_api_entity_prepare($type) {
     'blog' => '',
     'email' => '',
     'work_address' => '',
-    'event_date' => eventbrite_api_ctime(),
+    'event_date' => _eventbrite_api_ctime(),
     'eventbrite_fee' => '',
     'amount_paid' => '',
     'job_title' => '',
@@ -895,6 +1219,7 @@ function eventbrite_api_entity_prepare($type) {
     'cell_phone' => '',
     'age' => '',
     'quantity' => '',
+    'acid' => '',
     'is_new' => TRUE,
   );
   $attendee_answer = array(
@@ -903,6 +1228,7 @@ function eventbrite_api_entity_prepare($type) {
     'answer_text' => '',
     'question' => '',
     'question_type' => '',
+    'acid' => '',
     'is_new' => TRUE,
   );
   switch ($type) {
@@ -955,7 +1281,7 @@ function eventbrite_api_entity_prepare($type) {
 function _eventbrite_api_alter_field($data) {
   // Set some shorthand vars.
   $type = $data['type'];
-  $target_type = isset($data['settings']['target_type']) ? $data['settings']['target_type'] : '';
+  $target_type = $data['settings']['target_type'];
   // Check to see if this is the correct field.
   if ($type == 'entityreference' && $target_type == 'event') {
     // Get all of the necessary variables together.
@@ -979,7 +1305,8 @@ function _eventbrite_event_autocomplete($string) {
   // Select the organizers table.
   $query = db_select('eventbrite_api_events', 'e');
   // Select rows that match the string.
-  $return = $query->fields('e', array('eid', 'title'))
+  $return = $query
+    ->fields('e', array('eid', 'title'))
     ->condition('e.title', '%' . db_like($string) . '%', 'LIKE')
     ->range(0, 10)
     ->execute();
@@ -1000,8 +1327,12 @@ function _eventbrite_organizer_autocomplete($string) {
   // Select the organizers table.
   $query = db_select('eventbrite_api_organizers', 'o');
   // Select rows that match the string.
-  $return = $query->fields('o', array('oid', 'name'))
-    ->condition('o.name', '%' . db_like($string) . '%', 'LIKE')
+  $dborg_or = db_or();
+  $dborg_or->condition('o.name', '%' . db_like($string) . '%', 'LIKE');
+  $dborg_or->condition('o.oid', '%' . db_like($string) . '%', 'LIKE');
+  $return = $query
+    ->fields('o', array('oid', 'name'))
+    ->condition($dborg_or)
     ->range(0, 10)
     ->execute();
   // Add matches to $matches .
@@ -1018,16 +1349,26 @@ function _eventbrite_organizer_autocomplete($string) {
  */
 function _eventbrite_venue_autocomplete($string) {
   $matches = array();
-  // Select the organizers table.
+  // Select the venue table.
   $query = db_select('eventbrite_api_venues', 'v');
   // Select rows that match the string.
-  $return = $query->fields('v', array('vid', 'name'))
-    ->condition('v.name', '%' . db_like($string) . '%', 'LIKE')
+  $dbven_or = db_or();
+  $dbven_or->condition('v.name', '%' . db_like($string) . '%', 'LIKE');
+  $dbven_or->condition('v.region', '%' . db_like($string) . '%', 'LIKE');
+  $dbven_or->condition('v.city', '%' . db_like($string) . '%', 'LIKE');
+  $dbven_or->condition('v.address', '%' . db_like($string) . '%', 'LIKE');
+  $dbven_or->condition('v.vid', '%' . db_like($string) . '%', 'LIKE');
+  $return = $query
+    ->fields('v', array('vid', 'name', 'city', 'address'))
+    ->condition($dbven_or)
     ->range(0, 10)
+    ->orderBy('v.name')
+    ->orderBy('v.city')
+    ->orderBy('v.address')
     ->execute();
   // Add matches to $matches .
   foreach ($return as $row) {
-    $string = check_plain($row->name) . ' (' . $row->vid . ')';
+    $string = check_plain($row->name)  . ' ' . check_plain($row->address). ' ' . check_plain($row->city) . ' (' . $row->vid . ')';
     $matches[$string] = $string;
   }
   // Return for JS.
@@ -1054,10 +1395,13 @@ function eventbrite_api_autocomplete_build($id, $entity_type) {
   switch ($entity_type) {
     case 'event':
       $text = $entity->title;
-      break;
+    break;
+    case 'venue':
+      $text = check_plain($entity->name)  . ' ' . check_plain($entity->address). ' ' . check_plain($entity->city);
+    break;
     default:
       $text = $entity->name;
-      break;
+    break;
   }
   $string = $text . ' (' . $id . ')';
   return $string;
