@@ -1,0 +1,190 @@
+<?php
+
+/**
+ * Implements hook_uninstall().
+ */
+function eventbrite_attendees_uninstall() {
+  variable_del('eventbrite_attendees_user_key');
+  variable_del('eventbrite_attendees_app_key');
+  variable_del('eventbrite_attendees_event_id');
+  variable_del('eventbrite_attendees_opt_out_id');
+  variable_del('eventbrite_attendees_username_id');
+  variable_del('eventbrite_attendees_sponsor_ticket_id');
+  variable_del('eventbrite_attendees_create_users');
+  variable_del('eventbrite_attendees_sync_role');
+  variable_del('eventbrite_attendees_user_field_map');
+}
+
+/**
+ * Implements hook_schema().
+ */
+function eventbrite_attendees_schema() {
+  $schema['eventbrite_attendees'] = array(
+    'description' => t('Stores a record of event attendees'),
+    'fields' => array(
+      'id' => array(
+        'description' => t('The primary identifier for an attendee.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => t('The associated Drupal user ID.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'event_id' => array(
+        'description' => t('The numeric identifier for an event (can be larger then a 32 bit int, so use a string column).'),
+        'type' => 'varchar',
+        'length' => 16,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'ticket_id' => array(
+        'description' => t('The identifier for a ticket type.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'order_id' => array(
+        'description' => t('Theidentifier for an order.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'order_type' => array(
+        'description' => t('Order type.'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'amount_paid' => array(
+        'description' => t('Amount paid.'),
+        'type' => 'float',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'currency' => array(
+        'description' => t('Currency used.'),
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'discount' => array(
+        'description' => t('Discount or access code used.'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'email' => array(
+        'description' => t('The email.'),
+        'type' => 'varchar',
+        'length' => 254,
+        'not null' => TRUE,
+      ),
+      'first_name' => array(
+        'description' => t('First name.'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'last_name' => array(
+        'description' => t('Last name.'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'company' => array(
+        'description' => t('Company name.'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'website' => array(
+        'description' => t('Website.'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'created' => array(
+        'description' => t('Created time (ISO string).'),
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+      'modified' => array(
+        'description' => t('Modified time (ISO string).'),
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  $schema['eventbrite_attendee_answers'] = array(
+    'description' => t('Stores an attendees answers to questions.'),
+    'fields' => array(
+      'attendee_id' => array(
+        'description' => t('The attendee ID - join to {eventbrite_attendees}.id'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'question_id' => array(
+        'description' => t('The question ID.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'answer_text' => array(
+        'description' => t('The value of the answer.'),
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => TRUE,
+      ),
+      'question_type' => array(
+        'description' => t('Website.'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'question' => array(
+        'description' => t('The question.'),
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('attendee_id', 'question_id'),
+    'indexes' => array(
+      // Index just 16 characters of the answer.
+      'question_answer' => array('question_id', array('answer_text', 16)),
+    ),
+    'foreign keys' => array(
+      'attendee_id' => array(
+        'table' => 'eventbrite_attendees',
+        'columns' => array('attendee_id' => 'id'),
+      ),
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Install schema if the module was updated from an earlier version.
+ */
+function eventbrite_attendees_update_7200() {
+  if (!db_table_exists('eventbrite_attendees')) {
+    drupal_install_schema("eventbrite_attendees");
+  }
+}

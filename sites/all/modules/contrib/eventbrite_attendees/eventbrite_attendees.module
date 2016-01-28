@@ -1,0 +1,692 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function eventbrite_attendees_menu() {
+  $items = array();
+  $items['admin/config/services/eventbrite-attendees'] = array(
+    'title' => 'Eventbrite Configuration',
+    'description' => 'Set API keys and data mappings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('eventbrite_attendees_configure_form'),
+    'access arguments' => array('administer site configuration'),
+  );
+  $items['admin/reports/eventbrite-attendees'] = array(
+    'title' => 'Eventbrite Full Data',
+    'description' => 'See Full Attendee data',
+    'page callback' => 'eventbrite_attendees_report',
+    'access arguments' => array('access site reports'),
+  );
+  $items['admin/reports/eventbrite-attendees/test'] = array(
+    'title' => 'Eventbrite Full Data test',
+    'description' => 'Test',
+    'page callback' => 'eventbrite_attendees_test',
+    'access arguments' => array('access site reports'),
+  );
+  $items['admin/reports/eventbrite-attendees/csv'] = array(
+    'title' => 'Eventbrite CSV',
+    'description' => 'Export Attendee data',
+    'page callback' => 'eventbrite_attendees_csv_export',
+    'access arguments' => array('access site reports'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['eventbrite/attendees'] = array(
+    'title' => 'Event attendees',
+    'page callback' => 'eventbrite_attendees_listing',
+    'access arguments' => array('access content'),
+  );
+  $items['eventbrite/webhook/%'] = array(
+    'title' => 'Eventbrite Webhook',
+    'page callback' => 'eventbrite_attendees_webhook',
+    'access callback' => 'eventbrite_attendees_webhook_access',
+    'access arguments' => array(2),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Helper function to extract the questions and choices from data.
+ */
+function _eventbrite_attendees_get_questions(EventbriteAttendeeList $list) {
+  $question_choices = array();
+  $questions = array();
+  $opt_out_id = variable_get('eventbrite_attendees_opt_out_id', '');
+  // pre-analyze questions
+
+  foreach ($list as $a) {
+    if (is_array($a->answers)) {
+      foreach ($a->answers as $ans) {
+        // We don't need to see opt-out here.
+        if ($ans->question_id == $opt_out_id) {
+          continue;
+        }
+        $questions[$ans->question_id] = $ans->question;
+        if ($ans->question_type == "multiple choice") {
+          if (!isset($question_choices[$ans->question_id])) {
+            $question_choices[$ans->question_id] = array();
+          }
+          $choices = explode(' | ', $ans->answer_text);
+          foreach ($choices as $c) {
+            if (!isset($question_choices[$ans->question_id][$c])) {
+              $question_choices[$ans->question_id][$c] = 0;
+            }
+            $question_choices[$ans->question_id][$c]++;
+          }
+        }
+      }
+    }
+  }
+  return array($questions, $question_choices);
+}
+
+/**
+ * Page callback that displays a table of all attendee data.
+ *
+ * This page is for administrators to see all attendees and stats on them.
+ */
+function eventbrite_attendees_report() {
+  $list = eventbrite_attendees_load();
+  list($questions, $question_choices) = _eventbrite_attendees_get_questions($list);
+
+  $output = '';
+
+  $header = array(t('Name'), t('Company'), t('Website'), t('Email'), t('Amount paid'));
+  foreach ($questions as $id => $q) {
+    $header[] = truncate_utf8(check_plain($q), 30, TRUE, TRUE);
+  }
+
+  $rows = array();
+
+  foreach ($list as $attendee) {
+    $row = array();
+    $row[] = check_plain($attendee->first_name) . ' ' . check_plain($attendee->last_name);
+    $row[] = !empty($attendee->company) ? check_plain($attendee->company) : '';
+    $row[] = !empty($attendee->website) ? l($attendee->website, $attendee->website) : '';
+    $row[] = !empty($attendee->email) ? check_plain($attendee->email) : '';
+    $row[] = isset($attendee->amount_paid) ? check_plain($attendee->amount_paid) : '';
+    foreach ($questions as $id => $q) {
+      $row[] = isset($attendee->answers[$id]) ? check_plain($attendee->answers[$id]->answer_text) : '';
+    }
+    $rows[] = $row;
+  }
+
+  $output .= "<h3>" .  t('Answer summary') . "</h3>\n";
+  $output .= "<dl>\n";
+  foreach ($question_choices as $id => $choices) {
+    $output .= "<dt>" . check_plain($questions[$id]) . "</dt>\n";
+    foreach ($choices as $choice => $count) {
+      $output .= "<dd>" . check_plain($choice) . " : $count </dd>\n";
+    }
+  }
+  $output .= "</dl>\n";
+  $output .= "<p>" . l(t('Export CSV'), 'admin/reports/eventbrite-attendees/csv') . "</p>\n";
+  $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array(), 'caption' => t('All Attendees')));
+
+  return $output;
+}
+
+/**
+ * Page callback to download a CSV file with all attendee data.
+ */
+function eventbrite_attendees_csv_export() {
+  $list = eventbrite_attendees_load();
+  list($questions, $question_choices) = _eventbrite_attendees_get_questions($list);
+
+  $output = '';
+
+  $header = array(t('First Name'), t('Last Name'), t('Company'), t('Website'), t('Email'), t('Amount paid'));
+  foreach ($questions as $id => $q) {
+    $header[] = truncate_utf8(check_plain($q), 30, TRUE, TRUE);
+  }
+  // Send response headers to the browser
+  header('Content-Type: text/csv' );
+  header('Content-Disposition: attachment;filename=eventbrite_attendees-' . date('Y-m-d') . '.csv');
+  $fp = fopen('php://output', 'w');
+  fputcsv($fp, $header);
+
+  foreach ($list as $attendee) {
+    $row = array();
+    $row[] = ucfirst($attendee->first_name);
+    $row[] = ucfirst($attendee->last_name);
+    $row[] = !empty($attendee->company) ? $attendee->company : '';
+    $row[] = !empty($attendee->website) ? $attendee->website : '';
+    $row[] = !empty($attendee->email) ? $attendee->email : '';
+    $row[] = isset($attendee->amount_paid) ? $attendee->amount_paid : '';
+    foreach ($questions as $id => $q) {
+      $row[] = isset($attendee->answers[$id]) ? $attendee->answers[$id]->answer_text : '';
+    }
+    fputcsv($fp, $row);
+  }
+
+  fclose($fp);
+  exit();
+}
+
+
+/**
+ * Form builder for configuration form.
+ */
+function eventbrite_attendees_configure_form($form, &$form_state) {
+  $form['basic'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Basic configuration'),
+  );
+  $form['basic']['eventbrite_attendees_user_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Eventbrite User key'),
+    '#default_value' => variable_get('eventbrite_attendees_user_key', ''),
+    '#description' => t('The unique string assigned by Eventbrite which identifies the user making an API call.'),
+    '#required' => TRUE,
+  );
+  $form['basic']['eventbrite_attendees_app_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Eventbrite Application key'),
+    '#default_value' => variable_get('eventbrite_attendees_app_key', ''),
+    '#description' => t('The Eventbrite Application key for API calls (identifies this site).'),
+    '#required' => TRUE,
+  );
+  $form['basic']['eventbrite_attendees_event_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Eventbrite Event Id'),
+    '#default_value' => variable_get('eventbrite_attendees_event_id', ''),
+    '#description' => t('The Eventbrite event ID for the event whose attendees you want to list.'),
+    '#required' => TRUE,
+  );
+  $form['webhook'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Webhook configuration'),
+  );
+  $form['webhook']['eventbrite_attendees_webhook_url'] = array(
+    '#type' => 'markup',
+    '#title' => t('Eventbrite Webhook URL'),
+    '#markup' => url('eventbrite/webhook/' . eventbrite_attendees_get_webhook_token(), array('absolute' => TRUE)),
+  );
+  $form['additional'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Additional configuration'),
+  );
+  $form['additional']['eventbrite_attendees_opt_out_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Eventbrite Opt Out Question Id'),
+    '#default_value' => variable_get('eventbrite_attendees_opt_out_id', ''),
+    '#description' => t('The Eventbrite question ID for the checkbox where the user may opt out of being listed.'),
+  );
+  $form['additional']['eventbrite_attendees_username_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Eventbrite Drupal.org username Question Id'),
+    '#default_value' => variable_get('eventbrite_attendees_username_id', ''),
+    '#description' => t('The Eventbrite question ID where attendess may enter their drupal.org username.'),
+  );
+  $form['additional']['eventbrite_attendees_sponsor_ticket_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Eventbrite Individual Sponsor Ticket Id'),
+    '#default_value' => variable_get('eventbrite_attendees_sponsor_ticket_id', ''),
+    '#description' => t('The Eventbrite ticket ID purchased by individual sponsors.'),
+  );
+  $form['user_sync'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('User sync'),
+  );
+  $form['user_sync']['eventbrite_attendees_create_users'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Sync and create Drupal user accounts'),
+    '#default_value' => variable_get('eventbrite_attendees_create_users', 0),
+    '#description' => t('If enabled, a Drupal user account will be created for each attendee who registers.'),
+  );
+  $options = array(0 => t('- None -')) + user_roles(TRUE);
+  unset($options[DRUPAL_AUTHENTICATED_RID]);
+  $form['user_sync']['eventbrite_attendees_sync_role'] = array(
+    '#type' => 'radios',
+    '#title' => t('Extra role for Drupal user accounts'),
+    '#options' => $options,
+    '#default_value' => variable_get('eventbrite_attendees_sync_role', 0),
+    '#description' => t('Optional extra role to give to user accounts created from attendees.'),
+  );
+  if (module_exists('og')) {
+    $form['og'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Organic groups'),
+    );
+    $groups = array(0 => t('- None -'));
+    $nids = og_get_all_group();
+    foreach (db_query('SELECT nid, title FROM {node} WHERE nid IN(:nids) AND status = 1 ORDER BY title', array(':nids' => $nids)) as $row) {
+      $groups[$row->nid] = $row->title;
+    }
+    $form['og']['eventbrite_attendees_group'] = array(
+      '#type' => 'select',
+      '#title' => t('Organic group for attendees'),
+      '#options' => $groups,
+      '#default_value' => variable_get('eventbrite_attendees_group', 0),
+    );
+  }
+  $form = system_settings_form($form);
+  $form['#submit'][] = 'eventbrite_attendees_cache_clear';
+  return $form;
+}
+
+/**
+ * Clear cache entries.
+ */
+function eventbrite_attendees_cache_clear() {
+  cache_clear_all('eventbrite_attendees:', 'cache', TRUE);
+}
+
+function eventbrite_attendees_test() {
+  $list = eventbrite_attendees_fetch();
+  if ($list) {
+    eventbrite_attendees_update_data($list);
+  }
+  return '<pre>' . print_r(eventbrite_attendees_load(), TRUE) . '</pre>';
+}
+
+/**
+ * Load all attendee data and answers into an array keyed by ID.
+ *
+ * @return EventbriteAttendeeList
+ */
+function eventbrite_attendees_load() {
+  $data = db_query('SELECT * FROM {eventbrite_attendees} ORDER BY first_name, last_name')->fetchAllAssoc('id');
+  foreach ($data as $id => $a) {
+    $a->answers = array();
+  }
+  $answers = db_query('SELECT * FROM {eventbrite_attendee_answers}')->fetchAll();
+  foreach ($answers as $ans) {
+    if (isset($data[$ans->attendee_id])) {
+      $data[$ans->attendee_id]->answers[$ans->question_id] = $ans;
+    }
+  }
+  return new EventbriteAttendeeList($data, 'attending');
+}
+
+/**
+ * Implements hook_cron().
+ */
+function eventbrite_attendees_cron() {
+  $since = eventbrite_attendees_sync_new(TRUE);
+
+  $last_check = 0;
+  $cache = cache_get('eventbrite_attendees:last_not_attending_check');
+  if (isset($cache->data)) {
+    $last_check = $cache->data;
+  }
+  // Remove people only once per 3 hours to avoid hitting API limits.
+  if (REQUEST_TIME - $last_check >= 3 * 3600) {
+    $list = eventbrite_attendees_fetch($since, 'not_attending');
+    if ($list) {
+      eventbrite_attendees_not_attending($list);
+    }
+    cache_set('eventbrite_attendees:last_not_attending_check', REQUEST_TIME);
+    watchdog('eventbrite_attendees', 'Checked for people who are not attending, found !count', array('!count' => count($list)));
+  }
+}
+
+/**
+ * @return array
+ */
+function eventbrite_attendees_sync_new($update_last_fetch = FALSE) {
+// Eventbrite is based in CA - need to use their local time.
+  $now = new DateTime(NULL, timezone_open('America/Los_Angeles'));
+
+  $since = '';
+  // Use cache rather than variable table to avoid extra cache clears.
+  $cache = cache_get('eventbrite_attendees:last_fetch');
+  if (isset($cache->data)) {
+    $since = $cache->data;
+  }
+
+  $list = eventbrite_attendees_fetch($since, 'attending');
+  watchdog('eventbrite_attendees', 'Fetching data since "@since"', array('@since' => $since));
+
+  // Only update the timestamp if we got some data back, since
+  // errors could also give use an empty result.
+  if (count($list) > 0) {
+    // ISO date/time in CA local time.
+    $time = $now->format('Y-m-d H:i:s');
+    if ($update_last_fetch) {
+      cache_set('eventbrite_attendees:last_fetch', $time);
+    }
+    eventbrite_attendees_update_data($list);
+    watchdog('eventbrite_attendees', 'Added/updated !count attendees and setting new fetch time "@since"', array(
+      '!count' => count($list),
+      '@since' => $time
+    ));
+    eventbrite_attendees_sync_users();
+  }
+  return $since;
+}
+
+
+/**
+ * Fetch data from Eventbrite.
+ *
+ * @param string $modified_after
+ *   Optional date and time in ISO-like format like '2013-01-28 00:00:00'.
+ *   Needs to us San Francisco, CA time zone. Only attendees modified on or
+ *   after this date/time will be returned.
+ * @param string $status
+ *   Valid values are 'attending', 'not_attending' and 'all'.
+ *
+ * @return EventbriteAttendeeList
+ *   API result object decoded from JSON or NULL on error.
+ */
+function eventbrite_attendees_fetch($modified_after = '', $status = 'attending') {
+  $user_key = variable_get('eventbrite_attendees_user_key', '');
+  $app_key = variable_get('eventbrite_attendees_app_key', '');
+  $event_id = variable_get('eventbrite_attendees_event_id', '');
+  if (empty($user_key) || empty($app_key) || empty($event_id)) {
+    // Empty data.
+    return array();
+  }
+
+  $base_url = 'https://www.eventbrite.com/json/event_list_attendees?';
+  $query = array();
+  $query['page'] = 0;
+  $query['id'] = $event_id;
+  $query['app_key'] = $app_key;
+  $query['user_key'] = $user_key;
+  $query['status'] = $status;
+  if ($modified_after) {
+    $query['modified_after'] = $modified_after;
+  }
+  $url = $base_url . drupal_http_build_query($query);
+  $result = drupal_http_request($url);
+  $list = NULL;
+  if ($result->code == 200) {
+    $data = json_decode($result->data);
+    if (!empty($data->error) && $data->error->error_type != "Not Found") {
+      watchdog('eventbrite_attendees', 'Error type: "@error_type".  Error message: "@error_message"', array('@error_type' => $data->error->error_type, '@error_message' => $data->error->error_message), WATCHDOG_ERROR);
+    }
+    else {
+      $list = EventbriteAttendeeList::fromJsonData($data->attendees, $status);
+    }
+  }
+  else {
+    watchdog('eventbrite_attendees', 'Non-200 response: @code.  Error message: "@error_message"', array('@code' => $result->code, '@error_message' => $result->error), WATCHDOG_ERROR);
+  }
+
+  return $list;
+}
+
+/**
+ * Callback to insert/update attendees with API data.
+ */
+function eventbrite_attendees_update_data(EventbriteAttendeeList $list) {
+  foreach ($list as $attendee) {
+    $primary_keys = array();
+    $existing_answers = array();
+    $existing = db_query('SELECT 1 FROM {eventbrite_attendees} WHERE id = :id', array('id' => $attendee->id))->fetchField();
+    if ($existing) {
+      $primary_keys[] = 'id';
+      $existing_answers = db_query('SELECT question_id, 1 FROM {eventbrite_attendee_answers} WHERE attendee_id = :id', array('id' => $attendee->id))->fetchAllKeyed();
+    }
+    drupal_write_record('eventbrite_attendees', $attendee, $primary_keys);
+    foreach ($attendee->answers as $question_id => $answer) {
+      $primary_keys = isset($existing_answers[$question_id]) ? array('attendee_id', 'question_id') : array();
+      drupal_write_record('eventbrite_attendee_answers', $answer, $primary_keys);
+      // Clear this id from the list.
+      unset($existing_answers[$question_id]);
+    }
+    if ($existing_answers) {
+      // Wipe all left-over existing answers since they no longer appear,
+      // rather than changing value, when unchecked or omitted.
+      db_delete('eventbrite_attendee_answers')
+        ->condition('attendee_id', $attendee->id)
+        ->condition('question_id', array_keys($existing_answers))
+        ->execute();
+    }
+  }
+}
+
+/**
+ * Remove from the event list people who are not attending.
+ */
+function eventbrite_attendees_not_attending(EventbriteAttendeeList $list) {
+  $gid = 0;
+  if (module_exists('og')) {
+    $gid = variable_get('eventbrite_attendees_group', 0);
+  }
+  $rid = variable_get('eventbrite_attendees_sync_role', 0);
+  $uids = array();
+  foreach ($list as $attendee) {
+    $uid = db_query('SELECT uid FROM {eventbrite_attendees} WHERE id = :id', array('id' => $attendee->id))->fetchField();
+    if ($uid && $gid) {
+      og_ungroup('node', $gid, 'user', $uid);
+    }
+    if ($uid) {
+      $uids[] = $uid;
+      db_delete('eventbrite_attendees')
+        ->condition('id', $attendee->id)
+        ->execute();
+      db_delete('eventbrite_attendee_answers')
+        ->condition('attendee_id', $attendee->id)
+        ->execute();
+    }
+  }
+  if ($uids && $rid) {
+    user_multiple_role_edit($uids, 'remove_role', $rid);
+  }
+}
+
+/**
+ * Mapping of Eventbite attendee fields to Drupal user fields.
+ */
+function eventbrite_attendees_map_users() {
+  // For now just assume user fields from COD cod_base feature
+  $default = array(
+   'first_name' => 'field_profile_first',
+   'last_name' => 'field_profile_last',
+   'company' => 'field_profile_org',
+  );
+  $map = variable_get('eventbrite_attendees_user_field_map', $default);
+  return $map;
+}
+
+/**
+ * Load all attendees, and create a Drupal user account for any that need one.
+ */
+function eventbrite_attendees_sync_users() {
+  $sync = variable_get('eventbrite_attendees_create_users', FALSE);
+  if (!$sync) {
+    return;
+  }
+  $gid = 0;
+  if (module_exists('og')) {
+    $gid = variable_get('eventbrite_attendees_group', 0);
+  }
+  $rid = variable_get('eventbrite_attendees_sync_role', 0);
+  $map = eventbrite_attendees_map_users();
+  $data = db_query('SELECT * FROM {eventbrite_attendees} WHERE uid = 0')->fetchAllAssoc('id');
+  foreach ($data as $attendee) {
+    // Try to match to an existing user.
+    $uid = db_query('SELECT uid FROM {users} WHERE mail = :email', array('email' => $attendee->email))->fetchField();
+    $edit = array();
+    if ($uid) {
+      $account = user_load($uid);
+    }
+    else {
+      $account = new stdClass();
+      $account->uid = NULL;
+      $account->mail = $account->init = $attendee->email;
+      $account->roles = array();
+      $account->cache = 0;
+      $account->status = 1;
+      $edit['pass'] = user_password();
+      $name = '';
+      $error = TRUE;
+      if (!empty($attendee->first_name) && !empty($attendee->last_name)) {
+        // Use trim since extra spaces cause later validation failures.
+        $name = trim($attendee->first_name) . ' ' . trim($attendee->last_name);
+        // Remove any invalid characters.
+        $name = preg_replace('/[^\x{80}-\x{F7} a-z0-9@_.\'-]/i', '_', $name);
+        $error = user_validate_name($name);
+      }
+      if ((!$name || $error) && preg_match('/^([^@]+)/', $attendee->email, $m)) {
+        // Remove any invalid characters.
+        $name = preg_replace('/[^\x{80}-\x{F7} a-z0-9@_.\'-]/i', '_', $m[1]);
+        $error = user_validate_name($name);
+      }
+      // If we did not find a name, or it's invalid assign a random one.
+      if ($error) {
+        $name = strtolower(user_password(6));
+      }
+      do {
+        $existing_name = db_query('SELECT name FROM {users} WHERE name = :name', array('name' => $name))->fetchField();
+        if ($existing_name) {
+          // Add a random character.
+          $name .= user_password(1);
+        }
+      } while ($existing_name);
+      $account->name = $name;
+    }
+    if ($rid) {
+      $account->roles[$rid] = $rid;
+    }
+    foreach ($attendee as $key => $value) {
+      if (!empty($map[$key])) {
+        $field = $map[$key];
+        $account->{$field}[LANGUAGE_NONE][0]['value'] = $value;
+      }
+    }
+    user_save($account, $edit);
+    // Record the relationship.
+    db_update('eventbrite_attendees')
+      ->fields(array('uid' => $account->uid))
+      ->condition('id', $attendee->id)
+      ->execute();
+    if (!$uid) {
+      // Created a new account, send email. @see _user_mail_notify().
+      $params['account'] = $account;
+      $language = user_preferred_language($account);
+      $mail = drupal_mail('user', 'register_admin_created', $account->mail, $language, $params);
+      // @todo if $mail['result'] is empty, we could queue and retry.
+    }
+    if ($gid) {
+      // Make sure the user is an active member of the selected group.
+      og_group('node', $gid, array('entity' => $account));
+    }
+  }
+}
+
+/**
+ * Page callback to display atendees.
+ */
+function eventbrite_attendees_listing() {
+  // Flag for when we want to add RDFa
+  $rdf = function_exists('rdf_get_namespaces');
+  $data = eventbrite_attendees_load();
+  $output = '';
+  $header = array(t('Name'), t('Company'), t('Website'));
+  $sponsor_rows = array();
+  $rows = array();
+  $opt_out_id = variable_get('eventbrite_attendees_opt_out_id', '');
+  $username_id = variable_get('eventbrite_attendees_username_id', '');
+  if ($username_id) {
+    $header[] = t('Drupal.org username');
+  }
+  $sponsor_ticket_id = variable_get('eventbrite_attendees_sponsor_ticket_id', '');
+  $total_attendees = 0;
+  $listed_attendees = 0;
+  foreach ($data as $attendee) {
+    $opt_out = FALSE;
+    $username = '';
+    if (is_array($attendee->answers)) {
+      foreach ($attendee->answers as $ans) {
+        if ($ans->question_id == $opt_out_id && !empty($ans->answer_text)) {
+          $opt_out = TRUE;
+        }
+        if ($ans->question_id == $username_id && !empty($ans->answer_text)) {
+          $username = $ans->answer_text;
+        }
+      }
+    }
+    $total_attendees++;
+    if ($opt_out) {
+      continue;
+    }
+    $listed_attendees++;
+    $row = array('data' => array());
+    if ($rdf) {
+      $row['typeof'] = "schema:Person";
+    }
+    $cell = array('data' => check_plain($attendee->first_name . ' ' . $attendee->last_name));
+    if ($rdf) {
+      $cell['property'] = "schema:name";
+    }
+    $row['data'][] = $cell;
+    $cell = array();
+    if (!empty($attendee->company)) {
+      $cell['data'] = check_plain($attendee->company);
+      if ($rdf) {
+        $cell['property'] = "schema:affiliation";
+      }
+    }
+    $row['data'][] = $cell;
+    $cell = array();
+    if (!empty($attendee->website)) {
+      $attributes = array();
+      if ($rdf) {
+        $attributes['rel'] = "schema:url";
+       }
+       // Make sure the website URL is properly formed.
+       preg_match('@(https?://){0,1}(.+)@', $attendee->website, $m);
+       if (!$m[1]) {
+         $m[1] = 'http://';
+       }
+       $cell['data'] = l(rtrim($m[2], '/'), $m[1] . $m[2], array('attributes' => $attributes));
+    }
+    $row['data'][] = $cell;
+    if ($username_id) {
+      $cell = array();
+      $cell['data'] = $username;
+      if ($rdf && $username) {
+        $cell['property'] = "foaf:nick";
+      }
+      $row['data'][] = $cell;
+    }
+    if ($sponsor_ticket_id && $sponsor_ticket_id == $attendee->ticket_id) {
+      $sponsor_rows[] = $row;
+    }
+    else {
+      $rows[] = $row;
+    }
+  }
+  if ($sponsor_rows) {
+    $output .= theme('table', array('header' => $header, 'rows' => $sponsor_rows, 'attributes' => array(), 'caption' => t('Individual Sponsor attendees')));
+  }
+  $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array(), 'caption' => t('Regular Attendees')));
+  $output .= '<p>' . t('@total registered attendees (@listed listed)', array('@total' => $total_attendees, '@listed' => $listed_attendees)) . '</p>';
+  return $output;
+}
+
+/**
+ * Implements hook_rdf_namespaces().
+ */
+function eventbrite_attendees_rdf_namespaces() {
+  return array(
+    'schema'  => 'http://schema.org/',
+  );
+}
+
+function eventbrite_attendees_webhook() {
+  $data = file_get_contents('php://input');
+  if ($data) {
+    eventbrite_attendees_sync_new();
+    drupal_json_output(array('success' => TRUE));
+    watchdog('eventbrite_attendees', print_r(json_decode($data), TRUE));
+  }
+  exit;
+}
+
+function eventbrite_attendees_webhook_access($token) {
+  return $token === eventbrite_attendees_get_webhook_token();
+}
+
+function eventbrite_attendees_get_webhook_token() {
+  if (!($key = variable_get('eventbrite_attendees_webhook_token', 0))) {
+    $key = drupal_random_key();
+    variable_set('eventbrite_attendees_webhook_token', $key);
+  }
+  return $key;
+}
