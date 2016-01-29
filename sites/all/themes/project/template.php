@@ -23,7 +23,7 @@ function project_preprocess_html(&$vars) {
       '!IE' => FALSE
       ),
     'preprocess' => FALSE
-  ));
+    ));
 
   // Add plugin scripts.
   $plugin_path = $theme_path . '/plugins/';
@@ -31,20 +31,20 @@ function project_preprocess_html(&$vars) {
 
   // Animate.css
   $animate = theme_get_setting('animate');
-    if ($animate > 0) {
+  if ($animate > 0) {
     $plugins['animate']['external'] = NULL;
     $plugins['animate']['type'] = 'css';
     switch ($animate) {
       case 1:
-        $plugins['animate']['path'] = $plugin_path.'animate/animate.min.css';
-        break;
+      $plugins['animate']['path'] = $plugin_path.'animate/animate.min.css';
+      break;
       case 2:
-        $plugins['animate']['path'] = $plugin_path.'animate/animate.css';
-        break;
+      $plugins['animate']['path'] = $plugin_path.'animate/animate.css';
+      break;
       case 3:
-        $plugins['animate']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.4.0/animate.min.css';
-        $plugins['animate']['external'] = 'external';
-        break;
+      $plugins['animate']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.4.0/animate.min.css';
+      $plugins['animate']['external'] = 'external';
+      break;
     }
 
     // Conditionally add Morphext based on Animate.
@@ -53,11 +53,11 @@ function project_preprocess_html(&$vars) {
       $plugins['morphext_js']['type'] = 'js';
       switch ($morphext) {
         case 1:
-          $plugins['morphext_js']['path'] = $plugin_path.'morphext/morphext.min.js';
-          break;
+        $plugins['morphext_js']['path'] = $plugin_path.'morphext/morphext.min.js';
+        break;
         case 2:
-          $plugins['morphext_js']['path'] = $plugin_path.'morphext/morphext.js';
-          break;
+        $plugins['morphext_js']['path'] = $plugin_path.'morphext/morphext.js';
+        break;
       }
       if ($morphext > 0) {
         $plugins['morphext_css']['path'] = $plugin_path.'morphext/morphext.css';
@@ -73,11 +73,11 @@ function project_preprocess_html(&$vars) {
     $plugins['bootstrap_notify']['type'] = 'js';
     switch ($bootstrap_notify) {
       case 1:
-        $plugins['bootstrap_notify']['path'] = $plugin_path.'bootstrap-notify/bootstrap-notify.min.js';
-        break;
+      $plugins['bootstrap_notify']['path'] = $plugin_path.'bootstrap-notify/bootstrap-notify.min.js';
+      break;
       case 2:
-        $plugins['bootstrap_notify']['path'] = $plugin_path.'bootstrap-notify/bootstrap-notify.js';
-        break;
+      $plugins['bootstrap_notify']['path'] = $plugin_path.'bootstrap-notify/bootstrap-notify.js';
+      break;
     }
   }
 
@@ -88,15 +88,15 @@ function project_preprocess_html(&$vars) {
     $plugins['chartjs']['type'] = 'js';
     switch ($chartjs) {
       case 1:
-        $plugins['chartjs']['path'] = $plugin_path.'charts/Chart.min.js';
-        break;
+      $plugins['chartjs']['path'] = $plugin_path.'charts/Chart.min.js';
+      break;
       case 2:
-        $plugins['chartjs']['path'] = $plugin_path.'charts/Chart.js';
-        break;
+      $plugins['chartjs']['path'] = $plugin_path.'charts/Chart.js';
+      break;
       case 3:
-        $plugins['chartjs']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js';
-        $plugins['chartjs']['external'] = 'external';
-        break;
+      $plugins['chartjs']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js';
+      $plugins['chartjs']['external'] = 'external';
+      break;
     }
   }
 
@@ -107,15 +107,15 @@ function project_preprocess_html(&$vars) {
     $plugins['fontawesome']['type'] = 'css';
     switch ($fontawesome) {
       case 1:
-        $plugins['fontawesome']['path'] = $plugin_path.'font-awesome/css/font-awesome.min.css';
-        break;
+      $plugins['fontawesome']['path'] = $plugin_path.'font-awesome/css/font-awesome.min.css';
+      break;
       case 2:
-        $plugins['fontawesome']['path'] = $plugin_path.'font-awesome/css/font-awesome.css';
-        break;
+      $plugins['fontawesome']['path'] = $plugin_path.'font-awesome/css/font-awesome.css';
+      break;
       case 3:
-        $plugins['fontawesome']['path'] = 'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css';
-        $plugins['fontawesome']['external'] = 'external';
-        break;
+      $plugins['fontawesome']['path'] = 'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css';
+      $plugins['fontawesome']['external'] = 'external';
+      break;
     }
   }
 
@@ -126,15 +126,15 @@ function project_preprocess_html(&$vars) {
     $plugins['hover_css']['type'] = 'css';
     switch ($hover_css) {
       case 1:
-        $plugins['hover_css']['path'] = $plugin_path.'hover/hover-min.css';
-        break;
+      $plugins['hover_css']['path'] = $plugin_path.'hover/hover-min.css';
+      break;
       case 2:
-        $plugins['hover_css']['path'] = $plugin_path.'hover.css';
-        break;
+      $plugins['hover_css']['path'] = $plugin_path.'hover.css';
+      break;
       case 3:
-        $plugins['hover_css']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.0.2/css/hover-min.css';
-        $plugins['hover_css']['external'] = 'external';
-        break;
+      $plugins['hover_css']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.0.2/css/hover-min.css';
+      $plugins['hover_css']['external'] = 'external';
+      break;
     }
   }
 
@@ -145,15 +145,15 @@ function project_preprocess_html(&$vars) {
     $plugins['jasny_css']['type'] = 'css';
     switch ($jasny_css) {
       case 1:
-        $plugins['jasny_css']['path'] = $plugin_path.'jasny-bootstrap/css/jasny-bootstrap.min.css';
-        break;
+      $plugins['jasny_css']['path'] = $plugin_path.'jasny-bootstrap/css/jasny-bootstrap.min.css';
+      break;
       case 2:
-        $plugins['jasny_css']['path'] = $plugin_path.'jasny-bootstrap/css/jasny-bootstrap.css';
-        break;
+      $plugins['jasny_css']['path'] = $plugin_path.'jasny-bootstrap/css/jasny-bootstrap.css';
+      break;
       case 3:
-        $plugins['jasny_css']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/css/jasny-bootstrap.min.css';
-        $plugins['jasny_css']['external'] = 'external';
-        break;
+      $plugins['jasny_css']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/css/jasny-bootstrap.min.css';
+      $plugins['jasny_css']['external'] = 'external';
+      break;
     }
   }
 
@@ -164,15 +164,15 @@ function project_preprocess_html(&$vars) {
     $plugins['jasny_js']['type'] = 'js';
     switch ($jasny_js) {
       case 1:
-        $plugins['jasny_js']['path'] = $plugin_path.'jasny-bootstrap/js/jasny-bootstrap.min.js';
-        break;
+      $plugins['jasny_js']['path'] = $plugin_path.'jasny-bootstrap/js/jasny-bootstrap.min.js';
+      break;
       case 2:
-        $plugins['jasny_js']['path'] = $plugin_path.'jasny-bootstrap/js/jasny-bootstrap.js';
-        break;
+      $plugins['jasny_js']['path'] = $plugin_path.'jasny-bootstrap/js/jasny-bootstrap.js';
+      break;
       case 3:
-        $plugins['jasny_js']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/js/jasny-bootstrap.min.js';
-        $plugins['jasny_js']['external'] = 'external';
-        break;
+      $plugins['jasny_js']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/js/jasny-bootstrap.min.js';
+      $plugins['jasny_js']['external'] = 'external';
+      break;
     }
   }
 
@@ -183,12 +183,12 @@ function project_preprocess_html(&$vars) {
     $plugins['pacejs']['type'] = 'js';
     switch ($pacejs) {
       case 1:
-        $plugins['pacejs']['path'] = $plugin_path.'pace/pace.min.js';
-        break;
+      $plugins['pacejs']['path'] = $plugin_path.'pace/pace.min.js';
+      break;
       case 2:
-        $plugins['pacejs']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js';
-        $plugins['pacejs']['external'] = 'external';
-        break;
+      $plugins['pacejs']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js';
+      $plugins['pacejs']['external'] = 'external';
+      break;
     }
   }
 
@@ -199,11 +199,11 @@ function project_preprocess_html(&$vars) {
     $plugins['vide']['type'] = 'js';
     switch ($vide) {
       case 1:
-        $plugins['vide']['path'] = $plugin_path.'vide/jquery.vide.min.js';
-        break;
+      $plugins['vide']['path'] = $plugin_path.'vide/jquery.vide.min.js';
+      break;
       case 2:
-        $plugins['vide']['path'] = $plugin_path.'vide/jquery.vide.js';
-        break;
+      $plugins['vide']['path'] = $plugin_path.'vide/jquery.vide.js';
+      break;
     }
   }
 
@@ -214,15 +214,15 @@ function project_preprocess_html(&$vars) {
     $plugins['waypoints']['type'] = 'js';
     switch ($waypoints) {
       case 1:
-        $plugins['waypoints']['path'] = $plugin_path.'waypoints/jquery.waypoints.min.js';
-        break;
+      $plugins['waypoints']['path'] = $plugin_path.'waypoints/jquery.waypoints.min.js';
+      break;
       case 2:
-        $plugins['waypoints']['path'] = $plugin_path.'waypoints/jquery.waypoints.js';
-        break;
+      $plugins['waypoints']['path'] = $plugin_path.'waypoints/jquery.waypoints.js';
+      break;
       case 3:
-        $plugins['waypoints']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.0/noframework.waypoints.min.js';
-        $plugins['waypoints']['external'] = 'external';
-        break;
+      $plugins['waypoints']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.0/noframework.waypoints.min.js';
+      $plugins['waypoints']['external'] = 'external';
+      break;
     }
   }
 
@@ -300,8 +300,10 @@ function project_preprocess_page(&$vars) {
 
   // Navbar action classes.
   $navbar_actions = theme_get_setting('navbar_actions');
-  foreach ($navbar_actions as $key => $value) {
-    $navbar['class'][] = $key;
+  if (!empty($navbar_actions)) {
+    foreach ($navbar_actions as $key => $value) {
+      $navbar['class'][] = $key;
+    }
   }
 
   // Add search bar.
@@ -355,7 +357,7 @@ function project_status_messages($variables) {
     'error' => t('Error message'),
     'warning' => t('Warning message'),
     'info' => t('Informative message'),
-  );
+    );
 
   // Map Drupal message types to their corresponding Bootstrap classes.
   // @see http://twitter.github.com/bootstrap/components.html#alerts
@@ -364,14 +366,14 @@ function project_status_messages($variables) {
     'error' => 'danger',
     'warning' => 'warning',
     'info' => 'info',
-  );
+    );
 
   $status_icon = array(
     'status' => 'glyphicon glyphicon-ok-sign',
     'error' => 'glyphicon glyphicon-remove-sign',
     'warning' => 'glyphicon glyphicon-question-sign',
     'info' => 'glyphicon glyphicon-info-sign',
-  );
+    );
 
   foreach (drupal_get_messages($display) as $type => $messages) {
     $output = '';
@@ -437,8 +439,8 @@ function project_status_messages($variables) {
       'notify' => array(
         'options' => $notify_options,
         'settings' => $notify_settings,
-      ),
-    );
+        ),
+      );
 
   }
 
@@ -451,7 +453,7 @@ function project_status_messages($variables) {
     } elseif ($bootstrap_notify) {
       drupal_add_js('jQuery.notify('.$status['notify']['options'].', '.$status['notify']['settings'].');',
         array('type' => 'inline', 'scope' => 'footer')
-      );
+        );
       continue;
     } else {
       $status_output .= $status['standard'];
