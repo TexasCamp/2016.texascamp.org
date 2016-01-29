@@ -1,4 +1,3 @@
-
 // Top level site name/nav hack
 .nav {
   margin-bottom: 0;
@@ -21,7 +20,7 @@
     padding: 0;
   }
   .conference-title {
-    background-color: @brand-primary;
+    background-color: @brand-color;
     color: white;
     font-size: 1.8rem;
     text-transform: uppercase;
@@ -38,21 +37,21 @@
     > div {
       padding: 20px;
       &:first-child {
-        background-color: lighten(@brand-primary, 10%);
+        background-color: lighten(@brand-color, 10%);
         color: @white;
         text-align: center;
       }
       .group-social-media {
-        background-color: darken(@brand-primary, 10%);
+        background-color: darken(@brand-color, 10%);
         .field {
           width: 25%;
           text-align: center;
           a {
             background-color: @white;
             border-radius: 50%;
-            color: @brand-primary;
+            color: @brand-color;
             &:hover {
-              color: @darken(@brand-primary, 10%);
+              color: @darken(@brand-color, 10%);
             }
           }
         }
