@@ -1,0 +1,39 @@
+<?php
+/**
+ * @file
+ * Yandex favicon creation.
+ */
+
+/**
+ * Implements hook_favicon_generator_admin().
+ */
+function favicon_generator_yandex_favicon_generator_admin() {
+  $form = array();
+  $form['favicon_generator_yandex_title'] = array(
+    '#markup' => '<label>' . t('Yandex Style') . '</label>',
+  );
+  $form['favicon_generator_yandex'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show title in Yandex'),
+    '#description' => t('If checked the title will appear in the Yandex tableau page.'),
+    '#default_value' => variable_get('favicon_generator_yandex', 1),
+  );
+
+  return $form;
+}
+
+/**
+ * Implements hook_favicon_generator_spec().
+ */
+function favicon_generator_yandex_favicon_generator_spec($settings) {
+  $array = array('yandex_browser' => array());
+  // Yandex Settings.
+  $title = variable_get('favicon_generator_yandex', 1);
+  $array['yandex_browser']['background_color'] = $settings['color'];
+  $array['yandex_browser']['manifest'] = array(
+    'show_title' => $title == 1 ? TRUE : FALSE,
+    'version' => '1.0',
+  );
+
+  return $array;
+}

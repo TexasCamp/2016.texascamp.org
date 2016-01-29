@@ -1,0 +1,5 @@
+name = Favicon Generator Open Graph
+description = Configures Open Graph (Facebook) Settings
+core = 7.x
+package = Favicon Generator
+dependencies[] = favicon_generator

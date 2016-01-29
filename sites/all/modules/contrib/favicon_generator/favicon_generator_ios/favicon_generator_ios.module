@@ -1,0 +1,44 @@
+<?php
+/**
+ * @file
+ * IOS favicon creation.
+ */
+
+/**
+ * Implements hook_favicon_generator_admin().
+ */
+function favicon_generator_ios_favicon_generator_admin() {
+  $form = array();
+  $form['favicon_generator_ios'] = array(
+    '#type' => 'select',
+    '#title' => t('IOS Style'),
+    '#options' => array(
+      'transparent' => t('Transparent Background'),
+      'colored' => t('Colored Background'),
+    ),
+    '#default_value' => variable_get('favicon_generator_ios', 'colored'),
+  );
+
+  return $form;
+}
+
+/**
+ * Implements hook_favicon_generator_spec().
+ */
+function favicon_generator_ios_favicon_generator_spec($settings) {
+  $array = array('ios' => array());
+  $ios = variable_get('favicon_generator_ios', 'colored');
+  if ($ios == 'colored') {
+    $array['ios'] = array(
+      'picture_aspect' => 'background_and_margin',
+      'margin' => $settings['margin'],
+      'background_color' => $settings['color'],
+    );
+  }
+  elseif ($ios == 'transparent') {
+    $array['ios'] = array(
+      'picture_aspect' => 'no_change',
+    );
+  }
+  return $array;
+}

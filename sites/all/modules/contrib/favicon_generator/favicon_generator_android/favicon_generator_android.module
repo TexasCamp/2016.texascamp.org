@@ -1,0 +1,55 @@
+<?php
+/**
+ * @file
+ * Windows 8 favicon creation.
+ */
+
+/**
+ * Implements hook_favicon_generator_admin().
+ */
+function favicon_generator_android_favicon_generator_admin() {
+  $form = array();
+  // Android Picture Aspect.
+  $form['favicon_generator_android'] = array(
+    '#type' => 'select',
+    '#title' => t('Android Style'),
+    '#options' => array(
+      'transparent' => t('Transparent Background'),
+      'colored' => t('Colored Background'),
+      'shadow' => t('Add Shadow'),
+    ),
+    '#default_value' => variable_get('favicon_generator_android', 'shadow'),
+  );
+
+  return $form;
+}
+
+/**
+ * Implements hook_favicon_generator_spec().
+ */
+function favicon_generator_android_favicon_generator_spec($settings) {
+  $array = array('android_chrome' => array());
+  $android = variable_get('favicon_generator_android', 'shadow');
+  if ($android == 'transparent') {
+    $array['android_chrome'] = array(
+      'picture_aspect' => 'no_change',
+    );
+  }
+  elseif ($android == 'colored') {
+    $array['android_chrome'] = array(
+      'picture_aspect' => 'background_and_margin',
+      'margin' => $settings['margin'],
+      'background_color' => $settings['color'],
+    );
+  }
+  elseif ($android == 'shadow') {
+    $array['android_chrome'] = array(
+      'picture_aspect' => 'shadow',
+    );
+  }
+  $array['android_chrome']['manifest'] = array(
+    'name' => variable_get('site_name'),
+  );
+
+  return $array;
+}

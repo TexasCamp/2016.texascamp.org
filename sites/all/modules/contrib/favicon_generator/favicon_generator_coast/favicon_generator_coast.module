@@ -1,0 +1,19 @@
+<?php
+/**
+ * @file
+ * OpenGraph image creation.
+ */
+
+/**
+ * Implements hook_favicon_generator_spec().
+ */
+function favicon_generator_coast_favicon_generator_spec($settings) {
+  $array = array();
+  $array = array('coast' => array());
+
+  $array['coast']['picture_aspect'] = 'background_and_margin';
+  $array['coast']['background_color'] = $settings['color'];
+  $array['coast']['margin'] = ceil($settings['margin'] * 100 / 57) . '%';
+
+  return $array;
+}

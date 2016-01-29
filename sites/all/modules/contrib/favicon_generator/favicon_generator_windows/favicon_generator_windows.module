@@ -1,0 +1,46 @@
+<?php
+/**
+ * @file
+ * Windows 8 favicon creation.
+ */
+
+/**
+ * Implements hook_favicon_generator_admin().
+ */
+function favicon_generator_windows_favicon_generator_admin() {
+  $form = array();
+  $form['favicon_generator_windows'] = array(
+    '#type' => 'select',
+    '#title' => t('Windows 8 Style'),
+    '#options' => array(
+      'colored' => t('Use the icon as is'),
+      'white' => t('Turn the icon into a white silhouette'),
+    ),
+    '#default_value' => variable_get('favicon_generator_windows', 'colored'),
+  );
+
+  return $form;
+}
+
+/**
+ * Implements hook_favicon_generator_spec().
+ */
+function favicon_generator_windows_favicon_generator_spec($settings) {
+  $array = array('windows' => array());
+  // Windows 8 Settings.
+  $win = variable_get('favicon_generator_windows', 'colored');
+  if ($win == 'colored') {
+    $array['windows'] = array(
+      'picture_aspect' => '',
+      'background_color' => $settings['color'],
+    );
+  }
+  elseif ($win == 'white') {
+    $array['windows'] = array(
+      'picture_aspect' => 'white_silhouette',
+      'background_color' => $settings['color'],
+    );
+  }
+
+  return $array;
+}

@@ -1,0 +1,19 @@
+#favicon-generator-settings .form-item-favicon-generator-color .favicon_generator_colorpicker,
+#favicon-generator-settings .form-item-favicon-generator-color .color-presets {
+  width: 195px;
+  height: 195px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+#favicon-generator-settings .form-item-favicon-generator-color .color-presets .color-preset {
+  width: 45px;
+  height: 45px;
+  padding: 10px;
+  display: inline-block;
+  vertical-align: top;
+  color: #fff;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+}

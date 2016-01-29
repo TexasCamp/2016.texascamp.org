@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ *
+ * Favicon Generator - Installation file.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function favicon_generator_uninstall() {
+  variable_del('favicon_generator_color');
+  variable_del('favicon_generator_margin');
+  variable_del('favicon_generator_path');
+}

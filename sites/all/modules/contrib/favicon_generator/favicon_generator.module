@@ -1,0 +1,480 @@
+<?php
+/**
+ * @file
+ * Favicon generator primary module file.
+ *
+ * Contains all the code except the admin UI.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function favicon_generator_menu() {
+  $items = array();
+
+  $items['admin/config/user-interface/favicon_generator'] = array(
+    'title' => 'Real Favicon Generator',
+    'description' => 'Configure how the icons appear',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer themes'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('favicon_generator_settings'),
+    'file' => 'favicon_generator.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Adds a callback when the theme settings page is saved.
+ */
+function favicon_generator_form_system_theme_settings_alter(&$form, &$form_state, $form_id) {
+  $form['#submit'][] = 'favicon_generator_theme_form_submit';
+}
+
+/**
+ * Additional submit handler for the theme form.
+ *
+ * Called via favicon_generator_form_system_theme_settings_alter.
+ *
+ * Validation is done here and not in hook_form_validate() as
+ * system_theme_settings_submit() needs to execute before checking image sizes.
+ */
+function favicon_generator_theme_form_submit($form, &$form_state) {
+  $values = $form_state['values'];
+  $settings = variable_get($values['var'], '');
+  if (empty($settings)) {
+    return;
+  }
+
+  if ($values['default_favicon']) {
+    return;
+  }
+
+  $min_size = 70;
+  $rec_size = 260;
+
+  foreach (module_implements('favicon_generator_min_size') as $module) {
+    $size = module_invoke($module, 'favicon_generator_min_size');
+    $min_size = $size > $min_size ? $size : $min_size;
+  }
+  foreach (module_implements('favicon_generator_rec_size') as $module) {
+    $size = module_invoke($module, 'favicon_generator_min_size');
+    $rec_size = $size > $rec_size ? $size : $rec_size;
+  }
+  $rec_size = $rec_size >= $min_size ? $rec_size : $min_size;
+
+  $icon_name = _favicon_generator_resize_icon($settings['favicon_path'], $min_size, TRUE);
+
+  $img_info = image_get_info($icon_name);
+  if ($img_info == FALSE) {
+    return;
+  }
+
+  $errors = FALSE;
+
+  if ($img_info['width'] != $img_info['height']) {
+    $errors = TRUE;
+    drupal_set_message(t('Icon image must be square.'), 'error');
+  }
+  if ($img_info['width'] < $min_size || $img_info['height'] < $min_size) {
+    $errors = TRUE;
+    drupal_set_message(t('Icon image must be at lease @sizex@sizepx.', array('size' => $min_size)), 'error');
+  }
+
+  if ($errors) {
+    return;
+  }
+
+  $result = _favicon_generator_download_and_save_icons($icon_name, isset($settings['theme']) ? $settings['theme'] : NULL);
+
+  if (is_array($result)) {
+    if ($img_info['width'] < $rec_size) {
+      drupal_set_message(t('Your icon should be at least @sizex@size for optimal results.', array('@size' => $rec_size)), 'warning');
+    }
+
+    $array = variable_get($values['var'], array());
+    $array = array_merge($array, $result);
+    $array['favicon_path'] = $icon_name;
+    variable_set($values['var'], $array);
+    drupal_set_message(t('Favicons created'));
+  }
+  elseif ($result != FALSE) {
+    drupal_set_message($result, 'error');
+  }
+  else {
+    drupal_set_message(t('An error occurred while fetching the icon set. Please try again later.'), 'error');
+  }
+
+}
+
+/**
+ * Implements hook_page_build().
+ */
+function favicon_generator_page_build(&$page) {
+  $html = theme_get_setting('favicon_generator_html');;
+  if (!empty($html)) {
+    $element = array(
+      '#type' => 'markup',
+      '#markup' => $html,
+    );
+    drupal_add_html_head($element, 'favicon_generator');
+  }
+}
+
+/**
+ * Implements hook_html_head_alter().
+ */
+function favicon_generator_html_head_alter(&$head_elements) {
+  if (isset($head_elements['favicon_generator'])) {
+    unset($head_elements['drupal_add_html_head_link:shortcut icon:http://localhost/misc/favicon.ico']);
+  }
+}
+
+/**
+ * Implements hook_help().
+ */
+function favicon_generator_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#favicon_generator':
+      $path = dirname(__FILE__) . '/README.md';
+      if (file_exists($path)) {
+        $readme = file_get_contents($path);
+      }
+      if (!isset($readme)) {
+        return NULL;
+      }
+      if (module_exists('markdown')) {
+        $filters = module_invoke('markdown', 'filter_info');
+        $info = $filters['filter_markdown'];
+
+        if (function_exists($info['process callback'])) {
+          $function = $info['process callback'];
+          $output = filter_xss_admin($function($readme, NULL));
+        }
+        else {
+          $output = '<pre>' . check_plain($readme) . '</pre>';
+        }
+      }
+      else {
+        $output = '<pre>' . check_plain($readme) . '</pre>';
+      }
+
+      return $output;
+  }
+}
+
+/**
+ * Function to process the downloading, saving and un-zipping of the icons.
+ *
+ * @param string $icon_filename
+ *   The file name of the image to convert into an icon set.
+ * @param string $theme
+ *   The name of the theme to apply the icon set to.
+ *
+ * @return mixed
+ *   An array of extra theme setting, or false if an error occurred.
+ */
+function _favicon_generator_download_and_save_icons($icon_filename, $theme = NULL) {
+  $path_base = variable_get('favicon_generator_path', '');
+  if (isset($theme)) {
+    $path_base .= '/' . $theme;
+  }
+  $response = drupal_http_request(
+    'http://realfavicongenerator.net/api/favicon.php',
+    array(
+      'method' => 'POST',
+      'data' => json_encode(_favicon_generator_get_request_array($icon_filename, $path_base)),
+      'max_redirects' => 0,
+      'headers' => array(
+        'Content-Type' => 'application/json',
+      ),
+    )
+  );
+  $r = json_decode($response->data);
+
+  // Check for HTTP errors.
+  if (isset($response->error)) {
+    watchdog(
+      'favicon_generator',
+      'RealFaviconGenerator.net sent an error: %error_msg',
+      array('%error_msg' => $response->error),
+      WATCHDOG_WARNING
+    );
+    return $response->error;
+  }
+
+  // No JSON returned.
+  if (empty($r)) {
+    watchdog('favicon_generator', 'No JSON data was received.', NULL, WATCHDOG_WARNING);
+    return FALSE;
+  }
+
+  // Not a Real Favicon result.
+  if (!isset($r->favicon_generation_result)) {
+    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net.', NULL, WATCHDOG_WARNING);
+    return FALSE;
+  }
+
+  // Check for a result.
+  if (!isset($r->favicon_generation_result->result)) {
+    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net.', NULL, WATCHDOG_WARNING);
+    return FALSE;
+  }
+
+  // Check for result->status.
+  if (!isset($r->favicon_generation_result->result->status)) {
+    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net.', NULL, WATCHDOG_WARNING);
+    return FALSE;
+  }
+
+  // Make sure the call was a success.
+  if (!($r->favicon_generation_result->result->status === 'success')) {
+    if (isset($r->favicon_generation_result->result->error_message)) {
+      watchdog(
+        'favicon_generator',
+        'RealFaviconGenerator.net sent an error: %error_msg',
+        array('%error_msg' => $r->favicon_generation_result->result->error_message),
+        WATCHDOG_WARNING
+      );
+      return $r->favicon_generation_result->result->error_message;
+    }
+    else {
+      watchdog(
+        'favicon_generator',
+        'RealFaviconGenerator.net sent an error but no further details are available.',
+        NULL,
+        WATCHDOG_WARNING
+      );
+    }
+    return FALSE;
+  }
+
+  // Check for favicon section.
+  if (!isset($r->favicon_generation_result->favicon)) {
+    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net.', NULL, WATCHDOG_WARNING);
+    return FALSE;
+  }
+
+  // Check for package URL.
+  if (!isset($r->favicon_generation_result->favicon->package_url)) {
+    watchdog('favicon_generator', 'JSON does not contain the package URL.', NULL, WATCHDOG_WARNING);
+    return FALSE;
+  }
+
+  // Check for html code.
+  if (!isset($r->favicon_generation_result->favicon->html_code)) {
+    watchdog('favicon_generator', 'JSON does not contain any HTML code.', NULL, WATCHDOG_WARNING);
+    return FALSE;
+  }
+
+  // All OK here.
+  $package = check_url($r->favicon_generation_result->favicon->package_url);
+  $html = filter_xss($r->favicon_generation_result->favicon->html_code, array('link', 'meta'));
+  $version = isset($r->favicon_generation_result->version) ? check_plain($r->favicon_generation_result->version) : '0.0';
+
+  $path = file_build_uri($path_base);
+
+  // Create directory if necessary and make sure it's writable.
+  $dir_ok = file_prepare_directory(
+    $path,
+    FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS
+  );
+  if (!$dir_ok) {
+    watchdog(
+      'favicon_generator',
+      'Icon directory, %path, does not exist and could not be created.',
+      array('%path' => $path),
+      WATCHDOG_WARNING
+    );
+    return t('Icon directory, %path, does not exist and could not be created.',
+      array('%path' => $path)
+    );
+  }
+
+  // Download zip file.
+  $response = drupal_http_request(
+    $package,
+    array(
+      'method' => 'GET',
+    )
+  );
+
+  // Check for problems downloading file.
+  if (empty($response->data)) {
+    watchdog(
+      'favicon_generator',
+      'The icon package file, %package, could not be downloaded.',
+      array('%package' => $package),
+      WATCHDOG_WARNING
+    );
+    return t('The icon package file could not be downloaded.');
+  }
+
+  // Save zip file.
+  $zip_uri = $path . '/favicon.zip';
+  if (!file_unmanaged_save_data($response->data, $zip_uri, FILE_EXISTS_REPLACE)) {
+    watchdog(
+      'favicon_generator',
+      'The icon package could not be saved to %zip_uri.',
+      array('%zip_uri' => $zip_uri),
+      WATCHDOG_WARNING
+    );
+    return t('The icon package could not be saved to %zip_uri.',
+      array('%zip_uri' => $zip_uri)
+    );
+  }
+
+  $zip_path = variable_get('file_public_path', conf_path() . '/files') . '/' . file_uri_target($zip_uri);
+
+  // Unzip file.
+  $zip = new ZipArchive();
+  $res = $zip->open($zip_path);
+  if (!($res === TRUE)) {
+    watchdog(
+      'favicon_generator',
+      'There was a problem opening the package file: %err',
+      array('%err' => $res),
+      WATCHDOG_WARNING
+    );
+    return 'There was a problem extracting the icon files.';
+  }
+  if (!$zip->extractTo($path)) {
+    watchdog('favicon_generator', 'There was a problem extracting the icon files.', NULL, WATCHDOG_WARNING);
+    return 'There was a problem extracting the icon files.';
+  }
+  $zip->close();
+
+  $ret = array(
+    'favicon_generator_html' => $html,
+    'favicon_generator_version' => $version,
+  );
+  return $ret;
+}
+
+/**
+ * Helper function to build the Real Favicon json array.
+ *
+ * @param string $icon_filename
+ *   A string containing the file name of the image to convert
+ *   into an icon set.
+ * @param string $path
+ *   A string containing the path which to save the icon files to.
+ *   Relative to public://.
+ *
+ * @return array
+ *   The json data as a PHP array.
+ */
+function _favicon_generator_get_request_array($icon_filename, $path) {
+  $request = array(
+    'favicon_generation' => array(
+      'api_key' => 'ba2bae2dbffde5251857e412a8576c3ef259dd4b',
+      'master_picture' => array(
+        'type' => 'inline',
+        'content' => base64_encode(file_get_contents($icon_filename)),
+      ),
+      'files_location' => array(
+        'type' => 'path',
+        'path' => '/' . variable_get('file_public_path', conf_path() . '/files') . '/' . $path,
+      ),
+      'favicon_design' => array(),
+      'settings' => array(
+        'compression' => '3',
+        'scaling_algorithm' => 'Mitchell',
+        'error_on_image_too_small' => 'false',
+      ),
+    ),
+  );
+
+  $settings = array(
+    'color' => variable_get('favicon_generator_color', '#00aba9'),
+    'margin' => variable_get('favicon_generator_margin', 4),
+  );
+
+  $request['favicon_generation']['favicon_design'] = array_merge($request['favicon_generation']['favicon_design'], module_invoke_all('favicon_generator_spec', $settings));
+
+  return $request;
+}
+
+/**
+ * Helper function to resize the icon.
+ *
+ * Resizes the provided icon file so that it is square and at least the
+ * specified size.
+ *
+ * @param string $icon_filename
+ *   The file name of the provided icon.
+ * @param int $new_size
+ *   The size of the image to create.
+ * @param bool $notify
+ *   Set to true to report an image resize to the user.
+ *
+ * @return string
+ *   Returns the original filename if the format is OK or there is an error.
+ *   If the file needed resizing, the filename of the new file is returned.
+ */
+function _favicon_generator_resize_icon($icon_filename, $new_size, $notify = FALSE) {
+  $img = image_load($icon_filename);
+  if ($img === FALSE) {
+    return $icon_filename;
+  }
+
+  $max_size = $img->info['width'] > $img->info['height'] ? $img->info['width'] : $img->info['height'];
+  if (($img->info['width'] == $img->info['height']) && ($max_size >= $new_size)) {
+    return $icon_filename;
+  }
+
+  $newimg = imagecreatetruecolor($max_size, $max_size);
+  if ($newimg === FALSE) {
+    return $icon_filename;
+  }
+  if (!imagesavealpha($newimg, TRUE)) {
+    return $icon_filename;
+  }
+  if (!imagealphablending($newimg, FALSE)) {
+    return $icon_filename;
+  }
+  if (!imagesavealpha($img->resource, TRUE)) {
+    return $icon_filename;
+  }
+  $bg = imagecolorallocatealpha($newimg, 255, 255, 255, 127);
+  if ($bg === FALSE) {
+    return $icon_filename;
+  }
+  if (!imagefilledrectangle($newimg, 0, 0, $max_size, $max_size, $bg)) {
+    return $icon_filename;
+  }
+
+  $l = ($max_size - $img->info['width']) / 2;
+  $t = ($max_size - $img->info['height']) / 2;
+  if (!imagecopy($newimg, $img->resource, $l, $t, 0, 0, $img->info['width'], $img->info['height'])) {
+    return $icon_filename;
+  }
+
+  $newfn = $img->source;
+  $newfn = preg_replace('/' . $img->info['extension'] . '$/', 'resized.png', $newfn);
+  $img->resource = $newimg;
+  $img->info['width'] = $max_size;
+  $img->info['height'] = $max_size;
+  $img->info['extension'] = 'png';
+  $img->info['mime_type'] = 'image/png';
+  $img->source = $newfn;
+
+  if ($max_size < $new_size) {
+    if (!image_resize($img, $new_size, $new_size)) {
+      return $icon_filename;
+    }
+    else {
+      drupal_set_message(t('The icon was resized. For best results the image must be at least @sizex@size.', array('@size' => $new_size)));
+    }
+  }
+
+  if (!image_save($img)) {
+    return $icon_filename;
+  }
+
+  return $newfn;
+}

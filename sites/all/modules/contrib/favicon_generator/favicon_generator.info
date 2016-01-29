@@ -1,0 +1,5 @@
+name = Favicon Generator
+description = Gets a favicon set from http://realfavicongenerator.net/
+core = 7.x
+package = Favicon Generator
+configure = admin/config/user-interface/favicon_generator

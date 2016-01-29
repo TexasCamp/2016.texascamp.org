@@ -1,0 +1,27 @@
+<?php
+/**
+ * @file
+ * OpenGraph image creation.
+ */
+
+/**
+ * Implements hook_favicon_generator_spec().
+ */
+function favicon_generator_opengraph_favicon_generator_spec($settings) {
+  $array = array();
+  $array = array('open_graph' => array());
+
+  $array['open_graph']['picture_aspect'] = 'background_and_margin';
+  $array['open_graph']['background_color'] = $settings['color'];
+  $array['open_graph']['margin'] = ceil($settings['margin'] * 100 / 57) . '%';
+  $array['open_graph']['ratio'] = '1.91:1';
+
+  return $array;
+}
+
+/**
+ * Implements hook_favicon_generator_min_size().
+ */
+function favicon_generator_opengraph_favicon_generator_min_size() {
+  return 300;
+}

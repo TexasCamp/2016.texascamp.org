@@ -1,0 +1,5 @@
+name = Favicon Generator Android
+description = Configures Android icons
+core = 7.x
+package = Favicon Generator
+dependencies[] = favicon_generator
