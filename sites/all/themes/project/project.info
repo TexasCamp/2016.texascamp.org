@@ -30,10 +30,6 @@ stylesheets[all][] = less/project.less
 ;;;;;;;;;;;;;;;;;;;;;
 
 less[vars][@brand-primary]   = #2A90CC
-less[vars][@brand-secondary] = #FFC629
-less[vars][@brand-accent]    = #FF5C29
-less[vars][@brand-accent-2]  = #FF9F29
-less[vars][@brand-accent-3]  = #078ED0
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;; Scripts

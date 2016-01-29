@@ -13,8 +13,8 @@
 	border-bottom: 1px solid @dark-header-top-border;
 }
 .header-top.colored {
-	background-color: @base-color;
-	border-bottom: 1px solid @base-color;
+	background-color: @brand-color;
+	border-bottom: 1px solid @brand-color;
 }
 .header {
 	border-top: 1px solid #ffffff;
@@ -214,47 +214,47 @@
 	box-shadow: none;
 }
 .pattern-1 { 
-	background-image: url("../../images/pattern-1.png");
+	background-image: url("../images/pattern-1.png");
 	background-repeat: repeat;
 	background-position: 0 0; 
 }
 .pattern-2 { 
-	background-image: url("../../images/pattern-2.png");
+	background-image: url("../images/pattern-2.png");
 	background-repeat: repeat;
 	background-position: 0 0; 
 }
 .pattern-3 { 
-	background-image: url("../../images/pattern-3.png");
+	background-image: url("../images/pattern-3.png");
 	background-repeat: repeat;
 	background-position: 0 0; 
 }
 .pattern-4 { 
-	background-image: url("../../images/pattern-4.png");
+	background-image: url("../images/pattern-4.png");
 	background-repeat: repeat;
 	background-position: 0 0; 
 }
 .pattern-5 { 
-	background-image: url("../../images/pattern-5.png");
+	background-image: url("../images/pattern-5.png");
 	background-repeat: repeat;
 	background-position: 0 0; 
 }
 .pattern-6 { 
-	background-image: url("../../images/pattern-6.png");
+	background-image: url("../images/pattern-6.png");
 	background-repeat: repeat;
 	background-position: 0 0; 
 }
 .pattern-7 { 
-	background-image: url("../../images/pattern-7.png");
+	background-image: url("../images/pattern-7.png");
 	background-repeat: repeat;
 	background-position: 0 0; 
 }
 .pattern-8 { 
-	background-image: url("../../images/pattern-8.png");
+	background-image: url("../images/pattern-8.png");
 	background-repeat: repeat;
 	background-position: 0 0; 
 }
 .pattern-9 { 
-	background-image: url("../../images/pattern-9.png");
+	background-image: url("../images/pattern-9.png");
 	background-repeat: repeat;
 	background-position: 0 0; 
 }
@@ -288,37 +288,37 @@
 /*Backgrounds
 ---------------------------------- */
 .background-img-1 { 
-	background: url("../../images/background-img-1.jpg") 50% 0px no-repeat;
+	background: url("../images/background-img-1.jpg") 50% 0px no-repeat;
 }
 .background-img-2 { 
-	background: url("../../images/background-img-2.jpg") 50% 0px no-repeat;
+	background: url("../images/background-img-2.jpg") 50% 0px no-repeat;
 }
 .background-img-3 { 
-	background: url("../../images/background-img-3.jpg") 50% 0px no-repeat;
+	background: url("../images/background-img-3.jpg") 50% 0px no-repeat;
 }
 .background-img-4 { 
-	background: url("../../images/background-img-4.jpg") 50% 0px no-repeat;
+	background: url("../images/background-img-4.jpg") 50% 0px no-repeat;
 }
 .background-img-5 { 
-	background: url("../../images/background-img-5.jpg") 50% 0px no-repeat;
+	background: url("../images/background-img-5.jpg") 50% 0px no-repeat;
 }
 .background-img-6 { 
-	background: url("../../images/background-img-6.jpg") 50% 0px no-repeat;
+	background: url("../images/background-img-6.jpg") 50% 0px no-repeat;
 }
 .background-img-7 { 
-	background: url("../../images/background-img-7.jpg") 50% 0px no-repeat;
+	background: url("../images/background-img-7.jpg") 50% 0px no-repeat;
 }
 .background-img-8 { 
-	background: url("../../images/background-img-8.jpg") 50% 0px no-repeat;
+	background: url("../images/background-img-8.jpg") 50% 0px no-repeat;
 }
 .background-img-9 { 
-	background: url("../../images/background-img-9.jpg") 50% 0px no-repeat;
+	background: url("../images/background-img-9.jpg") 50% 0px no-repeat;
 }
 .background-img-10 { 
-	background: url("../../images/background-img-10.jpg") 50% 0px no-repeat;
+	background: url("../images/background-img-10.jpg") 50% 0px no-repeat;
 }
 .fullscreen-bg {
-	background: url("../../images/fullscreen-bg.jpg") 50% 0px no-repeat;
+	background: url("../images/fullscreen-bg.jpg") 50% 0px no-repeat;
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -372,7 +372,7 @@
 	color: #cdcdcd;
 }
 .default-bg {
-	background-color:@base-color;
+	background-color:@brand-color;
 	color: #ffffff;
 }
 .default-bg h1,
@@ -538,7 +538,7 @@
 }
 .default-hovered:hover:after,
 .default-hovered:hover {
-	background-color: @base-color;
+	background-color: @brand-color;
 }
 .light-gray-bg.default-hovered:hover * {
 	color: #ffffff;
@@ -1107,5 +1107,16 @@ h5 + .separator {
 @media (max-width: 767px) { 
 	.text-center-xs {
 		text-align: center;
+	}
+}
+
+// Luxe
+#luxe-wrap {
+	> div {
+		.box-sizing(border-box);
+	}
+	#luxe-login, #luxe-login-register {
+		padding-left: 10px;
+		padding-right: 10px;
 	}
 }
