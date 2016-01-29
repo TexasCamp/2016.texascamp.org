@@ -294,6 +294,28 @@ function project_preprocess_page(&$vars) {
   $header_top['class'][] = 'header-top';
   $header_top['class'][] = theme_get_setting('header_top_color');
   $vars['header_top_attr'] = $header_top;
+  // Header Top Classes for Menu width
+  $header_top_class = (theme_get_setting('header_top_class')) ? theme_get_setting('header_top_class') : 'small';
+  if (!empty($header_top_class)) {
+    switch ($header_top_class) {
+      case 'small':
+        $vars['header_top_class']['left']['class'][] = 'col-sm-6 col-md-9';
+        $vars['header_top_class']['right']['class'][] = 'col-sm-6 col-md-3';
+        break;
+      case 'medium':
+        $vars['header_top_class']['left']['class'][] = 'col-sm-6 col-md-8';
+        $vars['header_top_class']['right']['class'][] = 'col-sm-6 col-md-4';
+        break;
+      case 'large':
+        $vars['header_top_class']['left']['class'][] = 'col-sm-6 col-md-7';
+        $vars['header_top_class']['right']['class'][] = 'col-sm-6 col-md-5';
+        break;
+      default:
+        $vars['header_top_class']['left']['class'][] = 'col-sm-6 col-md-6';
+        $vars['header_top_class']['right']['class'][] = 'col-sm-6 col-md-6';
+        break;
+    }
+  }
 
   // Header
   $header = array();

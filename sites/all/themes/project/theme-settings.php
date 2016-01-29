@@ -125,6 +125,18 @@ function project_form_system_theme_settings_alter(&$form, &$form_state) {
 			'colored' => t('Colored'),
 		),
 	);
+	$form['project_regions']['header_top']['header_top_class'] = array(
+		'#type' => 'select',
+		'#title' => t('Header Top Menu Width'),
+		'#description' => t('Change the width of the menu section.'),
+		'#default_value' => (theme_get_setting('header_top_class')) ? theme_get_setting('header_top_class') : 'small',
+		'#options' => array(
+			'small' => t('Small'),
+			'medium' => t('Medium'),
+			'large' => t('Large'),
+			'even' => t('Even (50:50)'),
+		),
+	);
 
 	$form['project_regions']['header'] = array(
 		'#type' => 'fieldset', 
