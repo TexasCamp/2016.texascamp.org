@@ -594,4 +594,32 @@ $conf['404_fast_html'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN"
  */
 # $conf['theme_debug'] = TRUE;
 
+# Set the $base_url parameter if we are running on Pantheon:
+
+if (isset($_ENV['PANTHEON_ENVIRONMENT'])) {
+  if ($_ENV['PANTHEON_ENVIRONMENT'] === 'dev') {
+    $domain = 'dev.texascamp.org';
+  }
+  if ($_ENV['PANTHEON_ENVIRONMENT'] === 'test') {
+    $domain = 'staging.texascamp.org';
+  }
+  if ($_ENV['PANTHEON_ENVIRONMENT'] === 'live') {
+    $domain = 'www.texascamp.org';
+  }
+  else {
+    # Fallback value for multidev or other environments.
+    # This covers environment-sitename.pantheon.io domains
+    # that are generated per environment.
+    $domain = $_SERVER['HTTP_HOST'];
+  }
+
+  # This global variable determines the base for all URLs in Drupal.
+  $base_url = 'https://'. $domain;
+}
+
+# CloudFlare specific setting
+if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+  $_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_CF_CONNECTING_IP'];
+}
+
 @include_once('local.settings.php');
