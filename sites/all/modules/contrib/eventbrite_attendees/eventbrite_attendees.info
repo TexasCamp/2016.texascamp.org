@@ -2,6 +2,6 @@ name = Eventbrite Attendees
 description = Generates a page listing attendees at an upcoming event whose registration is handled by Eventbrite.
 core = 7.x
 
-configure = admin/config/content/eventbrite-attendees
+configure = admin/config/services/eventbrite-attendees
 
 files[] = src/AttendeeList.php
