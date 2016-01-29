@@ -231,7 +231,11 @@ function project_preprocess_html(&$vars) {
   foreach ($plugins as $key => $value) {
     if (isset($value['path'])) {
       if ($value['type'] == 'js') {
-        drupal_add_js($value['path'], $value['external']);
+        if (!empty($value['external'])) {
+          drupal_add_js($value['path'], $value['external']);
+        } else {
+          drupal_add_js($value['path']);
+        }
       } else {
         drupal_add_css($value['path'], $value['external']);
       }
