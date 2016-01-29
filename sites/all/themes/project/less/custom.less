@@ -32,3 +32,31 @@
     font-size: 1.8rem;
   }
 }
+
+.user-profile {
+  &.view-mode-full {
+    > div {
+      padding: 20px;
+      &:first-child {
+        background-color: lighten(@brand-primary, 10%);
+        color: @white;
+        text-align: center;
+      }
+      .group-social-media {
+        background-color: darken(@brand-primary, 10%);
+        .field {
+          width: 25%;
+          text-align: center;
+          a {
+            background-color: @white;
+            border-radius: 50%;
+            color: @brand-primary;
+            &:hover {
+              color: @darken(@brand-primary, 10%);
+            }
+          }
+        }
+      }
+    }
+  }
+}
