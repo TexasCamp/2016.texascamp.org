@@ -9,7 +9,7 @@
 					</div>
 				</div>
 				<div class="col-sm-6 col-md-5">
-					<div id="header-top-second pull-right"  class="clearfix">
+					<div id="header-top-second"  class="clearfix pull-right">
 						<?php if (!empty($secondary_nav)): ?>
 						<div id="secondary-navbar-menu">
 							<nav class="navbar-menu" role="navigation">
