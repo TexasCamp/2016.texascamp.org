@@ -31,7 +31,7 @@ function block_data_preprocess_block(&$vars) {
   $block = $vars['block'];
   $modules = unserialize($block->data_attr);
   // Add attributes to block;
-  if (!empty($modules)) {
+  if (!empty($modules) && is_array($modules)) {
     $data_attr = array();
     foreach ($modules as $module) {
       foreach ($module as $key => $value) {

@@ -96,14 +96,17 @@
     </div>
   <?php endif;?>
 
-  <!-- banner -->
-  <?php include 'includes/banner.inc'; ?>
+  <!-- content-top -->
+  <?php include 'includes/content_top.inc'; ?>
 
   <!-- top-bar -->
   <?php include 'includes/top_bar.inc'; ?>
 
   <!-- main-content -->
   <?php include 'includes/content.inc'; ?>
+
+  <!-- content-bottom -->
+  <?php include 'includes/content_bottom.inc'; ?>
 
   <!-- footer -->
   <?php include 'includes/footer.inc'; ?>

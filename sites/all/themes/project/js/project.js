@@ -5,9 +5,9 @@
  * Provides general enhancements.
  */
 
-var Drupal = Drupal || {};
+ var Drupal = Drupal || {};
 
-(function($, Drupal) {
+ (function($, Drupal) {
   "use strict";
 
   Drupal.behaviors.projectTheme = {
@@ -20,6 +20,61 @@ var Drupal = Drupal || {};
         $(el).find('.icon').removeClass('icon');
       });
       $socialFollow.wrapInner( "<ul class='social-links circle small hidden-xs'></ul>");
+
+      if ($.fn.vide && $("body", context).hasClass("front")) {
+        $('.vide-home-hero').vide({
+          mp4: "/sites/default/files/texascamp-background.mp4",
+          webm: "/sites/default/files/texascamp-background.webm",
+          poster: "/sites/default/files/texascamp-background.png"
+        }, {
+          volume: 1,
+          playbackRate: 1,
+          muted: true,
+          loop: true,
+          autoplay: true,
+          position: '50% 50%', // Similar to the CSS `background-position` property.
+          posterType: 'detect', // Poster image type. "detect" — auto-detection; "none" — no poster; "jpg", "png", "gif",... - extensions.
+          resizing: true, // Auto-resizing, read: https://github.com/VodkaBears/Vide#resizing
+          bgColor: 'transparent', // Allow custom background-color for Vide div,
+          className: "vide-background-home"
+        });
+      }
+
+      var gmap_options = {
+        generate_controls : false,
+        locations : [{
+          lat : 32.963261,
+          lon : -96.828881,
+          animation : google.maps.Animation.DROP,
+          html : "Addison Conference Center",
+          icon : "/sites/default/files/dallasdrupal-yellow-logo-retina-small_0.png",
+          clickable : true,
+        }],
+        map_options : {
+          scrollwheel : false,
+          mapTypeControl : true,
+          streetViewControl : false,
+          zoomControlOptions : {
+            style : google.maps.ZoomControlStyle.SMALL,
+          },
+          zoom : 14,
+                set_center : [ 32.963288, -96.804418 ], // adjust the "lon" attribute of your first location
+              },
+              styles : {
+                // source: https://snazzymaps.com/style/53/flat-map
+                'custom' : [{"featureType":"all","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"all","stylers":[{"visibility":"on"},{"color":"#f3f4f4"}]},{"featureType":"landscape.man_made","elementType":"geometry","stylers":[{"weight":0.9},{"visibility":"off"}]},{"featureType":"poi.park","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#83cead"}]},{"featureType":"road","elementType":"all","stylers":[{"visibility":"on"},{"color":"#ffffff"}]},{"featureType":"road","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"on"},{"color":"#fee379"}]},{"featureType":"road.arterial","elementType":"all","stylers":[{"visibility":"on"},{"color":"#fee379"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"on"},{"color":"#7fc8ed"}]}],
+              },
+            };
+
+      /**
+       * =======================================
+       * Google Maps
+       * =======================================
+       */
+       if ( typeof Maplace == 'function' && $( '#gmap' ) ) {
+        console.log("something?");
+        new Maplace( gmap_options ).Load();
+      };
 
     }
   };
@@ -47,7 +102,7 @@ var Drupal = Drupal || {};
       //Show dropdown on hover only for desktop devices
       //-----------------------------------------------
       var delay = 0,
-        setTimeoutConst;
+      setTimeoutConst;
       if (typeof Modernizr === 'object' && (Modernizr.mq('only all and (min-width: 768px)') && !Modernizr.touch) || $("html.ie8").length > 0) {
         $('.main-navigation:not(.onclick) .navbar-nav>li.dropdown, .main-navigation:not(.onclick) li.dropdown>ul>li.dropdown').hover(
           function() {
@@ -197,407 +252,407 @@ var Drupal = Drupal || {};
           hideAllCaptionAtLilmit: 0,
           startWithSlide: 0
         });
-        $('.transparent-header .slider-banner-container .slider-banner-fullscreen', context).show().revolution({
-          delay: 8000,
-          startwidth: 1140,
-          startheight: 520,
-          fullWidth: "off",
-          fullScreen: "on",
-          fullScreenOffsetContainer: ".header-top",
-          fullScreenOffset: "",
-
-          navigationArrows: "solo",
-
-          navigationStyle: "preview2",
-          navigationHAlign: "center",
-          navigationVAlign: "bottom",
-          navigationHOffset: 0,
-          navigationVOffset: 20,
-
-          soloArrowLeftHalign: "left",
-          soloArrowLeftValign: "center",
-          soloArrowLeftHOffset: 0,
-          soloArrowLeftVOffset: 0,
-
-          soloArrowRightHalign: "right",
-          soloArrowRightValign: "center",
-          soloArrowRightHOffset: 0,
-          soloArrowRightVOffset: 0,
-
-          spinner: "spinner2",
-
-          stopLoop: "off",
-          stopAfterLoops: -1,
-          stopAtSlide: -1,
-          onHoverStop: "off",
-
-          shuffle: "off",
-          hideTimerBar: "off",
-
-          autoHeight: "off",
-          forceFullWidth: "off",
-
-          hideThumbsOnMobile: "off",
-          hideNavDelayOnMobile: 1500,
-          hideBulletsOnMobile: "off",
-          hideArrowsOnMobile: "off",
-          hideThumbsUnderResolution: 0,
-
-          hideSliderAtLimit: 0,
-          hideCaptionAtLimit: 0,
-          hideAllCaptionAtLilmit: 0,
-          startWithSlide: 0
-        });
-
-        $('.slider-banner-container .slider-banner-fullwidth', context).show().revolution({
-          delay: 8000,
-          startwidth: 1140,
-          startheight: 450,
-
-          navigationArrows: "solo",
-
-          navigationStyle: "preview2",
-          navigationHAlign: "center",
-          navigationVAlign: "bottom",
-          navigationHOffset: 0,
-          navigationVOffset: 20,
-
-          soloArrowLeftHalign: "left",
-          soloArrowLeftValign: "center",
-          soloArrowLeftHOffset: 0,
-          soloArrowLeftVOffset: 0,
-
-          soloArrowRightHalign: "right",
-          soloArrowRightValign: "center",
-          soloArrowRightHOffset: 0,
-          soloArrowRightVOffset: 0,
-
-          fullWidth: "on",
-
-          spinner: "spinner2",
-
-          stopLoop: "off",
-          stopAfterLoops: -1,
-          stopAtSlide: -1,
-          onHoverStop: "off",
-
-          shuffle: "off",
-
-          autoHeight: "off",
-          forceFullWidth: "off",
-
-          hideThumbsOnMobile: "off",
-          hideNavDelayOnMobile: 1500,
-          hideBulletsOnMobile: "off",
-          hideArrowsOnMobile: "off",
-          hideThumbsUnderResolution: 0,
-
-          hideSliderAtLimit: 0,
-          hideCaptionAtLimit: 0,
-          hideAllCaptionAtLilmit: 0,
-          startWithSlide: 0
-        });
-
-        $('.slider-banner-container .slider-banner-fullwidth-big-height', context).show().revolution({
-          delay: 8000,
-          startwidth: 1140,
-          startheight: 650,
-
-          navigationArrows: "solo",
+$('.transparent-header .slider-banner-container .slider-banner-fullscreen', context).show().revolution({
+  delay: 8000,
+  startwidth: 1140,
+  startheight: 520,
+  fullWidth: "off",
+  fullScreen: "on",
+  fullScreenOffsetContainer: ".header-top",
+  fullScreenOffset: "",
+
+  navigationArrows: "solo",
+
+  navigationStyle: "preview2",
+  navigationHAlign: "center",
+  navigationVAlign: "bottom",
+  navigationHOffset: 0,
+  navigationVOffset: 20,
+
+  soloArrowLeftHalign: "left",
+  soloArrowLeftValign: "center",
+  soloArrowLeftHOffset: 0,
+  soloArrowLeftVOffset: 0,
+
+  soloArrowRightHalign: "right",
+  soloArrowRightValign: "center",
+  soloArrowRightHOffset: 0,
+  soloArrowRightVOffset: 0,
+
+  spinner: "spinner2",
+
+  stopLoop: "off",
+  stopAfterLoops: -1,
+  stopAtSlide: -1,
+  onHoverStop: "off",
+
+  shuffle: "off",
+  hideTimerBar: "off",
+
+  autoHeight: "off",
+  forceFullWidth: "off",
+
+  hideThumbsOnMobile: "off",
+  hideNavDelayOnMobile: 1500,
+  hideBulletsOnMobile: "off",
+  hideArrowsOnMobile: "off",
+  hideThumbsUnderResolution: 0,
+
+  hideSliderAtLimit: 0,
+  hideCaptionAtLimit: 0,
+  hideAllCaptionAtLilmit: 0,
+  startWithSlide: 0
+});
+
+$('.slider-banner-container .slider-banner-fullwidth', context).show().revolution({
+  delay: 8000,
+  startwidth: 1140,
+  startheight: 450,
+
+  navigationArrows: "solo",
+
+  navigationStyle: "preview2",
+  navigationHAlign: "center",
+  navigationVAlign: "bottom",
+  navigationHOffset: 0,
+  navigationVOffset: 20,
+
+  soloArrowLeftHalign: "left",
+  soloArrowLeftValign: "center",
+  soloArrowLeftHOffset: 0,
+  soloArrowLeftVOffset: 0,
+
+  soloArrowRightHalign: "right",
+  soloArrowRightValign: "center",
+  soloArrowRightHOffset: 0,
+  soloArrowRightVOffset: 0,
+
+  fullWidth: "on",
+
+  spinner: "spinner2",
+
+  stopLoop: "off",
+  stopAfterLoops: -1,
+  stopAtSlide: -1,
+  onHoverStop: "off",
+
+  shuffle: "off",
+
+  autoHeight: "off",
+  forceFullWidth: "off",
+
+  hideThumbsOnMobile: "off",
+  hideNavDelayOnMobile: 1500,
+  hideBulletsOnMobile: "off",
+  hideArrowsOnMobile: "off",
+  hideThumbsUnderResolution: 0,
+
+  hideSliderAtLimit: 0,
+  hideCaptionAtLimit: 0,
+  hideAllCaptionAtLilmit: 0,
+  startWithSlide: 0
+});
+
+$('.slider-banner-container .slider-banner-fullwidth-big-height', context).show().revolution({
+  delay: 8000,
+  startwidth: 1140,
+  startheight: 650,
+
+  navigationArrows: "solo",
 
-          navigationStyle: "preview2",
-          navigationHAlign: "center",
-          navigationVAlign: "bottom",
-          navigationHOffset: 0,
-          navigationVOffset: 20,
-
-          soloArrowLeftHalign: "left",
-          soloArrowLeftValign: "center",
-          soloArrowLeftHOffset: 0,
-          soloArrowLeftVOffset: 0,
-
-          soloArrowRightHalign: "right",
-          soloArrowRightValign: "center",
-          soloArrowRightHOffset: 0,
-          soloArrowRightVOffset: 0,
-
-          fullWidth: "on",
-
-          spinner: "spinner2",
-
-          stopLoop: "off",
-          stopAfterLoops: -1,
-          stopAtSlide: -1,
-          onHoverStop: "off",
-
-          shuffle: "off",
-
-          autoHeight: "off",
-          forceFullWidth: "off",
-
-          hideThumbsOnMobile: "off",
-          hideNavDelayOnMobile: 1500,
-          hideBulletsOnMobile: "off",
-          hideArrowsOnMobile: "off",
-          hideThumbsUnderResolution: 0,
-
-          hideSliderAtLimit: 0,
-          hideCaptionAtLimit: 0,
-          hideAllCaptionAtLilmit: 0,
-          startWithSlide: 0
-        });
-
-        $('.banner:not(.dark-bg) .slider-banner-container .slider-banner-boxedwidth', context).show().revolution({
-          delay: 8000,
-          startwidth: 1140,
-          startheight: 450,
-
-          navigationArrows: "solo",
-
-          navigationStyle: "preview2",
-          navigationHAlign: "center",
-          navigationVAlign: "bottom",
-          navigationHOffset: 0,
-          navigationVOffset: 20,
-
-          soloArrowLeftHalign: "left",
-          soloArrowLeftValign: "center",
-          soloArrowLeftHOffset: 0,
-          soloArrowLeftVOffset: 0,
-
-          soloArrowRightHalign: "right",
-          soloArrowRightValign: "center",
-          soloArrowRightHOffset: 0,
-          soloArrowRightVOffset: 0,
-
-          fullWidth: "off",
-
-          spinner: "spinner2",
-          shadow: 1,
-
-          stopLoop: "off",
-          stopAfterLoops: -1,
-          stopAtSlide: -1,
-          onHoverStop: "off",
-
-          shuffle: "off",
-
-          autoHeight: "off",
-          forceFullWidth: "off",
-
-          hideThumbsOnMobile: "off",
-          hideNavDelayOnMobile: 1500,
-          hideBulletsOnMobile: "off",
-          hideArrowsOnMobile: "off",
-          hideThumbsUnderResolution: 0,
-
-          hideSliderAtLimit: 0,
-          hideCaptionAtLimit: 0,
-          hideAllCaptionAtLilmit: 0,
-          startWithSlide: 0
-        });
-
-        $('.banner.dark-bg .slider-banner-container .slider-banner-boxedwidth', context).show().revolution({
-          delay: 8000,
-          startwidth: 1140,
-          startheight: 450,
-
-          navigationArrows: "solo",
-
-          navigationStyle: "preview2",
-          navigationHAlign: "center",
-          navigationVAlign: "bottom",
-          navigationHOffset: 0,
-          navigationVOffset: 20,
-
-          soloArrowLeftHalign: "left",
-          soloArrowLeftValign: "center",
-          soloArrowLeftHOffset: 0,
-          soloArrowLeftVOffset: 0,
-
-          soloArrowRightHalign: "right",
-          soloArrowRightValign: "center",
-          soloArrowRightHOffset: 0,
-          soloArrowRightVOffset: 0,
-
-          fullWidth: "off",
-
-          spinner: "spinner2",
-          shadow: 3,
-
-          stopLoop: "off",
-          stopAfterLoops: -1,
-          stopAtSlide: -1,
-          onHoverStop: "off",
-
-          shuffle: "off",
-
-          autoHeight: "off",
-          forceFullWidth: "off",
-
-          hideThumbsOnMobile: "off",
-          hideNavDelayOnMobile: 1500,
-          hideBulletsOnMobile: "off",
-          hideArrowsOnMobile: "off",
-          hideThumbsUnderResolution: 0,
-
-          hideSliderAtLimit: 0,
-          hideCaptionAtLimit: 0,
-          hideAllCaptionAtLilmit: 0,
-          startWithSlide: 0
-        });
-
-        $('.slider-banner-container .slider-banner-boxedwidth-no-shadow', context).show().revolution({
-          delay: 8000,
-          startwidth: 1140,
-          startheight: 450,
-
-          navigationArrows: "solo",
-
-          navigationStyle: "preview2",
-          navigationHAlign: "center",
-          navigationVAlign: "bottom",
-          navigationHOffset: 0,
-          navigationVOffset: 20,
-
-          soloArrowLeftHalign: "left",
-          soloArrowLeftValign: "center",
-          soloArrowLeftHOffset: 0,
-          soloArrowLeftVOffset: 0,
-
-          soloArrowRightHalign: "right",
-          soloArrowRightValign: "center",
-          soloArrowRightHOffset: 0,
-          soloArrowRightVOffset: 0,
-
-          fullWidth: "off",
-
-          spinner: "spinner2",
-          shadow: 0,
-
-          stopLoop: "off",
-          stopAfterLoops: -1,
-          stopAtSlide: -1,
-          onHoverStop: "off",
-
-          shuffle: "off",
-
-          autoHeight: "off",
-          forceFullWidth: "off",
-
-          hideThumbsOnMobile: "off",
-          hideNavDelayOnMobile: 1500,
-          hideBulletsOnMobile: "off",
-          hideArrowsOnMobile: "off",
-          hideThumbsUnderResolution: 0,
-
-          hideSliderAtLimit: 0,
-          hideCaptionAtLimit: 0,
-          hideAllCaptionAtLilmit: 0,
-          startWithSlide: 0
-        });
-
-        $('.banner:not(.dark-bg) .slider-banner-container .slider-banner-boxedwidth-stopped', context).show().revolution({
-          delay: 8000,
-          startwidth: 1140,
-          startheight: 450,
-
-          navigationArrows: "solo",
-
-          navigationStyle: "preview2",
-          navigationHAlign: "center",
-          navigationVAlign: "bottom",
-          navigationHOffset: 0,
-          navigationVOffset: 20,
-
-          soloArrowLeftHalign: "left",
-          soloArrowLeftValign: "center",
-          soloArrowLeftHOffset: 0,
-          soloArrowLeftVOffset: 0,
-
-          soloArrowRightHalign: "right",
-          soloArrowRightValign: "center",
-          soloArrowRightHOffset: 0,
-          soloArrowRightVOffset: 0,
-
-          fullWidth: "off",
-
-          spinner: "spinner2",
-          shadow: 1,
-
-          stopLoop: "off",
-          stopAfterLoops: 0,
-          stopAtSlide: 1,
-          onHoverStop: "off",
-
-          shuffle: "off",
-
-          autoHeight: "off",
-          forceFullWidth: "off",
-
-          hideThumbsOnMobile: "off",
-          hideNavDelayOnMobile: 1500,
-          hideBulletsOnMobile: "off",
-          hideArrowsOnMobile: "off",
-          hideThumbsUnderResolution: 0,
-
-          hideSliderAtLimit: 0,
-          hideCaptionAtLimit: 0,
-          hideAllCaptionAtLilmit: 0,
-          startWithSlide: 0
-        });
-
-        $('.banner.dark-bg .slider-banner-container .slider-banner-boxedwidth-stopped', context).show().revolution({
-          delay: 8000,
-          startwidth: 1140,
-          startheight: 450,
-
-          navigationArrows: "solo",
-
-          navigationStyle: "preview2",
-          navigationHAlign: "center",
-          navigationVAlign: "bottom",
-          navigationHOffset: 0,
-          navigationVOffset: 20,
-
-          soloArrowLeftHalign: "left",
-          soloArrowLeftValign: "center",
-          soloArrowLeftHOffset: 0,
-          soloArrowLeftVOffset: 0,
-
-          soloArrowRightHalign: "right",
-          soloArrowRightValign: "center",
-          soloArrowRightHOffset: 0,
-          soloArrowRightVOffset: 0,
-
-          fullWidth: "off",
-
-          spinner: "spinner2",
-          shadow: 3,
-
-          stopLoop: "off",
-          stopAfterLoops: 0,
-          stopAtSlide: 1,
-          onHoverStop: "off",
-
-          shuffle: "off",
-
-          autoHeight: "off",
-          forceFullWidth: "off",
-
-          hideThumbsOnMobile: "off",
-          hideNavDelayOnMobile: 1500,
-          hideBulletsOnMobile: "off",
-          hideArrowsOnMobile: "off",
-          hideThumbsUnderResolution: 0,
-
-          hideSliderAtLimit: 0,
-          hideCaptionAtLimit: 0,
-          hideAllCaptionAtLilmit: 0,
-          startWithSlide: 0
-        });
-
-      };
+  navigationStyle: "preview2",
+  navigationHAlign: "center",
+  navigationVAlign: "bottom",
+  navigationHOffset: 0,
+  navigationVOffset: 20,
+
+  soloArrowLeftHalign: "left",
+  soloArrowLeftValign: "center",
+  soloArrowLeftHOffset: 0,
+  soloArrowLeftVOffset: 0,
+
+  soloArrowRightHalign: "right",
+  soloArrowRightValign: "center",
+  soloArrowRightHOffset: 0,
+  soloArrowRightVOffset: 0,
+
+  fullWidth: "on",
+
+  spinner: "spinner2",
+
+  stopLoop: "off",
+  stopAfterLoops: -1,
+  stopAtSlide: -1,
+  onHoverStop: "off",
+
+  shuffle: "off",
+
+  autoHeight: "off",
+  forceFullWidth: "off",
+
+  hideThumbsOnMobile: "off",
+  hideNavDelayOnMobile: 1500,
+  hideBulletsOnMobile: "off",
+  hideArrowsOnMobile: "off",
+  hideThumbsUnderResolution: 0,
+
+  hideSliderAtLimit: 0,
+  hideCaptionAtLimit: 0,
+  hideAllCaptionAtLilmit: 0,
+  startWithSlide: 0
+});
+
+$('.banner:not(.dark-bg) .slider-banner-container .slider-banner-boxedwidth', context).show().revolution({
+  delay: 8000,
+  startwidth: 1140,
+  startheight: 450,
+
+  navigationArrows: "solo",
+
+  navigationStyle: "preview2",
+  navigationHAlign: "center",
+  navigationVAlign: "bottom",
+  navigationHOffset: 0,
+  navigationVOffset: 20,
+
+  soloArrowLeftHalign: "left",
+  soloArrowLeftValign: "center",
+  soloArrowLeftHOffset: 0,
+  soloArrowLeftVOffset: 0,
+
+  soloArrowRightHalign: "right",
+  soloArrowRightValign: "center",
+  soloArrowRightHOffset: 0,
+  soloArrowRightVOffset: 0,
+
+  fullWidth: "off",
+
+  spinner: "spinner2",
+  shadow: 1,
+
+  stopLoop: "off",
+  stopAfterLoops: -1,
+  stopAtSlide: -1,
+  onHoverStop: "off",
+
+  shuffle: "off",
+
+  autoHeight: "off",
+  forceFullWidth: "off",
+
+  hideThumbsOnMobile: "off",
+  hideNavDelayOnMobile: 1500,
+  hideBulletsOnMobile: "off",
+  hideArrowsOnMobile: "off",
+  hideThumbsUnderResolution: 0,
+
+  hideSliderAtLimit: 0,
+  hideCaptionAtLimit: 0,
+  hideAllCaptionAtLilmit: 0,
+  startWithSlide: 0
+});
+
+$('.banner.dark-bg .slider-banner-container .slider-banner-boxedwidth', context).show().revolution({
+  delay: 8000,
+  startwidth: 1140,
+  startheight: 450,
+
+  navigationArrows: "solo",
+
+  navigationStyle: "preview2",
+  navigationHAlign: "center",
+  navigationVAlign: "bottom",
+  navigationHOffset: 0,
+  navigationVOffset: 20,
+
+  soloArrowLeftHalign: "left",
+  soloArrowLeftValign: "center",
+  soloArrowLeftHOffset: 0,
+  soloArrowLeftVOffset: 0,
+
+  soloArrowRightHalign: "right",
+  soloArrowRightValign: "center",
+  soloArrowRightHOffset: 0,
+  soloArrowRightVOffset: 0,
+
+  fullWidth: "off",
+
+  spinner: "spinner2",
+  shadow: 3,
+
+  stopLoop: "off",
+  stopAfterLoops: -1,
+  stopAtSlide: -1,
+  onHoverStop: "off",
+
+  shuffle: "off",
+
+  autoHeight: "off",
+  forceFullWidth: "off",
+
+  hideThumbsOnMobile: "off",
+  hideNavDelayOnMobile: 1500,
+  hideBulletsOnMobile: "off",
+  hideArrowsOnMobile: "off",
+  hideThumbsUnderResolution: 0,
+
+  hideSliderAtLimit: 0,
+  hideCaptionAtLimit: 0,
+  hideAllCaptionAtLilmit: 0,
+  startWithSlide: 0
+});
+
+$('.slider-banner-container .slider-banner-boxedwidth-no-shadow', context).show().revolution({
+  delay: 8000,
+  startwidth: 1140,
+  startheight: 450,
+
+  navigationArrows: "solo",
+
+  navigationStyle: "preview2",
+  navigationHAlign: "center",
+  navigationVAlign: "bottom",
+  navigationHOffset: 0,
+  navigationVOffset: 20,
+
+  soloArrowLeftHalign: "left",
+  soloArrowLeftValign: "center",
+  soloArrowLeftHOffset: 0,
+  soloArrowLeftVOffset: 0,
+
+  soloArrowRightHalign: "right",
+  soloArrowRightValign: "center",
+  soloArrowRightHOffset: 0,
+  soloArrowRightVOffset: 0,
+
+  fullWidth: "off",
+
+  spinner: "spinner2",
+  shadow: 0,
+
+  stopLoop: "off",
+  stopAfterLoops: -1,
+  stopAtSlide: -1,
+  onHoverStop: "off",
+
+  shuffle: "off",
+
+  autoHeight: "off",
+  forceFullWidth: "off",
+
+  hideThumbsOnMobile: "off",
+  hideNavDelayOnMobile: 1500,
+  hideBulletsOnMobile: "off",
+  hideArrowsOnMobile: "off",
+  hideThumbsUnderResolution: 0,
+
+  hideSliderAtLimit: 0,
+  hideCaptionAtLimit: 0,
+  hideAllCaptionAtLilmit: 0,
+  startWithSlide: 0
+});
+
+$('.banner:not(.dark-bg) .slider-banner-container .slider-banner-boxedwidth-stopped', context).show().revolution({
+  delay: 8000,
+  startwidth: 1140,
+  startheight: 450,
+
+  navigationArrows: "solo",
+
+  navigationStyle: "preview2",
+  navigationHAlign: "center",
+  navigationVAlign: "bottom",
+  navigationHOffset: 0,
+  navigationVOffset: 20,
+
+  soloArrowLeftHalign: "left",
+  soloArrowLeftValign: "center",
+  soloArrowLeftHOffset: 0,
+  soloArrowLeftVOffset: 0,
+
+  soloArrowRightHalign: "right",
+  soloArrowRightValign: "center",
+  soloArrowRightHOffset: 0,
+  soloArrowRightVOffset: 0,
+
+  fullWidth: "off",
+
+  spinner: "spinner2",
+  shadow: 1,
+
+  stopLoop: "off",
+  stopAfterLoops: 0,
+  stopAtSlide: 1,
+  onHoverStop: "off",
+
+  shuffle: "off",
+
+  autoHeight: "off",
+  forceFullWidth: "off",
+
+  hideThumbsOnMobile: "off",
+  hideNavDelayOnMobile: 1500,
+  hideBulletsOnMobile: "off",
+  hideArrowsOnMobile: "off",
+  hideThumbsUnderResolution: 0,
+
+  hideSliderAtLimit: 0,
+  hideCaptionAtLimit: 0,
+  hideAllCaptionAtLilmit: 0,
+  startWithSlide: 0
+});
+
+$('.banner.dark-bg .slider-banner-container .slider-banner-boxedwidth-stopped', context).show().revolution({
+  delay: 8000,
+  startwidth: 1140,
+  startheight: 450,
+
+  navigationArrows: "solo",
+
+  navigationStyle: "preview2",
+  navigationHAlign: "center",
+  navigationVAlign: "bottom",
+  navigationHOffset: 0,
+  navigationVOffset: 20,
+
+  soloArrowLeftHalign: "left",
+  soloArrowLeftValign: "center",
+  soloArrowLeftHOffset: 0,
+  soloArrowLeftVOffset: 0,
+
+  soloArrowRightHalign: "right",
+  soloArrowRightValign: "center",
+  soloArrowRightHOffset: 0,
+  soloArrowRightVOffset: 0,
+
+  fullWidth: "off",
+
+  spinner: "spinner2",
+  shadow: 3,
+
+  stopLoop: "off",
+  stopAfterLoops: 0,
+  stopAtSlide: 1,
+  onHoverStop: "off",
+
+  shuffle: "off",
+
+  autoHeight: "off",
+  forceFullWidth: "off",
+
+  hideThumbsOnMobile: "off",
+  hideNavDelayOnMobile: 1500,
+  hideBulletsOnMobile: "off",
+  hideArrowsOnMobile: "off",
+  hideThumbsUnderResolution: 0,
+
+  hideSliderAtLimit: 0,
+  hideCaptionAtLimit: 0,
+  hideAllCaptionAtLilmit: 0,
+  startWithSlide: 0
+});
+
+};
 
       //Owl carousel
       //-----------------------------------------------
@@ -666,11 +721,11 @@ var Drupal = Drupal || {};
       // Fixed header
       //-----------------------------------------------
       var headerTopHeight = $(".header-top", context).outerHeight(),
-          headerHeight = $("header.header.fixed", context).outerHeight();
+      headerHeight = $("header.header.fixed", context).outerHeight();
       $(window).resize(function() {
         if (($(this).scrollTop() < headerTopHeight + headerHeight - 5) && ($(window).width() > 767)) {
           headerTopHeight = $(".header-top", context).outerHeight(),
-              headerHeight = $("header.header.fixed", context).outerHeight();
+          headerHeight = $("header.header.fixed", context).outerHeight();
         }
       });
 
@@ -858,7 +913,7 @@ var Drupal = Drupal || {};
           if (Modernizr.csstransitions) {
             var waypoints = $(this).waypoint(function(direction) {
               var appearDelay = $(this.element).attr("data-effect-delay"),
-                animatedObject = $(this.element);
+              animatedObject = $(this.element);
               setTimeout(function() {
                 animatedObject.addClass('animated object-visible ' + animatedObject.attr("data-animation-effect"));
               }, appearDelay);
@@ -890,7 +945,7 @@ var Drupal = Drupal || {};
       if ($(".stats [data-to]").length > 0) {
         $(".stats [data-to]").each(function() {
           var stat_item = $(this),
-            offset = stat_item.offset().top;
+          offset = stat_item.offset().top;
           if ($(window).scrollTop() > (offset - 800) && !(stat_item.hasClass('counting'))) {
             stat_item.addClass('counting');
             stat_item.countTo();
@@ -944,13 +999,13 @@ var Drupal = Drupal || {};
             return false;
           });
         });
-        $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-          $('.tab-pane .masonry-grid-fitrows').isotope({
-            itemSelector: '.masonry-grid-item',
-            layoutMode: 'fitRows'
-          });
-        });
-      };
+$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+  $('.tab-pane .masonry-grid-fitrows').isotope({
+    itemSelector: '.masonry-grid-item',
+    layoutMode: 'fitRows'
+  });
+});
+};
 
       // Animated Progress Bars
       //-----------------------------------------------
@@ -1123,7 +1178,7 @@ var Drupal = Drupal || {};
                 }
               }
             });
-          },
+},
           // debug: true,
           errorPlacement: function(error, element) {
             error.insertBefore(element);
@@ -1174,37 +1229,37 @@ var Drupal = Drupal || {};
             $(element).siblings("label").removeClass("hide");
           }
         });
-      };
+};
 
-      if ($("#footer-form").length > 0) {
-        $("#footer-form").validate({
-          submitHandler: function(form) {
-            $('.submit-button').button("loading");
-            $.ajax({
-              type: "POST",
-              url: "php/email-sender.php",
-              data: {
-                "name": $("#footer-form #name2").val(),
-                "email": $("#footer-form #email2").val(),
-                "subject": "Message from contact form",
-                "message": $("#footer-form #message2").val()
-              },
-              dataType: "json",
-              success: function(data) {
-                if (data.sent == "yes") {
-                  $("#MessageSent2").removeClass("hidden");
-                  $("#MessageNotSent2").addClass("hidden");
-                  $(".submit-button").removeClass("btn-default").addClass("btn-success").prop('value', 'Message Sent');
-                  $("#footer-form .form-control").each(function() {
-                    $(this).prop('value', '').parent().removeClass("has-success").removeClass("has-error");
-                  });
-                } else {
-                  $("#MessageNotSent2").removeClass("hidden");
-                  $("#MessageSent2").addClass("hidden");
-                }
-              }
+if ($("#footer-form").length > 0) {
+  $("#footer-form").validate({
+    submitHandler: function(form) {
+      $('.submit-button').button("loading");
+      $.ajax({
+        type: "POST",
+        url: "php/email-sender.php",
+        data: {
+          "name": $("#footer-form #name2").val(),
+          "email": $("#footer-form #email2").val(),
+          "subject": "Message from contact form",
+          "message": $("#footer-form #message2").val()
+        },
+        dataType: "json",
+        success: function(data) {
+          if (data.sent == "yes") {
+            $("#MessageSent2").removeClass("hidden");
+            $("#MessageNotSent2").addClass("hidden");
+            $(".submit-button").removeClass("btn-default").addClass("btn-success").prop('value', 'Message Sent');
+            $("#footer-form .form-control").each(function() {
+              $(this).prop('value', '').parent().removeClass("has-success").removeClass("has-error");
             });
-          },
+          } else {
+            $("#MessageNotSent2").removeClass("hidden");
+            $("#MessageSent2").addClass("hidden");
+          }
+        }
+      });
+    },
           // debug: true,
           errorPlacement: function(error, element) {
             error.insertAfter(element);
@@ -1249,39 +1304,39 @@ var Drupal = Drupal || {};
             $(element).siblings("label").removeClass("hide");
           }
         });
-      };
+};
 
-      if ($("#sidebar-form").length > 0) {
+if ($("#sidebar-form").length > 0) {
 
-        $("#sidebar-form").validate({
-          submitHandler: function(form) {
-            $('.submit-button').button("loading");
-            $.ajax({
-              type: "POST",
-              url: "php/email-sender.php",
-              data: {
-                "name": $("#sidebar-form #name3").val(),
-                "email": $("#sidebar-form #email3").val(),
-                "subject": "Message from FAQ page",
-                "category": $("#sidebar-form #category").val(),
-                "message": $("#sidebar-form #message3").val()
-              },
-              dataType: "json",
-              success: function(data) {
-                if (data.sent == "yes") {
-                  $("#MessageSent3").removeClass("hidden");
-                  $("#MessageNotSent3").addClass("hidden");
-                  $(".submit-button").removeClass("btn-default").addClass("btn-success").prop('value', 'Message Sent');
-                  $("#sidebar-form .form-control").each(function() {
-                    $(this).prop('value', '').parent().removeClass("has-success").removeClass("has-error");
-                  });
-                } else {
-                  $("#MessageNotSent3").removeClass("hidden");
-                  $("#MessageSent3").addClass("hidden");
-                }
-              }
+  $("#sidebar-form").validate({
+    submitHandler: function(form) {
+      $('.submit-button').button("loading");
+      $.ajax({
+        type: "POST",
+        url: "php/email-sender.php",
+        data: {
+          "name": $("#sidebar-form #name3").val(),
+          "email": $("#sidebar-form #email3").val(),
+          "subject": "Message from FAQ page",
+          "category": $("#sidebar-form #category").val(),
+          "message": $("#sidebar-form #message3").val()
+        },
+        dataType: "json",
+        success: function(data) {
+          if (data.sent == "yes") {
+            $("#MessageSent3").removeClass("hidden");
+            $("#MessageNotSent3").addClass("hidden");
+            $(".submit-button").removeClass("btn-default").addClass("btn-success").prop('value', 'Message Sent');
+            $("#sidebar-form .form-control").each(function() {
+              $(this).prop('value', '').parent().removeClass("has-success").removeClass("has-error");
             });
-          },
+          } else {
+            $("#MessageNotSent3").removeClass("hidden");
+            $("#MessageSent3").addClass("hidden");
+          }
+        }
+      });
+},
           // debug: true,
           errorPlacement: function(error, element) {
             error.insertAfter(element);
@@ -1325,38 +1380,38 @@ var Drupal = Drupal || {};
           }
         });
 
-      };
+};
 
-      if ($("#rsvp").length > 0) {
-        $("#rsvp").validate({
-          submitHandler: function(form) {
-            $('.submit-button').button("loading");
-            $.ajax({
-              type: "POST",
-              url: "php/email-sender.php",
-              data: {
-                "name": $("#rsvp #name").val(),
-                "email": $("#rsvp #email").val(),
-                "guests": $("#rsvp #guests").val(),
-                "subject": "RSVP",
-                "events": $("#rsvp #events").val()
-              },
-              dataType: "json",
-              success: function(data) {
-                if (data.sent == "yes") {
-                  $("#MessageSent").removeClass("hidden");
-                  $("#MessageNotSent").addClass("hidden");
-                  $(".submit-button").removeClass("btn-default").addClass("btn-success").prop('value', 'Message Sent');
-                  $("#rsvp .form-control").each(function() {
-                    $(this).prop('value', '').parent().removeClass("has-success").removeClass("has-error");
-                  });
-                } else {
-                  $("#MessageNotSent").removeClass("hidden");
-                  $("#MessageSent").addClass("hidden");
-                }
-              }
+if ($("#rsvp").length > 0) {
+  $("#rsvp").validate({
+    submitHandler: function(form) {
+      $('.submit-button').button("loading");
+      $.ajax({
+        type: "POST",
+        url: "php/email-sender.php",
+        data: {
+          "name": $("#rsvp #name").val(),
+          "email": $("#rsvp #email").val(),
+          "guests": $("#rsvp #guests").val(),
+          "subject": "RSVP",
+          "events": $("#rsvp #events").val()
+        },
+        dataType: "json",
+        success: function(data) {
+          if (data.sent == "yes") {
+            $("#MessageSent").removeClass("hidden");
+            $("#MessageNotSent").addClass("hidden");
+            $(".submit-button").removeClass("btn-default").addClass("btn-success").prop('value', 'Message Sent');
+            $("#rsvp .form-control").each(function() {
+              $(this).prop('value', '').parent().removeClass("has-success").removeClass("has-error");
             });
-          },
+          } else {
+            $("#MessageNotSent").removeClass("hidden");
+            $("#MessageSent").addClass("hidden");
+          }
+        }
+      });
+    },
           // debug: true,
           errorPlacement: function(error, element) {
             error.insertAfter(element);
@@ -1399,7 +1454,7 @@ var Drupal = Drupal || {};
             $(element).siblings("label").removeClass("hide");
           }
         });
-      };
+};
 
 
       // Affix Menu

@@ -1,3 +1,6 @@
+// Media Queries
+/* Portrait and Landscape */
+@mobile: ~"only screen and (min-width: 320px) and (max-width: 480px)";
 
 // Mixins.
 .border-animation(@color: @black){
@@ -44,6 +47,47 @@
       color: @black;
       &:hover, &:focus {
         background-color: darken(@brand-color, 10%);
+      }
+    }
+  }
+}
+
+.header-top {
+  @media @mobile {
+    > .container > .row {
+      > [class*="col-"] {
+        padding: 0;
+      }
+    }
+    #block-block-3 {
+      float: none !important;
+      .menu.nav {
+        > li {
+          float: left;
+          width: 50%;
+          &.last {
+            span {
+              border-top: 1px solid @brand-color;
+              border-bottom: 1px solid @brand-color;
+              padding-top: 9px;
+              padding-bottom: 9px;  
+            }
+          }
+        }
+      }
+    }
+    #header-top-second {
+      float: none !important;
+      .menu.nav.secondary {
+        > li {
+          display: inline-block;
+          width: 32%;
+          text-align: center;
+          &.first.btn-default {
+            display: block;
+            width: 100%;
+          }
+        }
       }
     }
   }
@@ -196,4 +240,67 @@
     padding-left: 10px;
     padding-right: 10px;
   }
+}
+
+// Video styling
+.vide-home-hero {
+  > div {
+    padding: 3em 0 3em;
+    &:first-child {
+      z-index: 0 !important;
+    }
+  }
+  .hero-caption {
+    .box-sizing(border-box);
+    padding: 1.5em;
+    background-color: fade(@black, 90%);
+    color: white;
+    h1, h2, h3 {
+      color: @brand-color;
+    }
+    hr {
+      border-color: @white;
+    }
+  }
+  @media @mobile {
+    .hero-image {
+      display: none;
+    }
+  }
+}
+
+// Maps
+.contact-maps-section {
+  padding: 90px 0;
+  margin-top: -22px;
+  .section-background-maps {
+    z-index: 1;
+  }
+}
+.section-background-maps {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+#gmap {
+  position: absolute !important;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+.contact-maps-box {
+  position: relative;
+  z-index: 2;
+  padding: 40px;
+  background-color: #fff;
+  background-color: rgba(255,255,255,0.9);
+  -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+img {
+  display: inline-block;
 }

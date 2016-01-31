@@ -32,7 +32,7 @@ function project_preprocess_html(&$vars) {
   // Animate.css
   $animate = theme_get_setting('animate');
   if ($animate > 0) {
-    $plugins['animate']['external'] = NULL;
+    $plugins['animate']['options']['type'] = NULL;
     $plugins['animate']['type'] = 'css';
     switch ($animate) {
       case 1:
@@ -43,7 +43,7 @@ function project_preprocess_html(&$vars) {
       break;
       case 3:
       $plugins['animate']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.4.0/animate.min.css';
-      $plugins['animate']['external'] = 'external';
+      $plugins['animate']['options']['type'] = 'external';
       break;
     }
 
@@ -69,7 +69,7 @@ function project_preprocess_html(&$vars) {
   // Bootstrap Notify
   $bootstrap_notify = theme_get_setting('bootstrap_notify');
   if ($bootstrap_notify > 0) {
-    $plugins['bootstrap_notify']['external'] = NULL;
+    $plugins['bootstrap_notify']['options']['type'] = NULL;
     $plugins['bootstrap_notify']['type'] = 'js';
     switch ($bootstrap_notify) {
       case 1:
@@ -84,7 +84,7 @@ function project_preprocess_html(&$vars) {
   // Chart.js
   $chartjs = theme_get_setting('chartjs');
   if ($chartjs > 0) {
-    $plugins['chartjs']['external'] = NULL;
+    $plugins['chartjs']['options']['type'] = NULL;
     $plugins['chartjs']['type'] = 'js';
     switch ($chartjs) {
       case 1:
@@ -95,7 +95,7 @@ function project_preprocess_html(&$vars) {
       break;
       case 3:
       $plugins['chartjs']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js';
-      $plugins['chartjs']['external'] = 'external';
+      $plugins['chartjs']['options']['type'] = 'external';
       break;
     }
   }
@@ -103,7 +103,7 @@ function project_preprocess_html(&$vars) {
   // Font Awesome
   $fontawesome = theme_get_setting('fontawesome');
   if ($fontawesome > 0) {
-    $plugins['fontawesome']['external'] = NULL;
+    $plugins['fontawesome']['options']['type'] = NULL;
     $plugins['fontawesome']['type'] = 'css';
     switch ($fontawesome) {
       case 1:
@@ -114,7 +114,7 @@ function project_preprocess_html(&$vars) {
       break;
       case 3:
       $plugins['fontawesome']['path'] = 'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css';
-      $plugins['fontawesome']['external'] = 'external';
+      $plugins['fontawesome']['options']['type'] = 'external';
       break;
     }
   }
@@ -122,7 +122,7 @@ function project_preprocess_html(&$vars) {
   // Hover.css
   $hover_css = theme_get_setting('hover_css');
   if ($hover_css > 0) {
-    $plugins['hover_css']['external'] = NULL;
+    $plugins['hover_css']['options']['type'] = NULL;
     $plugins['hover_css']['type'] = 'css';
     switch ($hover_css) {
       case 1:
@@ -133,7 +133,7 @@ function project_preprocess_html(&$vars) {
       break;
       case 3:
       $plugins['hover_css']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.0.2/css/hover-min.css';
-      $plugins['hover_css']['external'] = 'external';
+      $plugins['hover_css']['options']['type'] = 'external';
       break;
     }
   }
@@ -141,7 +141,7 @@ function project_preprocess_html(&$vars) {
   // Jasny Bootstrap CSS
   $jasny_css = theme_get_setting('jasny_css');
   if ($jasny_css > 0) {
-    $plugins['jasny_css']['external'] = NULL;
+    $plugins['jasny_css']['options']['type'] = NULL;
     $plugins['jasny_css']['type'] = 'css';
     switch ($jasny_css) {
       case 1:
@@ -152,7 +152,7 @@ function project_preprocess_html(&$vars) {
       break;
       case 3:
       $plugins['jasny_css']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/css/jasny-bootstrap.min.css';
-      $plugins['jasny_css']['external'] = 'external';
+      $plugins['jasny_css']['options']['type'] = 'external';
       break;
     }
   }
@@ -160,7 +160,7 @@ function project_preprocess_html(&$vars) {
   // Jasny Bootstrap JS
   $jasny_js = theme_get_setting('jasny_js');
   if ($jasny_js > 0) {
-    $plugins['jasny_js']['external'] = NULL;
+    $plugins['jasny_js']['options']['type'] = NULL;
     $plugins['jasny_js']['type'] = 'js';
     switch ($jasny_js) {
       case 1:
@@ -171,23 +171,56 @@ function project_preprocess_html(&$vars) {
       break;
       case 3:
       $plugins['jasny_js']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/js/jasny-bootstrap.min.js';
-      $plugins['jasny_js']['external'] = 'external';
+      $plugins['jasny_js']['options']['type'] = 'external';
       break;
+    }
+  }
+
+  // Maplace
+  $maplace = theme_get_setting('maplace');
+  if ($maplace > 0) {
+    $plugins['maplace']['options']['type'] = NULL;
+    $plugins['maplace']['type'] = 'js';
+    switch ($maplace) {
+      case 1:
+      $plugins['maplace']['path'] = $plugin_path.'maplace/maplace.min.js';
+      break;
+      case 1:
+      $plugins['maplace']['path'] = $plugin_path.'maplace/maplace.min.js';
+      break;
+      case 3:
+      $plugins['maplace']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/maplace-js/0.2.5/maplace.min.js';
+      $plugins['maplace']['options']['type'] = 'external';
+      break;
+    }
+
+    // Google Maps API Key
+    $gmap_api_key = theme_get_setting('gmap_api_key');
+    if (!empty($gmap_api_key)) {
+      $plugins['gmap']['type'] = 'js';
+      $plugins['gmap']['path'] = 'https://maps.google.com/maps/api/js?sensor=false&libraries=geometry&v=3.22&key='.$gmap_api_key;
+      $plugins['gmap']['options']['type'] = 'external';
+      $plugins['gmap']['options']['weight'] = -100;
+    } else {
+      drupal_set_message(t('You do not have an API key set. If using Maplace, you need to obtain a Google Maps API key. For more info please go to !google website', array('!google' => l('Google Maps JavaScript API developers', 'https://developers.google.com/maps/documentation/javascript/get-api-key'))), 'status', FALSE);
     }
   }
 
   // Pace by Hubspot
   $pacejs = theme_get_setting('pacejs');
   if ($pacejs > 0) {
-    $plugins['pacejs']['external'] = NULL;
+    $plugins['pacejs']['options']['type'] = NULL;
     $plugins['pacejs']['type'] = 'js';
     switch ($pacejs) {
       case 1:
       $plugins['pacejs']['path'] = $plugin_path.'pace/pace.min.js';
       break;
-      case 2:
+      case 1:
+      $plugins['pacejs']['path'] = $plugin_path.'pace/pace.js';
+      break;
+      case 3:
       $plugins['pacejs']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js';
-      $plugins['pacejs']['external'] = 'external';
+      $plugins['pacejs']['options']['type'] = 'external';
       break;
     }
   }
@@ -195,7 +228,7 @@ function project_preprocess_html(&$vars) {
   // Vide
   $vide = theme_get_setting('vide');
   if ($vide > 0) {
-    $plugins['vide']['external'] = NULL;
+    $plugins['vide']['options']['type'] = NULL;
     $plugins['vide']['type'] = 'js';
     switch ($vide) {
       case 1:
@@ -210,7 +243,7 @@ function project_preprocess_html(&$vars) {
   // Waypoints
   $waypoints = theme_get_setting('waypoints');
   if ($waypoints > 0) {
-    $plugins['waypoints']['external'] = NULL;
+    $plugins['waypoints']['options']['type'] = NULL;
     $plugins['waypoints']['type'] = 'js';
     switch ($waypoints) {
       case 1:
@@ -221,24 +254,23 @@ function project_preprocess_html(&$vars) {
       break;
       case 3:
       $plugins['waypoints']['path'] = 'https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.0/noframework.waypoints.min.js';
-      $plugins['waypoints']['external'] = 'external';
+      $plugins['waypoints']['options']['type'] = 'external';
       break;
     }
   }
-
 
   // Add all plugins.
   foreach ($plugins as $key => $value) {
     if (isset($value['path'])) {
       if ($value['type'] == 'js') {
-        if (!empty($value['external'])) {
-          drupal_add_js($value['path'], $value['external']);
+        if (!empty($value['options']['external'])) {
+          drupal_add_js($value['path'], $value['options']);
         } else {
           drupal_add_js($value['path']);
         }
       } else {
-        if (!empty($value['external'])) {
-          drupal_add_css($value['path'], $value['external']);
+        if (!empty($value['options']['external'])) {
+          drupal_add_css($value['path'], $value['options']);
         } else {
           drupal_add_css($value['path']);
         }
@@ -299,20 +331,20 @@ function project_preprocess_page(&$vars) {
   if (!empty($header_top_class)) {
     switch ($header_top_class) {
       case 'small':
-        $vars['header_top_class']['left']['class'][] = 'col-sm-6 col-md-9';
-        $vars['header_top_class']['right']['class'][] = 'col-sm-6 col-md-3';
+        $vars['header_top_class']['left']['class'][] = 'col-xs-12 col-sm-6 col-md-9';
+        $vars['header_top_class']['right']['class'][] = 'col-xs-12 col-sm-6 col-md-3';
         break;
       case 'medium':
-        $vars['header_top_class']['left']['class'][] = 'col-sm-6 col-md-8';
-        $vars['header_top_class']['right']['class'][] = 'col-sm-6 col-md-4';
+        $vars['header_top_class']['left']['class'][] = 'col-xs-12 col-sm-6 col-md-8';
+        $vars['header_top_class']['right']['class'][] = 'col-xs-12 col-sm-6 col-md-4';
         break;
       case 'large':
-        $vars['header_top_class']['left']['class'][] = 'col-sm-6 col-md-7';
-        $vars['header_top_class']['right']['class'][] = 'col-sm-6 col-md-5';
+        $vars['header_top_class']['left']['class'][] = 'col-xs-12 col-sm-6 col-md-7';
+        $vars['header_top_class']['right']['class'][] = 'col-xs-12 col-sm-6 col-md-5';
         break;
       default:
-        $vars['header_top_class']['left']['class'][] = 'col-sm-6 col-md-6';
-        $vars['header_top_class']['right']['class'][] = 'col-sm-6 col-md-6';
+        $vars['header_top_class']['left']['class'][] = 'col-xs-12 col-sm-6 col-md-6';
+        $vars['header_top_class']['right']['class'][] = 'col-xs-12 col-sm-6 col-md-6';
         break;
     }
   }
