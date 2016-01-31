@@ -1,0 +1,163 @@
+<?php
+/**
+ * @file get_form_id.module
+ * Core functionality for the Get Form ID module.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function get_form_id_menu() {
+
+  $items['ajax/get_form_id/%ctools_js/%'] = array(
+    'title' => 'Get Form ID',
+    'page arguments' => array(2, 3),
+    'page callback' => 'get_form_id_callback',
+    'access arguments' => array('access get form id contextual links'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function get_form_id_form_alter(&$form, &$form_state, $form_id) {
+
+  if (user_access('access contextual links') && user_access('access get form id contextual links')) {
+
+    // Load modal window code.
+    _get_form_id_prepare_modal_window();
+
+    // Prepare our contextual link.
+    $links = array(
+      array(
+        'href' => 'ajax/get_form_id/nojs/' . $form_id,
+        'title' => t('Form ID') . ': ' . $form_id,
+        'attributes' => array('class' => array('ctools-use-modal', 'ctools-modal-get-form-id-style')),
+      )
+    );
+
+    // Prepare render array.
+    $build = array(
+      '#type' => 'markup',
+      '#prefix' => '<div class="contextual-links-wrapper">',
+      '#suffix' => '</div>',
+      '#theme' => 'links__contextual',
+      '#links' => $links,
+      '#attributes' => array('class' => array('contextual-links')),
+      '#attached' => array(
+        'library' => array(array('contextual', 'contextual-links')),
+      ),
+    );
+
+    // Mark form as a region for contextual links.
+    $form['#attributes']['class'][] = 'contextual-links-region';
+
+    // Assign render array to contextual links variable.
+    $form['contextual_links'] = $build;
+  }
+}
+
+/**
+ * Prepare code which is necessary to make modal window work.
+ */
+function _get_form_id_prepare_modal_window() {
+
+  // Include the CTools tools that we need.
+  ctools_include('ajax');
+  ctools_include('modal');
+
+  // Add CTools' javascript to the page.
+  ctools_modal_add_js();
+
+  // Add Ajax Lib
+  drupal_add_library('system', 'drupal.ajax');
+
+  // Add JS
+  drupal_add_js(drupal_get_path('module', 'get_form_id') . '/get_form_id.js');
+
+  // Add CSS
+  drupal_add_css(drupal_get_path('module', 'get_form_id') . '/get_form_id.css');
+
+  // Add custom modal window style.
+  drupal_add_js(array(
+    'get-form-id-style' => array(
+      'modalSize' => array(
+        'type' => 'fixed',
+        'width' => 600,
+        'height' => 'auto',
+      ),
+      'modalOptions' => array(
+        'opacity' => .8,
+        'background-color' => '#777',
+      ),
+      'animation' => 'fadeIn',
+    ),
+  ), 'setting');
+}
+
+/**
+ * A modal static page callback.
+ * @param $js
+ *   boolean CTools determination whether the user's browser is javascript enabled.
+ * @param $nid
+ *   string The node ID of passed as an argument from the hook_menu() path
+ * @return
+ *   string The contents of the node, that will fill the modal window.
+ */
+function get_form_id_callback($js = NULL, $form_id = NULL) {
+  if ($form_id == NULL) {
+    return 'No form id was specified. Error.';
+  }
+
+  $title = t('Get Form ID');
+  $contents = drupal_get_form('get_form_id_form', $form_id);
+
+  if ($js) {
+    // Required includes for ctools to work:
+    ctools_include('modal');
+    ctools_include('ajax');
+    return ctools_modal_render($title, $contents);
+  }
+
+  drupal_set_title($title);
+
+  return $contents;
+}
+
+/**
+ * Implements hook_form().
+ */
+function get_form_id_form($form, $form_state, $form_id) {
+  $form = array();
+
+  $form['id'] = array(
+    '#type' => 'textfield',
+    '#default_value' => $form_id,
+    '#description' => t('Form ID'),
+  );
+
+  $form['hook'] = array(
+    '#type' => 'textfield',
+    '#default_value' => 'hook_form_' . $form_id . '_alter(&$form, &$form_state)',
+    '#description' => t('Implements hook_form_FORM_ID_alter()'),
+  );
+
+  return $form;
+}
+
+
+/**
+ * Implements hook_permission().
+ */
+function get_form_id_permission() {
+  return array(
+    'access get form id contextual links' => array(
+      'title' => t('View Form ID'),
+      'description' => t('View Form ID via contextual link.'),
+    ),
+  );
+
+}

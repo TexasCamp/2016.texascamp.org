@@ -1,0 +1,14 @@
+name = Get Form ID
+description = Find out Form's ID and alter hook name.
+package = Development
+core = 7.x
+files[] = get_form_id.module
+dependencies[] = ctools
+dependencies[] = contextual
+
+; Information added by drupal.org packaging script on 2013-05-01
+version = "7.x-1.0"
+core = "7.x"
+project = "get_form_id"
+datestamp = "1367424011"
+
