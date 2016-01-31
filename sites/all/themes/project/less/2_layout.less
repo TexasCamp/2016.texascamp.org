@@ -66,7 +66,8 @@
 	border-top-color: @dark-header-top-opacity-60;
 }
 .header-left {
-	padding: 12px 0 0 0;
+	padding: 12px 0 12px 0;
+	.box-sizing(border-box);
 }
 .header-right {
 	position: relative;
@@ -1107,16 +1108,5 @@ h5 + .separator {
 @media (max-width: 767px) { 
 	.text-center-xs {
 		text-align: center;
-	}
-}
-
-// Luxe
-#luxe-wrap {
-	> div {
-		.box-sizing(border-box);
-	}
-	#luxe-login, #luxe-login-register {
-		padding-left: 10px;
-		padding-right: 10px;
 	}
 }

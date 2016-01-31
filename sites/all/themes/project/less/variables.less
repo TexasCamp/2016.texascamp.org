@@ -20,9 +20,15 @@
 @white:                 #ffffff;
 @black:                 @gray-dark;
 
-//** Base Colors of Blue Skin.
-@brand-color:            #2A90CC;
+//** Base Colors of Yellow Skin.
+@brand-color:            #F6B926;
+@brand-secondary:        #3498DB;
 @brand-color-hover:      darken(@brand-color, 10%);
+
+//** Brand darkness
+@brand-dark: darken(@brand-color, 10%);
+@brand-darker: darken(@brand-color, 15%);
+@brand-darkest: darken(@brand-color, 18%);
 
 //== Scaffolding
 //
@@ -58,16 +64,18 @@
 // Add Google Fonts
 @import url(https://fonts.googleapis.com/css?family=Roboto);
 @import url(https://fonts.googleapis.com/css?family=Raleway);
+@import url(https://fonts.googleapis.com/css?family=Lato);
 @import url(https://fonts.googleapis.com/css?family=PT+Serif);
 @import url(https://fonts.googleapis.com/css?family=Pacifico);
 
 @font-family-roboto:     'Roboto', sans-serif;
 @font-family-raleway:    'Raleway', sans-serif;
+@font-family-lato:       'Lato', sans-serif;
 @font-family-pt-serif:   'PT Serif', serif;
 @font-family-pacifico:   'Pacifico', cursive, sans-serif;
 @font-family-serif:       Georgia, "Times New Roman", Times, serif;
 
-@font-family-sans-serif:  "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+@font-family-sans-serif:  "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
 @font-family-serif:       Georgia, "Times New Roman", Times, serif;
 //** Default monospace fonts for `<code>`, `<kbd>`, and `<pre>`.
 @font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace;
@@ -90,7 +98,7 @@
 @line-height-computed:    floor((@font-size-base * @line-height-base)); // ~20px
 
 //** By default, this inherits from the `<body>`.
-@headings-font-family:    @font-family-raleway;
+@headings-font-family:    @font-family-lato;
 @headings-font-weight:    400;
 @headings-line-height:    1.2;
 @headings-color:          inherit;

@@ -369,8 +369,25 @@ function project_preprocess_maintenance_page(&$vars) {
 
   // Add back Bootstrap.js
   $bootstrap_path = drupal_get_path('theme', 'bootstrap');
-  drupal_add_js($bootstrap_path . '/js/bootstrap.js');
+  drupal_add_js($bootstrap_path . '/dist/js/bootstrap.js');
 
+}
+
+/**
+ * Implements hook_preprocess_block()
+ */
+function project_preprocess_block(&$variables) {
+  // Remove duplicate classes and empty classes
+  $variables['classes_array'] = array_unique(array_diff($variables['classes_array'], array('')));
+  // Add classes to blocks for front page containers.
+  if ($variables['elements']['#block']->region == 'content') {
+    // Only add container class if it's the front page and NOT the main system block.
+    if ($variables['is_front']) {
+      unset($variables['theme_hook_suggestions']);
+      $variables['theme_hook_suggestions'][] = 'block__container';
+    }
+    dpm($variables);
+  }
 }
 
 /*

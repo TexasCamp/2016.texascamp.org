@@ -1,3 +1,22 @@
+
+// Mixins.
+.border-animation(@color: @black){
+  &:after {
+    display:block;
+    content: '';
+    border-bottom: solid 3px @color;
+    .scaleX(0.0001);
+    .transition(transform 250ms ease-in-out);
+  }
+  &:hover:after {
+    .scaleX(1);
+  }
+}
+
+.btn-primary {
+  .button-variant(@black,@brand-color,@brand-color);
+}
+
 // Top level site name/nav hack
 .nav {
   margin-bottom: 0;
@@ -14,6 +33,34 @@
   }
 }
 
+.nav > li {
+  > a:hover,
+  > a:focus {
+    color: @black;
+  }
+  &.btn-default {
+    > a {
+      background-color: @brand-color;
+      color: @black;
+      &:hover, &:focus {
+        background-color: darken(@brand-color, 10%);
+      }
+    }
+  }
+}
+
+// Secondary Menu styling
+.secondary {
+  &.navbar-nav > li > a {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    &:hover, &:focus {
+      border:0;
+    }
+  }
+}
+
+// Header top
 .header-top {
   &:not(.banner) {
     border: 0;
@@ -21,7 +68,7 @@
   }
   .conference-title {
     background-color: @brand-color;
-    color: white;
+    color: black;
     font-size: 1.8rem;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -32,30 +79,121 @@
   }
 }
 
+.page-user {
+  .page-title-wrapper {
+    display: none;
+  }
+}
+
+.logo img {
+  max-height: 55px;
+}
+.fixed-header-on .header .logo img {
+  max-height: 55px;
+}
+
 .user-profile {
   &.view-mode-full {
-    > div {
-      padding: 20px;
-      &:first-child {
-        background-color: lighten(@brand-color, 10%);
-        color: @white;
-        text-align: center;
-      }
-      .group-social-media {
-        background-color: darken(@brand-color, 10%);
-        .field {
-          width: 25%;
-          text-align: center;
-          a {
-            background-color: @white;
-            border-radius: 50%;
-            color: @brand-color;
-            &:hover {
-              color: darken(@brand-color, 10%);
-            }
+    .group-header {
+      background-color: @brand-color;
+      color: @black;
+      text-align: center;
+      padding-top: 2em;
+      .field-name-ds-user-picture {
+        img {
+          .img-thumbnail();
+          .img-circle();
+          .transition(all 0.3s);
+          max-width: 200px;
+          &:hover {
+            .transition(all 0.3s);
+            box-shadow: 0 0 0 15px fade(@gray-dark, 95%);
           }
         }
       }
+      .field-name-realname {
+        .h1();
+        font-weight: 600;
+      }
+      .field-name-field-profile-job-title {
+        .h4();
+        font-style: italic;
+        font-weight: 600;
+        margin-bottom: 0;
+      }
+      .field-name-field-profile-org {
+        .h4();
+        .font-size(1.6);
+        font-weight: 600;
+        margin-top: 5px;
+      }
     }
+    .group-social-wrapper {
+      background-color: darken(@brand-color, 10%);
+      padding: 10px;
+      margin-top: 1em;
+      text-align: center;
+    }
+    .group-social-media {
+      margin: 0 auto;
+      display: table;
+      li {
+        display: table-cell;
+        text-align: center;
+        a {
+          color: @black;
+          .font-size(2.4);
+          .border-animation();
+        }
+      }
+    }
+    .group-left {
+      margin-top: 1em;
+      padding-top: 1em;
+      border-top: 2px solid @gray-light;
+      width: 100%;
+      .field-name-field-profile-bio {
+        width: 50%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+  }
+}
+
+// Session
+.node-type-session {
+  .user-profile {
+    &.view-mode-full {
+      .group-left, .group-right {
+        display: none;
+      }
+    }
+  }
+}
+
+.dark {
+  .footer {
+    h1, h2, h3, h4, h5, h6 {
+      color: @brand-color;
+    }
+    label {
+      color: @white;
+    }
+    .webform-submit {
+      .button-variant(@black, @brand-color, @brand-color)
+    }
+  }
+}
+
+
+// Luxe
+#luxe-wrap {
+  > div {
+    .box-sizing(border-box);
+  }
+  #luxe-login, #luxe-login-register {
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }

@@ -3,20 +3,21 @@
 @import "variables.less";
 
 //** Base Colors
-@brand-color-opacity-60: rgba(red(@brand-color), green(@brand-color), blue(@brand-color), 0.6);
-@brand-color-opacity-70: rgba(red(@brand-color), green(@brand-color), blue(@brand-color), 0.7);
-@brand-color-opacity-80: rgba(red(@brand-color), green(@brand-color), blue(@brand-color), 0.8);
+@brand-color-opacity-60: fade(@brand-color, 60%);
+@brand-color-opacity-70: fade(@brand-color, 70%);
+@brand-color-opacity-80: fade(@brand-color, 80%);
 @brand-color-hover:      lighten(@brand-color, 1%);
+
 //** Dark Header Top and Header
-@dark-header:                   darken(@brand-color, 10%);
-@dark-header-opacity-95:        rgba(darken(red(@brand-color), 10%), darken(green(@brand-color), 10%), darken(blue(@brand-color), 10%), 0.95);
-@dark-header-opacity-90:        rgba(darken(red(@brand-color), 10%), darken(green(@brand-color), 10%), darken(blue(@brand-color), 10%), 0.9);
-@dark-header-opacity-80:        rgba(darken(red(@brand-color), 10%), darken(green(@brand-color), 10%), darken(blue(@brand-color), 10%), 0.8);
-@dark-header-opacity-60:        rgba(darken(red(@brand-color), 10%), darken(green(@brand-color), 10%), darken(blue(@brand-color), 10%), 0.6);
-@dark-header-top:               darken(@brand-color, 15%);
-@dark-header-top-opacity-60:    rgba(darken(red(@brand-color), 15%), darken(green(@brand-color), 15%), darken(blue(@brand-color), 15%), 0.5);
-@dark-header-top-border:        darken(@brand-color, 18%);
-@dark-navigation-item-border:   rgba(darken(red(@brand-color), 18%), darken(green(@brand-color), 18%), darken(blue(@brand-color), 18%), 0.8);
+@dark-header:                   @gray-dark;
+@dark-header-opacity-95:        fade(@gray-dark, 95%);
+@dark-header-opacity-90:        fade(@gray-dark, 90%);
+@dark-header-opacity-80:        fade(@gray-dark, 80%);
+@dark-header-opacity-60:        fade(@gray-dark, 60%);
+@dark-header-top:               @gray-darker;
+@dark-header-top-opacity-60:    fade(@gray-darker, 50%);
+@dark-header-top-border:        darken(@gray-darker, 10%);
+@dark-navigation-item-border:   fade(darken(@gray-darker, 10%), 80%);
 
 /* 1- Typography
 -------------------------------------------------

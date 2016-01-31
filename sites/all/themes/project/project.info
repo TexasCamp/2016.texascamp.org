@@ -10,7 +10,7 @@ base theme = bootstrap
 regions[header_top]     = 'Header Top'
 regions[header_bottom]  = 'Header Bottom'
 regions[header]         = 'Top Bar'
-regions[highlighted]    = 'Highlighted'
+regions[banner]         = 'Banner'
 regions[help]           = 'Help'
 regions[content]        = 'Content'
 regions[sidebar_first]  = 'Primary'
@@ -29,11 +29,26 @@ stylesheets[all][] = less/project.less
 ;; LESS
 ;;;;;;;;;;;;;;;;;;;;;
 
-less[vars][@brand-primary]   = #2A90CC
+less[vars][@brand-color]   = #F6B926
+less[vars][@brand-secondary]   = #3498DB
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;; Scripts
 ;;;;;;;;;;;;;;;;;;;;;
+
+scripts[] = 'bootstrap/js/affix.js'
+scripts[] = 'bootstrap/js/alert.js'
+scripts[] = 'bootstrap/js/button.js'
+scripts[] = 'bootstrap/js/carousel.js'
+scripts[] = 'bootstrap/js/collapse.js'
+scripts[] = 'bootstrap/js/dropdown.js'
+scripts[] = 'bootstrap/js/modal.js'
+scripts[] = 'bootstrap/js/tooltip.js'
+scripts[] = 'bootstrap/js/popover.js'
+scripts[] = 'bootstrap/js/scrollspy.js'
+scripts[] = 'bootstrap/js/tab.js'
+scripts[] = 'bootstrap/js/transition.js'
+scripts[] = 'bootstrap/dist/js/bootstrap.js'
 
 scripts[] = 'js/modernizr.js'
 scripts[] = 'js/project.js'
