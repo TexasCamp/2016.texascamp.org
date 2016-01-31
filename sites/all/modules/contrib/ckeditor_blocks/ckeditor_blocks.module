@@ -1,0 +1,199 @@
+<?php
+
+/**
+ * Implements hook_menu()
+ */
+function ckeditor_blocks_menu() {
+  $items = array();
+  
+  $items['ckeditor/blocks'] = array(
+    'page callback' => 'ckeditor_blocks_blocks_ajax',
+    'access arguments' => array('administer blocks'), 
+  );
+  $items['ckeditor/block/%/%'] = array(
+    'page callback' => 'ckeditor_blocks_block_ajax',
+    'page arguments' => array(2,3),
+    'access arguments' => array('administer blocks'),
+  );
+  
+  return $items;
+}
+
+/**
+ * Render a specific block
+ */
+function ckeditor_blocks_get_block($module, $delta, $check_roles = FALSE) {
+  $block = block_load($module, $delta);
+  
+  // Check user roles if required.
+  if ($check_roles) {
+    global $user;
+    $block_roles = _ckeditor_blocks_roles();
+    if (isset($block_roles[$block->module][$block->delta]) && !array_intersect($block_roles[$block->module][$block->delta], array_keys($user->roles))) {
+      return '';
+    }
+  }
+
+  $block_content = module_invoke($block->module, 'block_view', $block->delta);
+  // Allow modules to modify the block before it is viewed, via either
+  // hook_block_view_alter() or hook_block_view_MODULE_DELTA_alter().
+  $block->subject = $block_content['subject'];
+  drupal_alter(array('block_view', "block_view_{$block->module}_" . str_replace('-', '_', $block->delta)), $block_content, $block);
+  if (isset($block_content['content'])) {
+    $render = array(
+      'elements' => array(
+        '#block' => $block,
+        '#children' => render($block_content['content'])
+      )
+    );
+    $output = theme('block', $render);
+  }
+  else {
+    $output = '';
+  }
+  
+  return $output;
+}
+
+/**
+ * Page callback for getting a list of blocks.
+ */
+function ckeditor_blocks_blocks_ajax() {
+  // Disable client-side caching.
+  header('Cache-Control: private, no-cache, no-store, must-revalidate, max-age=0');
+  header('Pragma: no-cache');
+  // Disable server-side caching.
+  drupal_page_is_cacheable(FALSE);  
+
+  global $theme_key;
+  $options = array();
+  $blocks = _block_rehash($theme_key);
+  foreach($blocks as $block) {
+    if ($block['module'] != 'system' || $block['delta'] != 'main') { // Don't allow main block because of recursion.
+      $options['[block:' . $block['module'] . '=' . $block['delta'] . ']'] = $block['info'];
+    }
+  }
+  
+  // Sort alphabetically to find blocks easier.
+  ksort($options);
+
+  drupal_json_output($options);
+}
+
+/**
+ * Page callback for rendering a block
+ */
+function ckeditor_blocks_block_ajax($module, $delta) {
+  // Disable client-side caching.
+  header('Cache-Control: private, no-cache, no-store, must-revalidate, max-age=0');
+  header('Pragma: no-cache');
+  // Disable server-side caching.
+  drupal_page_is_cacheable(FALSE);
+  
+  $block = ckeditor_blocks_get_block($module, $delta);
+  
+  drupal_json_output(array('html' => ($block?$block:'(Empty Block)')));
+}
+
+/**
+ * Implements hook_ckeditor_plugin().
+ * 
+ * @return type
+ */
+function ckeditor_blocks_ckeditor_plugin() {
+  $plugins = array();
+  $plugins['blocks'] = array(
+    // Plugin name.
+    'name' => 'blocks',
+    // Plugin description - it will be displayed in the plugins management section of the profile settings.
+    'desc' => t('Plugin for adding Drupal blocks withing CKEditor'),
+    // The full path to the CKEditor plugin directory, trailing slash included.
+    'path' => drupal_get_path('module', 'ckeditor_blocks') . '/plugins/blocks/',
+    // Plugin buttons definition (optional).
+    'buttons' => array(
+      'Blocks' => array('label' => 'Block', 'icon' => 'icons/blocks.png'),
+    )
+  );
+  return $plugins;
+}
+
+/**
+ * Implementation of hook_filter_info().
+ */
+function ckeditor_blocks_filter_info() {
+  $filters['ckeditor_blocks'] = array(
+    'title' => t('Drupal blocks'),
+    'description' => t('Inserts the contents of a block into a textarea using [block:module=delta] tags.'),
+    'process callback' => '_ckeditor_blocks',
+    'settings callback' => '_ckeditor_blocks_settings',
+    'tips callback' => '_ckeditor_blocks_tips',
+    'default settings' => array(
+      'check_roles' => 0,
+    ),
+    'cache' => FALSE,
+  );
+  return $filters;
+}
+
+/**
+ * Filter replacement callback.
+ * 
+ * @param type $text
+ * @param type $filter
+ * @param type $format
+ * @return type
+ */
+function _ckeditor_blocks($text, $filter, $format) {
+  if (preg_match_all("/\[block:([^=\\]]+)=?([^\\]]*)?\]/i", $text, $match)) {
+    foreach ($match[2] as $key => $value) {
+      $raw_tags[] = $match[0][$key];
+      $module = $match[1][$key];
+      $delta = $match[2][$key];
+
+      $check_roles = !empty($filter->settings['check_roles']);
+      $repl[] =  ckeditor_blocks_get_block($module, $delta, $check_roles);
+    }
+    return str_replace($raw_tags, $repl, $text);
+  }
+  return $text;
+}
+
+/**
+ * Settings callback for the drupal block filter.
+ */
+function _ckeditor_blocks_settings($form, &$form_state, $filter, $format, $defaults) {
+  $filter->settings += $defaults;
+  $settings['check_roles'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Check the roles assigned by the Block module'),
+    '#default_value' => $filter->settings['check_roles'],
+    '#description' => t('Without this checked, anyone can see drupal blocks.'),
+  );
+  return $settings;
+}
+
+function _ckeditor_blocks_tips($filter, $format, $long = FALSE) {
+  if ($long) {
+    return t('<a name="filter-ckeditor_blocks"></a>You may use [block:<em>module</em>=<em>delta</em>] tags to display the contents of block <em>delta</em> for module <em>module</em>. To discover module names and deltas, visit admin/build/block and hover over a block\'s configure link and look in your browser\'s status bar. The last "word" you see is the name of the module and the number following that is the delta. If you leave off the delta in an Insert Block tag, the default delta will be used.');
+  }
+  else {
+    return t('You may use <a href="@ckeditor_blocks_help">[block:<em>module</em>=<em>delta</em>] tags</a> to display the contents of block <em>delta</em> for module <em>module</em>.',
+    array("@ckeditor_blocks_help" => url("filter/tips/$format->format", array('fragment' => 'filter-ckeditor_blocks'))));
+  }
+}
+
+/**
+ * Helper function to load and cache the block roles.
+ */
+function _ckeditor_blocks_roles() {
+  // Build an array of roles for each block.
+  $block_roles = &drupal_static(__FUNCTION__, NULL);
+  if (!isset($block_roles)) {
+    $block_roles = array();
+    $result = db_query('SELECT module, delta, rid FROM {block_role}');
+    foreach ($result as $record) {
+      $block_roles[$record->module][$record->delta][] = $record->rid;
+    }
+  }
+  return $block_roles;
+}
