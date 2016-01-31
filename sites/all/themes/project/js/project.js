@@ -52,7 +52,7 @@
         }],
         map_options : {
           scrollwheel : false,
-          mapTypeControl : true,
+          mapTypeControl : false,
           streetViewControl : false,
           zoomControlOptions : {
             style : google.maps.ZoomControlStyle.SMALL,
