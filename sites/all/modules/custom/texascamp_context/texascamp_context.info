@@ -1,0 +1,6 @@
+name = Texascamp Context
+description = Just fix the damn issue.
+core = 7.x
+
+dependencies[] = og
+dependencies[] = og_context

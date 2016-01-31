@@ -1,0 +1,9 @@
+<?php
+
+function texascamp_context_form_session_node_form_alter(&$form, &$form_state) {
+  // Manually set default conference
+  $conference = variable_get('cod_events_default_event', 1);
+  if (empty($form['og_group_ref']['und']['#default_value'])) {
+    $form['og_group_ref']['und']['#default_value'][0] = $conference;
+  }
+}

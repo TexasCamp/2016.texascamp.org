@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Update module weight.
+ */
+function texascamp_context_update_7000() {
+  db_query("UPDATE {system} SET weight = -10 WHERE type = 'module' AND name = 'texascamp_context'");
+}
