@@ -386,7 +386,6 @@ function project_preprocess_block(&$variables) {
       unset($variables['theme_hook_suggestions']);
       $variables['theme_hook_suggestions'][] = 'block__container';
     }
-    dpm($variables);
   }
 }
 
