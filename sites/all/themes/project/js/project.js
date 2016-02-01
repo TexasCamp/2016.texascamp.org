@@ -71,7 +71,7 @@
        * Google Maps
        * =======================================
        */
-       if ( typeof Maplace == 'function' && $( '#gmap' ) ) {
+       if ( typeof Maplace == 'function' && $('#gmap').length > 0 ) {
         console.log("something?");
         new Maplace( gmap_options ).Load();
       };
