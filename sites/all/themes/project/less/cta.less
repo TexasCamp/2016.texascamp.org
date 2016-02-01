@@ -1,0 +1,168 @@
+
+// Remap for now.
+@brand-primary: @brand-color;
+@brand-accent: darken(@brand-color, 10%);
+
+.cta-btn {
+  .button-variant(@white; @brand-primary; @brand-primary);
+  .rounded(3px);
+  border: 0;
+
+  h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+    color: @white;
+    margin-top: 5px;
+    margin-bottom: 3px;
+  }
+  .light & {
+    color: @black;
+    h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+      color: @black;
+    }
+  }
+
+  &.cta-alt {
+    .button-variant(@brand-primary; transparent; @brand-primary);
+  }
+  &.cta-secondary {
+    .button-variant(@white; @brand-secondary; @brand-secondary);
+    &.cta-alt {
+      .button-variant(@brand-secondary; transparent; @brand-secondary);
+    }
+    .light-secondary & {
+      color: @black;
+      h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+        color: @black;
+      }
+    }
+  }
+  &.cta-accent {
+    background-color: @brand-accent;
+    .button-variant(@white; @brand-accent; @brand-accent);
+    &.cta-alt {
+      .button-variant(@brand-accent; transparent; @brand-accent);
+    }
+  }
+}
+
+.cta {
+  .box-sizing();
+  padding: 10px;
+  border: 0;
+  overflow: hidden;
+
+  .cta-title {
+    margin-top: 0;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  .btn-cta {
+    .button-variant(@white, @brand-primary, @brand-primary);
+    padding-top: 4px;
+    padding-bottom: 5px;
+    .rounded(4px);
+    .btn-verb, .btn-icon {
+      color: @white;
+      .light & {
+        color: @black;
+      }
+    }
+    .btn-verb {
+      padding-right: 6px;
+      border-right: 1px solid @white;
+      .light & {
+        border-right-color: @black;
+      }
+    }
+    .btn-icon {
+      padding-left: 3px;
+    }
+    &.btn {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+
+  &.cta-secondary {
+    h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+      color: @brand-secondary
+    }
+    .btn-cta {
+      .button-variant(@white, @brand-secondary, @brand-secondary);
+      .light-secondary & {
+        .button-variant(@black, @brand-secondary, @brand-secondary);
+        .btn-verb, .btn-icon {
+          color: @black;
+        }
+        .btn-verb {
+          border-right-color: @black;
+        }
+      }
+    }
+  }
+
+  &.cta-bg {
+    background-color: @brand-primary;
+    &, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+      color: @white;
+    }
+    .btn-cta {
+      .button-variant(@brand-primary, @white, @white);
+    }
+    .btn-verb, .btn-icon {
+      color: @brand-primary;
+      border-right-color: @brand-primary;
+    }
+    .light & {
+      &, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+        color: @black;
+      }
+      .btn-cta {
+        .button-variant(@brand-primary, @black, @black);
+      }
+    }
+    &.cta-secondary {
+      background-color: @brand-secondary;
+      &, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+        color: @white
+      }
+      .btn-cta {
+        .button-variant(@brand-secondary, @white, @white);
+      }
+      .btn-verb, .btn-icon {
+        color: @brand-secondary;
+        border-right-color: @brand-secondary;
+      }
+      .light-secondary & {
+        &, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+          color: @black;
+        }
+        .btn-verb, .btn-icon {
+          color: @brand-secondary;
+          border-right-color: @brand-secondary;
+        }
+        .btn-cta {
+          .button-variant(@brand-secondary, @black, @black);
+        }
+      }
+    }
+  }
+  &.cta-rectangle {
+    color: @text-color;
+    h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+      color: @brand-primary;
+    }
+    &:hover {
+      &, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+        text-decoration: none;
+      }
+    }
+    &.cta-secondary {
+      h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+        color: @brand-secondary;
+      } 
+    }
+  }
+}

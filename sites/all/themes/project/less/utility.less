@@ -1,0 +1,384 @@
+// Utility classes.
+
+// Borders
+.border-bottom {
+  border-bottom: 1px solid @gray-lighter;
+  &.white {
+    border-bottom-color: white;
+  }
+  &.gray-light {
+    border-bottom-color: @gray-light;
+  }
+}
+.border-top {
+  border-top: 1px solid @gray-lighter;
+  &.white {
+    border-top-color: white;
+  }
+  &.gray-light {
+    border-top-color: @gray-light;
+  }
+}
+.border-left {
+  border-left: 1px solid @gray-lighter;
+  &.white {
+    border-left-color: white;
+  }
+  &.gray-light {
+    border-left-color: @gray-light;
+  }
+}
+.border-right {
+  border-right: 1px solid @gray-lighter;
+  &.white {
+    border-right-color: white;
+  }
+  &.gray-light {
+    border-right-color: @gray-light;
+  }
+}
+.border-allsides {
+  border: 1px solid @gray-light;
+}
+.remove-border {
+  border: 0;
+}
+.remove-border-mobile {
+  @media @mobile {
+    border: 0;
+  }
+}
+
+// Font
+.font-light {
+  font-weight: 300;
+}
+.font-bold {
+  font-weight: 700;
+}
+.font-xxxxl {
+  .font-size(5.0);
+}
+.font-xxxl {
+  .font-size(3.4);
+}
+.font-xxl {
+  .font-size(2.8);
+}
+.font-xl {
+  .font-size(2.2);
+}
+.font-lg {
+  // Based on @font-size-large
+  .font-size(1.8);
+}
+.font-sm {
+  .font-size(1.2);
+}
+.font-xs {
+  // Based on @font-size-small
+  .font-size(1);
+}
+.line-height,
+.line-height-1 {
+  line-height: 1em;
+}
+.line-height-15 {
+  line-height: 1.5em;
+}
+.line-height-2 {
+  line-height: 2em;
+}
+.uppercase {
+  text-transform: uppercase;
+}
+.lowercase {
+  text-transform: lowercase;
+}
+
+// Margin
+.margin-top {
+  margin-top: 20px;
+  &.ten    {margin-top: 10px;}
+  &.thirty {margin-top: 30px;}
+  &.forty  {margin-top: 40px;}
+  &.fifty  {margin-top: 50px;}
+}
+.margin-bottom {
+  margin-bottom: 20px;
+  &.ten    {margin-bottom: 10px;}
+  &.thirty {margin-bottom: 30px;}
+  &.forty  {margin-bottom: 40px;}
+  &.fifty  {margin-bottom: 50px;}
+}
+.margin-right {
+  margin-right: 20px;
+  &.ten    {margin-right: 10px;}
+  &.thirty {margin-right: 30px;}
+  &.forty  {margin-right: 40px;}
+  &.fifty  {margin-right: 50px;}
+}
+.margin-left {
+  margin-left: 20px;
+  &.ten    {margin-left: 10px;}
+  &.thirty {margin-left: 30px;}
+  &.forty  {margin-left: 40px;}
+  &.fifty  {margin-left: 50px;}
+}
+.margin-top-mobile {
+  @media @mobile {
+    margin-top: 20px;
+  }
+}
+.margin-bottom-mobile {
+  @media @mobile {
+    margin-bottom: 20px;
+  }
+}
+.margin-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+.remove-margin {
+  margin: 0;
+}
+.remove-bottom-margin {
+  margin-bottom: 0;
+}
+.remove-top-margin {
+  margin-top: 0;
+}
+
+// Padding
+.padding-top {
+  padding-top: 20px;
+}
+.padding-bottom {
+  padding-bottom: 20px;
+}
+.padding-left {
+  padding-left: 10px;
+}
+.padding-right {
+  padding-right: 10px;
+}
+.padding-all-sides {
+  padding: 20px;
+}
+.remove-padding {
+  padding: 0;
+}
+
+// Padding for columns
+[class*='col-'] {
+  &.no-gutter {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  &.no-gutter-left {
+    padding-left: 0;
+  }
+  &.no-gutter-right {
+    padding-right: 0;
+  }
+  .no-gutter & {
+    &:first-child {
+      padding-left: 0;
+    }
+    &:last-child {
+      padding-right: 0;
+    }
+  }
+  .no-gutter-mobile & {
+    @media @mobile {
+      &:first-child {
+        padding-left: 0;
+      }
+      &:last-child {
+        padding-right: 0;
+      } 
+    }
+  }
+}
+
+// Overflow
+.overflow-auto {
+  overflow: auto;
+}
+.overflow-hidden {
+  overflow: hidden;
+}
+.overflow-visible {
+  overflow: visible;
+}
+
+// Position
+.position-relative {
+  position: relative;
+}
+.position-static {
+  position: static;
+}
+.position-fixed {
+  position: fixed;
+}
+
+// Colors
+.color-primary {
+  color: @brand-primary !important;
+  &.link {
+    &:hover {
+      color: darken(@brand-primary, 10%);
+      text-decoration: none;
+    }
+  }
+}
+.color-secondary {
+  color: @brand-secondary !important;
+  &.link {
+    &:hover {
+      color: darken(@brand-secondary, 10%);
+      text-decoration: none;
+    }
+  }
+}
+.color-accent {
+  color: @brand-accent !important;
+  &.link {
+    &:hover {
+      color: darken(@brand-accent, 10%);
+      text-decoration: none;
+    }
+  }
+}
+.color-white {
+  color: @white;
+}
+.color-black {
+  color: @black;
+}
+
+// Grays
+.color-gray {color: @gray;}
+.color-gray-light {color: @gray-light;}
+.color-gray-lighter {color: @gray-lighter;}
+.color-gray-dark {color: @gray-dark;}
+.color-gray-darker {color: @gray-darker;}
+
+.background-primary {
+  background-color: @brand-primary !important;
+}
+.background-secondary {
+  background-color: @brand-secondary !important;
+}
+.background-accent {
+  background-color: @brand-accent !important;
+}
+.background-light-gray {
+  background-color: @gray-lighter;
+}
+
+// Displays and floats
+.inline-block {
+  display: inline-block;
+}
+.float-left {
+  float: left;
+}
+.float-right {
+  float: right;
+}
+
+// Blocks
+.hide-block {
+  display: none;
+}
+.hide-block-mobile {
+  @media @mobile {
+    display: none;
+  }
+}
+.hide-block-title {
+  .block-title {
+    display: none;
+  }
+}
+.hide-block-title-mobile {
+  @media @mobile {
+    .block-title {
+      display: none;
+    }
+  }
+}
+
+// Links
+.pointer {
+  cursor: pointer;
+}
+
+.table.gray-table {
+  border-collapse: separate;
+  > thead {
+    > tr:first-child {
+      > th {
+        border-bottom: 1px solid @gray-light;
+        border-top: 1px solid @gray-light;
+      }
+    }
+  }
+  > tbody {
+    background-color: @gray-lighter;
+    > tr:first-child td {
+      border-top: 0 none;
+    }
+    > tr > td {
+      border: 1px solid #fff;
+    }
+    > tr > td:first-child {
+      border-left: 0 none;
+    }
+    > tr > td:last-child {
+      border-right: 0 none;
+    }
+  }
+}
+
+// Minimum Heights
+.min-height-100 {
+  min-height: 100px;
+}
+.min-height-150 {
+  min-height: 150px;
+}
+.min-height-200 {
+  min-height: 200px;
+}
+.min-height-250 {
+  min-height: 250px;
+}
+.min-height-300 {
+  min-height: 300px;
+}
+.min-height-350 {
+  min-height: 350px;
+}
+
+// Background percentage color
+@percentage : 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100;
+@length : length(@percentage);
+
+.background-variation(@percentage; @index) when (@index > 0) {
+  .background-variation(@percentage; (@index - 1)); // decrement.
+
+  @percent: extract(@percentage, @index);
+  @base-percentage: (@percent * 1%);
+
+  .bg-primary-@{percent} {
+    background-color: fade(@brand-color, @base-percentage);
+  }
+  .bg-secondary-@{percent} {
+    background-color: fade(@brand-secondary, @base-percentage);
+  }
+}
+
+.background-variation(@percentage; @length);

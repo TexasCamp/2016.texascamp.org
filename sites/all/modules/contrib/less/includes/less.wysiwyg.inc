@@ -29,42 +29,40 @@ function less_wysiwyg_editor_settings_alter(&$settings, $context) {
     // Keep track if comma separated paths, or array of paths.
     $is_array = is_array($stylesheets);
 
-    if ($is_array === FALSE) {
+    // $stylesheets is an array or comma separated list of file paths.
+    $stylesheets = $is_array ? $stylesheets : explode(',', $stylesheets);
 
-      // $stylesheets is a list of comma separated file paths.
-      $stylesheets = explode(',', $stylesheets);
-    }
+    // Create a 'value => value' array to preserve original stylesheet order.
+    $stylesheets = drupal_map_assoc($stylesheets);
+
+    // Do not attempt to process remote or regular CSS files.
+    $local_stylesheets = array_filter(array_map('parse_url', $stylesheets), function ($value) {
+      return empty($value['host']) && preg_match('/.*\.less$/i', $value['path']) == 1;
+    });
 
     // Prepare an array that can be handled by normal LESS module processing.
-    $styles = array(
-      '#items' => array(),
-    );
-    
-    foreach ($stylesheets as $stylesheet) {
-
-      // Might contain ?query portion, separate parts.
-      $parts = drupal_parse_url($stylesheet);
-
-      // Paths are expected to be relative to DRUPAL_ROOT, trim leading '/'.
-      $path = trim($parts['path'], '/');
-
-      $styles['#items'][$path] = array(
-        'data' => $path,
+    $items = array_map(function ($stylesheet) {
+      return array(
+        'data' => trim($stylesheet['path'], '/'),
       );
-    }
+    }, $local_stylesheets);
 
-    $styles = _less_pre_render($styles);
+    $processed_styles = _less_pre_render(array('#items' => $items));
 
-    $processed_stylesheets = array();
+    // Compiled path is in 'data' index of each sheet item.
+    $compiled_sheets = array_map(function ($value) { return $value['data']; }, $processed_styles['#items']);
 
-    foreach ($styles['#items'] as $file) {
-      $processed_stylesheets[] = file_create_url($file['data']);
-    }
+    // WYSIWYGs can't handle Drupal public:// paths, so get an accessible URL.
+    $compiled_sheets = array_map('file_create_url', $compiled_sheets);
+
+    // Replace paths to compiled output paths based on key (path) of original file.
+    $processed_stylesheets = array_replace($stylesheets, $compiled_sheets);
+
+    // Need a integer indexed array so JSON encoding doesn't attempt to make a object.
+    $processed_stylesheets = array_values($processed_stylesheets);
 
     // Recombine file paths into comma separated list.
-    if ($is_array === FALSE) {
-      $processed_stylesheets = implode(',', $processed_stylesheets);
-    }
+    $processed_stylesheets = $is_array ? $processed_stylesheets : implode(',', $processed_stylesheets);
 
     $settings[$editors[$wysiwyg]] = $processed_stylesheets;
   }

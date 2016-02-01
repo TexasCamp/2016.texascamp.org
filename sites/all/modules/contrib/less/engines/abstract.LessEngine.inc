@@ -98,9 +98,4 @@ abstract class LessEngine implements LessEngineInterface {
 
     return $this->dependencies;
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  abstract public function compile();
 }

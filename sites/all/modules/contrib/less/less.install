@@ -9,6 +9,9 @@
  * Implements hook_uninstall().
  */
 function less_uninstall() {
+
+  // Ensure Less module constants are available during uninstall.
+  drupal_load('module', 'less');
   
   variable_del('less_engine');
   

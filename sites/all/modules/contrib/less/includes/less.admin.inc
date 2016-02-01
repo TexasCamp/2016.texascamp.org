@@ -10,6 +10,16 @@
  */
 function less_settings_form($form, &$form_state) {
 
+  if (!function_exists('proc_open')) {
+
+    $message_vars = array(
+      '@proc_open_url' => url('http://php.net/manual/en/function.proc-open.php'),
+      '@disable_functions_url' => url('http://php.net/manual/en/ini.core.php#ini.disable-functions'),
+    );
+
+    drupal_set_message(t('PHP function <a href="@proc_open_url">proc_open()</a> is currently <a href="@disable_functions_url">disabled</a>. You will be unable to less.js or Autoprefixer.', $message_vars), 'warning');
+  }
+
   $form['less_flush'] = array(
     '#type' => 'fieldset',
     '#collapsible' => FALSE,
@@ -66,7 +76,7 @@ function less_settings_form($form, &$form_state) {
     '#type' => 'checkbox',
     '#title' => t('Use @name - <a href="@vendor_url">@vendor_url</a>', array('@name' => $lessautoprefixer_library['name'], '@vendor_url' => $lessautoprefixer_library['vendor url'])),
     '#description' => t('Enable automatic prefixing of vendor CSS extensions.'),
-    '#default_value' => variable_get(LESS_AUTOPREFIXER, FALSE),
+    '#default_value' => variable_get(LESS_AUTOPREFIXER, FALSE) && !empty($lessautoprefixer_library['installed']),
     '#disabled' => empty($lessautoprefixer_library['installed']),
   );
   

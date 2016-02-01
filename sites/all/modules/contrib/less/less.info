@@ -22,9 +22,9 @@ files[] = classes/class.lessautoprefixer.inc
 ; Testing files
 files[] = tests/less.test
 
-; Information added by Drupal.org packaging script on 2015-01-30
-version = "7.x-4.0"
+; Information added by Drupal.org packaging script on 2015-11-12
+version = "7.x-4.0+5-dev"
 core = "7.x"
 project = "less"
-datestamp = "1422653011"
+datestamp = "1447291142"
 

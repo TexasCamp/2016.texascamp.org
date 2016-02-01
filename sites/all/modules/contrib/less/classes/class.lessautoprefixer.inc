@@ -48,14 +48,17 @@ class LessAutoprefixer {
 
     $version = NULL;
 
-    try {
+    if (function_exists('proc_open')) {
 
-      $version_response = self::create(NULL)->proc_open(array('--version'));
+      try {
 
-      $version = preg_replace('/.*?([\d\.]+).*/', '$1', $version_response);
-    }
-    catch (Exception $e) {
+        $version_response = self::create(NULL)->proc_open(array('--version'));
 
+        $version = preg_replace('/.*?([\d\.]+).*/', '$1', $version_response);
+      }
+      catch (Exception $e) {
+
+      }
     }
 
     return $version;

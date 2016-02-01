@@ -15,6 +15,12 @@
     .scaleX(1);
   }
 }
+.rounded(@radius: 10px) {
+  -webkit-border-radius: @radius;
+  -o-border-radius: @radius;
+  -moz-border-radius: @radius;
+  border-radius: @radius;
+}
 
 .btn-primary {
   .button-variant(@black,@brand-color,@brand-color);
@@ -218,6 +224,7 @@
   }
 }
 
+// Footer
 .dark {
   .footer {
     h1, h2, h3, h4, h5, h6 {
@@ -231,7 +238,16 @@
     }
   }
 }
-
+#footer {
+  background-image: url(../images/dallas-skyline.png);
+  background-position: 50% 100%;
+  background-color: transparent;
+  background-size: contain;
+  background-repeat: no-repeat;
+  .footer {
+    background-color: fade(darken(@brand-secondary, 10%), 85%);
+  }
+}
 
 // Luxe
 #luxe-wrap {
@@ -311,3 +327,20 @@ img {
 .img-inline {
   display: inline-block !important;
 }
+
+// Background Patterns
+.bg-dallas {
+  background-image: url(../images/dallas-skyline.png);
+  background-position: 50% 100%;
+  background-color: transparent;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.bg-drupal {
+  background-image: url(../images/drupal8.png);
+  background-position: 100% 100%;
+  background-color: transparent;
+  // background-size: contain;
+  background-repeat: no-repeat;
+}
+
