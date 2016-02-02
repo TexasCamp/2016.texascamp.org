@@ -475,9 +475,7 @@ function project_status_messages($variables) {
         $notify_message .= '  <li>' . $message . "</li>\n";
         if (preg_match('/\b(devel\w+)\b/', $message)) {
           $devel++;
-          dd("preg match passed");
         }
-        dd("preg match DID NOT pass");
       }
 
       $output .= " </ul>\n";
@@ -488,9 +486,7 @@ function project_status_messages($variables) {
       $notify_message .= $messages[0];
       if (preg_match('/\b(devel\w+)\b/', $messages[0])) {
         $devel++;
-        dd("preg match passed");
       }
-      dd("preg match DID NOT pass");
     }
 
     $output .= "</div>\n";
