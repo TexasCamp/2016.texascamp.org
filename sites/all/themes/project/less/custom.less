@@ -166,40 +166,40 @@
 }
 
 .user-profile {
-  &.view-mode-full {
+  &.view-mode-full, &.view-mode-individual_sponsor  {
     .group-header {
       background-color: @brand-color;
       color: @black;
       text-align: center;
       padding-top: 2em;
-      .field-name-ds-user-picture {
-        img {
-          .img-thumbnail();
-          .img-circle();
+    }
+    .field-name-ds-user-picture {
+      img {
+        .img-thumbnail();
+        .img-circle();
+        .transition(all 0.3s);
+        max-width: 200px;
+        &:hover {
           .transition(all 0.3s);
-          max-width: 200px;
-          &:hover {
-            .transition(all 0.3s);
-            box-shadow: 0 0 0 15px fade(@gray-dark, 95%);
-          }
+          box-shadow: 0 0 0 15px fade(@gray-dark, 95%);
         }
       }
-      .field-name-realname {
-        .h1();
-        font-weight: 600;
-      }
-      .field-name-field-profile-job-title {
-        .h4();
-        font-style: italic;
-        font-weight: 600;
-        margin-bottom: 0;
-      }
-      .field-name-field-profile-org {
-        .h4();
-        .font-size(1.6);
-        font-weight: 600;
-        margin-top: 5px;
-      }
+    }
+    .field-name-realname {
+      .h1();
+      font-weight: 600;
+    }
+    .field-name-field-profile-job-title {
+      .h4();
+      font-style: italic;
+      font-weight: 600;
+      margin-bottom: 0;
+    }
+    .field-name-field-profile-org {
+      .h4();
+      .font-size(1.6);
+      font-weight: 600;
+      margin-top: 5px;
     }
     .group-social-wrapper {
       background-color: darken(@brand-color, 10%);
@@ -225,11 +225,11 @@
       padding-top: 1em;
       border-top: 2px solid @gray-light;
       width: 100%;
-      .field-name-field-profile-bio {
-        width: 50%;
-        margin-left: auto;
-        margin-right: auto;
-      }
+    }
+    .field-name-field-profile-bio {
+      width: 50%;
+      margin-left: auto;
+      margin-right: auto;
     }
   }
 }
