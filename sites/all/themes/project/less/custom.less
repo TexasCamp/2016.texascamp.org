@@ -101,6 +101,26 @@
   }
 }
 
+// General content updates
+.page-wrapper {
+  .top-bar, .main-container {
+    a {
+      color: @brand-secondary;
+      &:hover, &:focus, &:active {
+        color: darken(@brand-secondary, 10%);
+      }
+      &.btn-default {
+        &, &:hover, &:active, &:focus {
+          color: @black;
+        }
+        &:hover {
+          background-color: darken(@brand-color, 10%);
+        }
+      }
+    }
+  }
+}
+
 // Secondary Menu styling
 .secondary {
   &.navbar-nav > li > a {
