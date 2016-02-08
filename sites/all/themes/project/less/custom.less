@@ -109,15 +109,18 @@
       &:hover, &:focus, &:active {
         color: darken(@brand-secondary, 10%);
       }
-      &.btn-default {
+      &.btn {
         &, &:hover, &:active, &:focus {
           color: @black;
         }
-        &:hover {
-          background-color: darken(@brand-color, 10%);
-        }
       }
     }
+  }
+}
+
+.btn-default {
+  &:hover {
+    background-color: darken(@brand-color, 10%);
   }
 }
 
