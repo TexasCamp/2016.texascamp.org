@@ -909,7 +909,7 @@ $('.banner.dark-bg .slider-banner-container .slider-banner-boxedwidth-stopped', 
       //-----------------------------------------------
       if ($("[data-animation-effect]").length > 0) {
         $("[data-animation-effect]").each(function() {
-          if (Modernizr.csstransitions) {
+          if (Modernizr.csstransitions && $.fn.waypoint) {
             var waypoints = $(this).waypoint(function(direction) {
               var appearDelay = $(this.element).attr("data-effect-delay"),
               animatedObject = $(this.element);
