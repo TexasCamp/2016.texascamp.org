@@ -104,21 +104,19 @@
 // General content updates
 .page-wrapper {
   .top-bar, .main-container {
-    a {
+    a:not(.btn) {
       color: @brand-secondary;
       &:hover, &:focus, &:active {
         color: darken(@brand-secondary, 10%);
-      }
-      &.btn {
-        &, &:hover, &:active, &:focus {
-          color: @black;
-        }
       }
     }
   }
 }
 
 .btn-default {
+  &, &:hover, &:active, &:focus {
+    color: @black;
+  }
   &:hover {
     background-color: darken(@brand-color, 10%);
   }
