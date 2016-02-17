@@ -39,42 +39,6 @@
           className: "vide-background-home"
         });
       }
-
-      var gmap_options = {
-        generate_controls : false,
-        locations : [{
-          lat : 32.963261,
-          lon : -96.828881,
-          animation : google.maps.Animation.DROP,
-          html : "Addison Conference Center",
-          icon : "/sites/default/files/dallasdrupal-yellow-logo-retina-small_0.png",
-          clickable : true,
-        }],
-        map_options : {
-          scrollwheel : false,
-          mapTypeControl : false,
-          streetViewControl : false,
-          zoomControlOptions : {
-            style : google.maps.ZoomControlStyle.SMALL,
-          },
-          zoom : 14,
-                set_center : [ 32.963288, -96.804418 ], // adjust the "lon" attribute of your first location
-              },
-              styles : {
-                // source: https://snazzymaps.com/style/53/flat-map
-                'custom' : [{"featureType":"all","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"all","stylers":[{"visibility":"on"},{"color":"#f3f4f4"}]},{"featureType":"landscape.man_made","elementType":"geometry","stylers":[{"weight":0.9},{"visibility":"off"}]},{"featureType":"poi.park","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#83cead"}]},{"featureType":"road","elementType":"all","stylers":[{"visibility":"on"},{"color":"#ffffff"}]},{"featureType":"road","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"on"},{"color":"#fee379"}]},{"featureType":"road.arterial","elementType":"all","stylers":[{"visibility":"on"},{"color":"#fee379"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"on"},{"color":"#7fc8ed"}]}],
-              },
-            };
-
-      /**
-       * =======================================
-       * Google Maps
-       * =======================================
-       */
-       if ( typeof Maplace == 'function' && $('#gmap').length > 0 ) {
-        new Maplace( gmap_options ).Load();
-      };
-
     }
   };
 
