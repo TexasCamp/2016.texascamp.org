@@ -283,6 +283,16 @@ function project_preprocess_html(&$vars) {
   if (theme_get_setting('navbar_transparent')) {
     $vars['classes_array'][] = 'transparent-header';
   }
+  // Disable caret.
+  switch (theme_get_setting('caret')) {
+    case 'project':
+      $vars['classes_array'][] = 'caret-project';
+      break;
+    
+    default:
+      $vars['classes_array'][] = 'caret-default';
+      break;
+  }
 
 }
 

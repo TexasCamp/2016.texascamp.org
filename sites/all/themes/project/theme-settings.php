@@ -89,6 +89,17 @@ function project_form_system_theme_settings_alter(&$form, &$form_state) {
     '#description' => t('Use colors defined to skin the theme.'),
   );
 
+  $form['project_config']['column_right']['caret'] = array(
+    '#type' => 'select',
+    '#title' => t('Switch Caret'),
+    '#default_value' => theme_get_setting('caret'),
+    '#description' => t('Choose which caret to display .'),
+    '#options' => array(
+      'default' => t('Default'),
+      'project' => t('Project'),
+    ),
+  );
+
   $form['project_config']['column_right']['project_block_striping'] = array(
     '#type' => 'select',
     '#title' => t('Block Striping'),

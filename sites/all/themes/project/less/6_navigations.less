@@ -234,7 +234,7 @@ header .dropdown-menu > li.active > a i.fa-circle-o:before {
 
 /* Arrow for parent menu item 
 ------------------------------ */
-.dropdown>a:before {
+.dropdown > a:before {
 	font-family: 'FontAwesome';
 	content: "\f107";
 	position: absolute;
@@ -244,9 +244,9 @@ header .dropdown-menu > li.active > a i.fa-circle-o:before {
 	line-height: 1;
 	color: #d1d1d1;
 	.font-size(1.4);
-}
-.header.centered .dropdown>a:before {
-	top: 18px;
+	.header.centered & {
+		top: 18px;
+	}
 }
 .header:not(.dark) .active.dropdown>a:before,
 .header:not(.dark).centered .active.dropdown>a:before {
@@ -883,4 +883,10 @@ header.full-width .animated.main-navigation .dropdown-menu .open .dropdown-menu.
 }
 #offcanvas .dropdown .dropdown>a:before {
 	content: "\f107";
+}
+
+// Custom Caret
+.caret-project .dropdown .caret,
+.caret-default .dropdown > a:before {
+	display: none;
 }
