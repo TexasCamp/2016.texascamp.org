@@ -614,7 +614,7 @@ if (isset($_ENV['PANTHEON_ENVIRONMENT'])) {
   }
 
   # This global variable determines the base for all URLs in Drupal.
-  $base_url = 'https://'. $domain;
+  $base_url = 'http://'. $domain;
 }
 
 # CloudFlare specific setting
