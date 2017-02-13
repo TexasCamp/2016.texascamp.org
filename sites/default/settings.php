@@ -604,7 +604,7 @@ if (isset($_ENV['PANTHEON_ENVIRONMENT'])) {
     $domain = 'staging.texascamp.org';
   }
   if ($_ENV['PANTHEON_ENVIRONMENT'] === 'live') {
-    $domain = 'www.texascamp.org';
+    $domain = '2016.texascamp.org';
   }
   else {
     # Fallback value for multidev or other environments.
