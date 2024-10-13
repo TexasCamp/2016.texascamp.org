@@ -1,0 +1,362 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+<!--[if IE 9]> <html lang="en" dir="ltr" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en" dir="ltr">
+<!--
+_______                          __________      _____                           _____             
+__  __ \___________________      ___  ____/________  /______________________________(_)___________ 
+_  / / /__  __ \  _ \_  __ \     __  __/  __  __ \  __/  _ \_  ___/__  __ \_  ___/_  /__  ___/  _ \
+/ /_/ /__  /_/ /  __/  / / /     _  /___  _  / / / /_ /  __/  /   __  /_/ /  /   _  / _(__  )/  __/
+\____/ _  .___/\___//_/ /_/      /_____/  /_/ /_/\__/ \___//_/    _  .___//_/    /_/  /____/ \___/ 
+       /_/                                                        /_/                              
+
+Open Enterprise CMS brought to you by Levelten Interactive.
+http://getcm2.com
+
+-->
+<head profile="http://www.w3.org/1999/xhtml/vocab">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" href="../sites/default/files/texascamp-96x96.png" type="image/png" />
+<link rel="shortlink" href="../node/29.html" />
+<link rel="canonical" href="datalayer-what-it-and-why-you-need-it.html" />
+<meta name="Generator" content="Drupal 7 (http://drupal.org)" />
+  <title>Datalayer: What it is, and why you need it | Texascamp 2016</title>
+  <link type="text/css" rel="stylesheet" href="../sites/default/files/css/css_lQaZfjVpwP_oGNqdtWCSpJT1EMqXdMiU84ekLLxQnc4.css" media="all" />
+<link type="text/css" rel="stylesheet" href="../sites/default/files/css/css_sm09NZtk-mDNV2pbBYGfdJmpJYMZoXiJU7QSm3iSDFg.css" media="all" />
+<link type="text/css" rel="stylesheet" href="../sites/default/files/css/css_KuQe_P-MIOcriAAgOx8DraMpTxNTOan4HV-QhJARSzA.css" media="all" />
+<link type="text/css" rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" media="all" />
+<link type="text/css" rel="stylesheet" href="../sites/default/files/css/css_FgAIEoj71-SquuY2rzcMDI463VtvQqFP239-f88EYX0.css" media="all" />
+<link type="text/css" rel="stylesheet" href="../sites/default/files/css/css_Oo2--P54rFed1U1mXKyVIXNNUBOJi8oW_OVGJh1Dq2Y.css" media="all" />
+
+<!--[if lte IE 8]>
+<link type="text/css" rel="stylesheet" href="/sites/all/themes/project/lte-ie-8.css" media="all" />
+<![endif]-->
+  <!-- HTML5 element support for IE6-8 -->
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <script src="../profiles/cod/modules/contrib/jquery_update/replace/jquery/1.9/jquery.min.js%3Fv=1.9.1"></script>
+<script src="../misc/jquery.once.js%3Fv=1.2"></script>
+<script src="../misc/drupal.js"></script>
+<script src="../sites/all/modules/contrib/equalheights/jquery.equalheights.js%3Fv=1.0"></script>
+<script src="../sites/all/modules/contrib/equalheights/equalheights.js"></script>
+<script src="../sites/all/libraries/imagesloaded/jquery.imagesloaded.min.js"></script>
+<script src="../sites/all/libraries/stellarjs/jquery.stellar.min.js"></script>
+<script src="../profiles/cod/modules/contrib/field_group/field_group.js"></script>
+<script src="../sites/all/themes/project/plugins/morphext/morphext.min.js"></script>
+<script src="../sites/all/themes/project/plugins/maplace/maplace.min.js"></script>
+<script src="https://maps.google.com/maps/api/js?sensor=false&amp;libraries=geometry&amp;v=3.22&amp;key=AIzaSyDJM14rrxlXKMsFsvp6fP9fnA0k38cvYKg"></script>
+<script src="../sites/all/themes/project/plugins/vide/jquery.vide.min.js"></script>
+<script src="../sites/all/themes/project/bootstrap/js/affix.js"></script>
+<script src="../sites/all/themes/project/bootstrap/js/alert.js"></script>
+<script src="../sites/all/themes/project/bootstrap/js/button.js"></script>
+<script src="../sites/all/themes/project/bootstrap/js/carousel.js"></script>
+<script src="../sites/all/themes/project/bootstrap/js/collapse.js"></script>
+<script src="../sites/all/themes/project/bootstrap/js/dropdown.js"></script>
+<script src="../sites/all/themes/project/bootstrap/js/modal.js"></script>
+<script src="../sites/all/themes/project/bootstrap/js/tooltip.js"></script>
+<script src="../sites/all/themes/project/bootstrap/js/popover.js"></script>
+<script src="../sites/all/themes/project/bootstrap/js/scrollspy.js"></script>
+<script src="../sites/all/themes/project/bootstrap/js/tab.js"></script>
+<script src="../sites/all/themes/project/bootstrap/js/transition.js"></script>
+<script src="../sites/all/themes/project/bootstrap/dist/js/bootstrap.js"></script>
+<script src="../sites/all/themes/project/js/modernizr.js"></script>
+<script src="../sites/all/themes/project/js/project.js"></script>
+<script>jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"","ajaxPageState":{"theme":"project","theme_token":"6IRnxMhugumNH6Kjn3punCXFT7Xf6fXaGry5G15cx9k","js":{"sites\/all\/modules\/contrib\/stellarjs\/js\/drupal.stellar.js":1,"sites\/all\/themes\/bootstrap\/js\/bootstrap.js":1,"0":1,"profiles\/cod\/modules\/contrib\/jquery_update\/replace\/jquery\/1.9\/jquery.min.js":1,"misc\/jquery.once.js":1,"misc\/drupal.js":1,"sites\/all\/modules\/contrib\/equalheights\/jquery.equalheights.js":1,"sites\/all\/modules\/contrib\/equalheights\/equalheights.js":1,"sites\/all\/libraries\/imagesloaded\/jquery.imagesloaded.min.js":1,"sites\/all\/libraries\/stellarjs\/jquery.stellar.min.js":1,"profiles\/cod\/modules\/contrib\/field_group\/field_group.js":1,"sites\/all\/themes\/project\/plugins\/morphext\/morphext.min.js":1,"sites\/all\/themes\/project\/plugins\/maplace\/maplace.min.js":1,"https:\/\/maps.google.com\/maps\/api\/js?sensor=false\u0026libraries=geometry\u0026v=3.22\u0026key=AIzaSyDJM14rrxlXKMsFsvp6fP9fnA0k38cvYKg":1,"sites\/all\/themes\/project\/plugins\/vide\/jquery.vide.min.js":1,"sites\/all\/themes\/project\/bootstrap\/js\/affix.js":1,"sites\/all\/themes\/project\/bootstrap\/js\/alert.js":1,"sites\/all\/themes\/project\/bootstrap\/js\/button.js":1,"sites\/all\/themes\/project\/bootstrap\/js\/carousel.js":1,"sites\/all\/themes\/project\/bootstrap\/js\/collapse.js":1,"sites\/all\/themes\/project\/bootstrap\/js\/dropdown.js":1,"sites\/all\/themes\/project\/bootstrap\/js\/modal.js":1,"sites\/all\/themes\/project\/bootstrap\/js\/tooltip.js":1,"sites\/all\/themes\/project\/bootstrap\/js\/popover.js":1,"sites\/all\/themes\/project\/bootstrap\/js\/scrollspy.js":1,"sites\/all\/themes\/project\/bootstrap\/js\/tab.js":1,"sites\/all\/themes\/project\/bootstrap\/js\/transition.js":1,"sites\/all\/themes\/project\/bootstrap\/dist\/js\/bootstrap.js":1,"sites\/all\/themes\/project\/js\/modernizr.js":1,"sites\/all\/themes\/project\/js\/project.js":1},"css":{"modules\/system\/system.base.css":1,"profiles\/cod\/modules\/contrib\/date\/date_api\/date.css":1,"profiles\/cod\/modules\/contrib\/date\/date_popup\/themes\/datepicker.1.7.css":1,"modules\/field\/theme\/field.css":1,"sites\/all\/modules\/contrib\/luxe\/css\/luxe.css":1,"modules\/node\/node.css":1,"profiles\/cod\/modules\/contrib\/views\/css\/views.css":1,"profiles\/cod\/modules\/contrib\/ckeditor\/css\/ckeditor.css":1,"profiles\/cod\/modules\/contrib\/ctools\/css\/ctools.css":1,"profiles\/cod\/modules\/contrib\/panels\/css\/panels.css":1,"profiles\/cod\/modules\/contrib\/field_group\/field_group.css":1,"sites\/all\/modules\/contrib\/ds\/layouts\/ds_2col_stacked\/ds_2col_stacked.css":1,"\/\/maxcdn.bootstrapcdn.com\/font-awesome\/4.2.0\/css\/font-awesome.min.css":1,"https:\/\/cdnjs.cloudflare.com\/ajax\/libs\/animate.css\/3.4.0\/animate.min.css":1,"sites\/all\/themes\/project\/plugins\/morphext\/morphext.css":1,"sites\/all\/themes\/project\/plugins\/hover\/hover-min.css":1,"sites\/all\/themes\/project\/less\/project.less":1,"sites\/all\/themes\/project\/lte-ie-8.css":1}},"equalHeightsModule":{"classes":[{"selector":".page-node-10 .feature-box","mediaquery":"","minheight":"","maxheight":"","overflow":"hidden"}],"imagesloaded_ie8":0},"stellarjs":{"disable_on_mobile":0,"mobile_screen_width":768},"field_group":{"html-element":"full","div":"full"},"ogContext":{"groupType":"node","gid":"1"},"bootstrap":{"anchorsFix":"0","anchorsSmoothScrolling":"0","formHasError":1,"popoverEnabled":1,"popoverOptions":{"animation":1,"html":0,"placement":"right","selector":"","trigger":"click","triggerAutoclose":1,"title":"","content":"","delay":0,"container":"body"},"tooltipEnabled":1,"tooltipOptions":{"animation":1,"html":0,"placement":"auto left","selector":"","trigger":"hover focus","delay":0,"container":"body"}}});</script>
+</head>
+<body class="html not-front not-logged-in no-sidebars page-node page-node- page-node-29 node-type-session og-context og-context-node og-context-node-1 navbar-is-static-top caret-default" >
+  <div id="skip-link">
+    <a href="datalayer-what-it-and-why-you-need-it.html#main-content" class="element-invisible element-focusable">Skip to main content</a>
+  </div>
+    
+<div class="page-wrapper">
+
+  <div class="header-container">
+    <!-- Header Top -->
+			<div  class="header-top dark">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="header-top-first clearfix">
+							  <div class="region region-header-top">
+    <section id="block-block-3" class="block block-block col-md-6 pull-left clearfix">
+
+      
+  <ul class="menu nav navbar-nav">
+    <li class="first leaf">
+      <span class="conference-title">Texascamp</span>
+    </li>
+    <li class="last leaf">
+      <span class="conference-date">April 1-2, 2016</span>
+    </li>
+</ul>
+</section>
+  </div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	<!-- Header -->
+<header  class="header fixed clearfix" >
+  <div class="container">
+    <div class="row">
+
+        <div class="col-md-1">
+          <!-- header-left start -->
+          <div class="header-left clearfix">
+            <!-- logo -->
+                          <div id="logo" class="logo">
+                <a href="../index.html" title="Home">
+                  <img class="img-responsive" src="../sites/default/files/dallasdrupal-yellow-logo-retina-small.png" alt="Home" />
+                </a>
+              </div>
+                        <!-- name-and-slogan -->
+                                  </div> <!-- header-left start -->
+        </div>
+
+        <div class="col-md-11">
+          <!-- header-right start -->
+          <div class="header-right clearfix">
+            <!-- main-navigation start -->
+            <div  class="main-navigation onclick animated">
+              <nav class="navbar navbar-default" role="navigation">
+                <div class="container-fluid">
+                  <!-- Toggle get grouped for better mobile display -->
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                  </div>
+                  <!-- Collect the nav links, forms, and other content for toggling -->
+                  <div class="collapse navbar-collapse" id="navbar-collapse-1">
+                                          <ul class="menu nav navbar-nav"><li class="first expanded dropdown"><a href="../node/41.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Sponsors <span class="caret"></span></a><ul class="dropdown-menu"><li class="first leaf"><a href="../node/41.html">Overview</a></li>
+<li class="leaf"><a href="../individual-sponsors.html">Individual Sponsors</a></li>
+<li class="last leaf"><a href="../organizational-sponsors.html">Organizational Sponsors</a></li>
+</ul></li>
+<li class="leaf"><a href="../travel.html">Travel</a></li>
+<li class="leaf"><a href="../register.html">Register</a></li>
+<li class="leaf"><a href="../about.html">About</a></li>
+<li class="leaf"><a href="../schedule.html">Schedule</a></li>
+<li class="last leaf"><a href="../sessions.html">Sessions</a></li>
+</ul>                                        <!-- header buttons -->
+                    <div class="header-dropdown-buttons hidden-xs">
+                                          </div> <!-- header buttons end-->
+                  </div> <!-- end-navbar -->
+                </div>
+              </nav>
+            </div>
+          </div>
+        </div>
+    </div> <!-- /.row -->
+  </div> <!-- /.container -->
+</header>
+  </div>
+
+  <!-- breadcrumbs -->
+  
+  <!-- content-top -->
+  <!-- Content Top -->
+
+  <!-- top-bar -->
+  
+  <!-- main-content -->
+  <section class="main-container">
+	
+		
+	<!-- Main end -->
+			<div class="container">
+		<div class="row">
+			
+		<div class="main col-md-12" >
+			<!-- Title -->
+			<div class="page-title-wrapper">
+										<h1 class="page-title">Datalayer: What it is, and why you need it</h1>
+									<div class="separator-2"></div>
+		</div>
+				<a id="main-content"></a>
+			
+			  <div class="region region-content">
+    <section id="block-system-main" class="block block-system clearfix">
+
+      
+  
+
+<div  class="node node-session view-mode-full">
+    <div class="row">
+    <div class="col-sm-9 ">
+      <div class="field field-name-body field-type-text-with-summary field-label-hidden"><div class="field-items"><div class="field-item even"><p>Google Tag Manager (GTM) and Google Analytics (GA) are among the most popular (and inexpensive) tag manager and analytics platforms, but integrating them in a clean and clear way can be tricky. With the <em>datalayer </em>Drupal module we will explore out-of-the-box datalayer handling in Drupal for super-tight GTM/GA integrations that require less code and offer more flexibility for your data needs.</p>
+
+<p>Note: the <em>datalayer</em> module only supports Drupal 7 but the topics and implementation example will work on any site following the datalayer guidelines.</p>
+
+<p>Link to presentation: https://docs.google.com/presentation/d/16PW7M0W-bqbgWvDeNIfem-On5txfsKsTuITsU_76sgo/edit?usp=sharing</p></div></div></div>    </div>
+    <div class="col-sm-3 ">
+      <ul class="group-session-info field-group-html-element list-group"><h3><span>Session Info</span></h3><li class="list-group-item"><div class="label-inline" >Experience level:&nbsp;</div><strong>Beginner</strong></li><li class="list-group-item"><div class="label-above" >Slides:&nbsp;</div><span class="file"><img class="file-icon" alt="PDF icon" title="application/pdf" src="../modules/file/icons/application-pdf.png" /> <a href="../sites/default/files/slides/dataLayer.pdf" type="application/pdf; length=37122">dataLayer.pdf</a></span></li></ul><div class="field field-name-field-speakers"><div  class="ds-2col-stacked user-profile view-mode-full clearfix">
+
+  
+  <div class="group-header">
+    <div class="field field-name-ds-user-picture"><a href="../users/david-porter.html"><img class="img-responsive" src="../sites/default/files/druplicon-square-texas.jpg" alt="David Porter&#039;s picture" title="David Porter&#039;s picture" /></a></div><div class="field field-name-realname">David Porter</div><div class="field field-name-field-profile-job-title">Software Developer</div><div class="field field-name-field-profile-org">Rackspace</div><div class="group-social-wrapper field-group-div"><ul class="group-social-media field-group-div nav nav-pills"><li><a href="https://twitter.com/bighappyface" title="Twitter"><i class="fa fa-twitter"></i></a></li>
+<li><a href="https://www.drupal.org/u/bighappyface" title="Drupal"><i class="fa fa-drupal"></i></a></li>
+</ul></div>  </div>
+
+  <div class="group-left">
+      </div>
+
+  <div class="group-right">
+      </div>
+
+  <div class="group-footer">
+      </div>
+
+</div>
+
+</div>    </div>
+  </div>
+</div>
+
+
+<!-- Needed to activate display suite support on forms -->
+
+</section>
+  </div>
+		</div>
+		<!-- Main end -->
+
+					<!-- sidebar-first -->
+			<!-- sidebar-second -->
+		
+	</div>
+	</div></section>
+  <!-- content-bottom -->
+  <!-- Content Bottom -->
+	<div class="content-bottom">
+		  <div class="region region-content-bottom">
+    <section id="block-views-cod-sponsors-block-1" class="block block-views container margin-bottom margin-top clearfix">
+
+      
+  <div class="view view-cod-sponsors view-id-cod_sponsors view-display-id-block_1 view-dom-id-3b4a0d0c0c3bd05d47f5a9125a82584b">
+        
+  
+  
+      <div class="view-content">
+        <h3>Platinum</h3>
+  <div class="views-row views-row-1 views-row-odd views-row-first">
+      
+  <div class="views-field views-field-field-sponsor-logo">        <div class="field-content"><a href="https://pantheon.io/"><img class="img-responsive" src="../sites/default/files/styles/cod_sponsors/public/Pantheon-Fist-Banner.png%3Fitok=psQDDQVf" width="220" height="80" alt="" /></a></div>  </div>  </div>
+  <div class="views-row views-row-2 views-row-even views-row-last">
+      
+  <div class="views-field views-field-field-sponsor-logo">        <div class="field-content"><a href="http://www.getlevelten.com"><img class="img-responsive" src="../sites/default/files/styles/cod_sponsors/public/logo.png%3Fitok=TQLwmc-N" width="220" height="66" alt="" /></a></div>  </div>  </div>
+  <h3>Gold</h3>
+  <div class="views-row views-row-1 views-row-odd views-row-first views-row-last">
+      
+  <div class="views-field views-field-field-sponsor-logo">        <div class="field-content"><a href="http://www.skvare.com"><img class="img-responsive" src="../sites/default/files/styles/cod_sponsors/public/skvare.png%3Fitok=5bfSsbSd" width="220" height="65" alt="" /></a></div>  </div>  </div>
+  <h3>Saturday Night Party</h3>
+  <div class="views-row views-row-1 views-row-odd views-row-first views-row-last">
+      
+  <div class="views-field views-field-field-sponsor-logo">        <div class="field-content"><a href="http://www.amazeelabs.com"><img class="img-responsive" src="../sites/default/files/styles/cod_sponsors/public/Amazee&#32;Labs_0.png%3Fitok=MkWLkapg" width="220" height="117" alt="" /></a></div>  </div>  </div>
+  <h3>Community</h3>
+  <div class="views-row views-row-1 views-row-odd views-row-first">
+      
+  <div class="views-field views-field-field-sponsor-logo">        <div class="field-content"><img class="img-responsive" src="../sites/default/files/styles/cod_sponsors/public/logo-fw_0.png%3Fitok=YoW5ioJZ" width="220" height="220" alt="" /></div>  </div>  </div>
+  <div class="views-row views-row-2 views-row-even">
+      
+  <div class="views-field views-field-field-sponsor-logo">        <div class="field-content"><a href="https://drupalwatchdog.com/"><img class="img-responsive" src="../sites/default/files/styles/cod_sponsors/public/drupalwatchdog.png%3Fitok=odbbw6OY" width="220" height="75" alt="" /></a></div>  </div>  </div>
+  <div class="views-row views-row-3 views-row-odd views-row-last">
+      
+  <div class="views-field views-field-field-sponsor-logo">        <div class="field-content"><img class="img-responsive" src="../sites/default/files/styles/cod_sponsors/public/acquia-logo.png%3Fitok=hiig6q1H" width="220" height="53" alt="" /></div>  </div>  </div>
+    </div>
+  
+  
+  
+  
+  
+  
+</div>
+</section>
+  </div>
+	</div>
+
+  <!-- footer -->
+  <!-- footer -->
+<footer id="footer"  class="clearfix dark">
+      <div class="footer">
+      <div class="container">
+        <div class="footer-inner">
+          <div class="row">
+              <div class="region region-footer">
+    <div class="block-row-wrapper row1">
+  <section id="block-menu-menu-footer-menu" class="block block-menu col-md-3 clearfix">
+
+        <h2 class="block-title">Site Map</h2>
+    
+  <ul class="menu nav"><li class="first leaf"><a href="../about.html">About TexasCamp</a></li>
+<li class="leaf"><a href="../code-conduct.html">Code of Conduct</a></li>
+<li class="leaf"><a href="../faq.html">FAQ</a></li>
+<li class="leaf"><a href="../after-party.html">After Party</a></li>
+<li class="leaf"><a href="../travel.html">Travel</a></li>
+<li class="last leaf"><a href="../speaker-info.html">Speaker Info</a></li>
+</ul>
+</section>
+</div>
+  </div>
+          </div>
+        </div>
+      </div>
+    </div>
+        <div class="subfooter">
+      <div class="container">
+        <div class="subfooter-inner">
+          <div class="row">
+              <div class="region region-footer-bottom">
+    <section id="block-block-2" class="block block-block clearfix">
+
+      
+  <div class="col-md-6">Website Management Platform Powered by <a href="https://pantheon.io" title="Pantheon">Pantheon</a></div>
+
+<div class="col-md-6 text-right">Powered by <a href="https://drupal.org" title="Drupal">Drupal</a></div>
+
+</section>
+  </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer></div>  <script src="../sites/all/modules/contrib/stellarjs/js/drupal.stellar.js"></script>
+<script src="../sites/all/themes/bootstrap/js/bootstrap.js"></script>
+<script>var gmap_options = {
+  generate_controls : false,
+  locations : [{
+    lat : 32.783057,
+    lon : -96.797514,
+    animation : google.maps.Animation.DROP,
+    html : "Dallas Fort Work",
+    icon : "/sites/default/files/dallasdrupal-yellow-logo-retina-small_0.png",
+    clickable : true,
+  }],
+  map_options : {
+    scrollwheel : false,
+    mapTypeControl : false,
+    streetViewControl : false,
+    zoomControlOptions : {
+      style : google.maps.ZoomControlStyle.SMALL,
+    },
+    zoom : 14,
+    set_center : [ 32.785062, -96.773889 ],
+  },
+  styles : {
+    // source: https://snazzymaps.com/style/53/flat-map
+    'custom' : [{"featureType":"all","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"all","stylers":[{"visibility":"on"},{"color":"#f3f4f4"}]},{"featureType":"landscape.man_made","elementType":"geometry","stylers":[{"weight":0.9},{"visibility":"off"}]},{"featureType":"poi.park","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#83cead"}]},{"featureType":"road","elementType":"all","stylers":[{"visibility":"on"},{"color":"#ffffff"}]},{"featureType":"road","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"on"},{"color":"#fee379"}]},{"featureType":"road.arterial","elementType":"all","stylers":[{"visibility":"on"},{"color":"#fee379"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"on"},{"color":"#7fc8ed"}]}],
+  },
+};
+
+if ( typeof Maplace == 'function' && jQuery('#gmap').length > 0 ) {
+  new Maplace( gmap_options ).Load();
+};
+</script>
+</body>
+</html>
